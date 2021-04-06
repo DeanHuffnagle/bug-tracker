@@ -2,18 +2,23 @@ import {
 	Entity,
 	Column,
 	PrimaryGeneratedColumn,
-	PrimaryColumn,
 	CreateDateColumn,
 	UpdateDateColumn,
+	ManyToOne,
 } from 'typeorm';
+import { Ticket } from './Ticket';
+import { User } from './User';
 
 @Entity()
 export class Comment {
-	@PrimaryColumn()
-	userId!: number;
+	@PrimaryGeneratedColumn()
+	id: number;
 
-	@PrimaryColumn()
-	ticketId!: number;
+	@ManyToOne(() => User, (user) => user.id)
+	user: User;
+
+	@ManyToOne(() => Ticket, (ticket) => ticket.id)
+	ticket: Ticket;
 
 	@Column()
 	commentText!: string;
