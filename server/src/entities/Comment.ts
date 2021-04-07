@@ -1,3 +1,4 @@
+import { Field, ObjectType } from 'type-graphql';
 import {
 	Entity,
 	Column,
@@ -9,23 +10,38 @@ import {
 import { Ticket } from './Ticket';
 import { User } from './User';
 
+@ObjectType()
 @Entity()
 export class Comment {
+	//================================================================================
+	//Columns
+	//================================================================================
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => User, (user) => user.id)
-	user: User;
-
-	@ManyToOne(() => Ticket, (ticket) => ticket.id)
-	ticket: Ticket;
-
+	@Field()
 	@Column()
 	commentText!: string;
 
+	@Field()
 	@CreateDateColumn()
 	createdAt: Date;
 
+	@Field()
 	@UpdateDateColumn()
 	updatedAt: Date;
+
+	//================================================================================
+	//Relationships
+	//================================================================================
+
+	//// comments to user relationship ////
+	@Field()
+	@ManyToOne(() => User, (user) => user.comments)
+	user: User;
+
+	//// comments to ticket relationship ////
+	@Field()
+	@ManyToOne(() => Ticket, (ticket) => ticket.comments)
+	ticket: Ticket;
 }
