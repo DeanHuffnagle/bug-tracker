@@ -57,12 +57,12 @@ export class Ticket {
 	developer: User;
 
 	//// Tickets to project relationship ////
-	@Field()
+	@Field(() => Number)
 	@ManyToOne(() => Project, (project) => project.tickets)
 	project: Project;
 
 	//// Ticket to comments relationship ////
-	@Field()
+	@Field(() => Number)
 	@OneToMany(() => Comment, (comment) => comment.ticket)
 	comments: Comment[];
 }

@@ -45,22 +45,22 @@ export class Project {
 	//================================================================================
 
 	//// Project to project manager relationship ////
-	@Field()
+	@Field(() => Number)
 	@ManyToOne(() => User, (user) => user.projects)
 	manager: User;
 
 	//// Project to assigned developers relationship ////
-	@Field()
+	@Field(() => Number)
 	@ManyToMany(() => User, (user) => user.assignments)
 	developers: User[];
 
 	//// Project to organization relationship ////
-	@Field()
+	@Field(() => Number)
 	@ManyToOne(() => Organization, (organization) => organization.projects)
 	organization: Organization;
 
 	//// Project to tickets relationship ////
-	@Field()
+	@Field(() => Number)
 	@OneToMany(() => Ticket, (ticket) => ticket.project)
 	tickets: Ticket[];
 }

@@ -23,12 +23,12 @@ export class Organization {
 	//================================================================================
 
 	//// Organization to user relationship ////
-	@Field()
+	@Field(() => Number)
 	@OneToMany(() => User, (user) => user.organization)
 	user: User[];
 
 	//// Organization to projects relationship ////
-	@Field()
+	@Field(() => Number)
 	@OneToMany(() => Project, (project) => project.organization)
 	projects: Project[];
 }

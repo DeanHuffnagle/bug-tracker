@@ -57,28 +57,28 @@ export class User {
 	//================================================================================
 
 	//// user to organization relationship ////
-	@Field()
+	@Field(() => Number)
 	@ManyToOne(() => Organization, (organization) => organization.user)
 	organization: Organization;
 
 	//// user to assigned projects relationship ////
-	@Field()
+	@Field(() => Number)
 	@ManyToMany(() => Project, (project) => project.developers)
 	@JoinTable()
 	assignments: Project;
 
 	//// user to project  manager relationship ////
-	@Field()
+	@Field(() => Number)
 	@OneToMany(() => Project, (project) => project.manager)
 	projects: Project[];
 
 	//// user to ticket relationship ////
-	@Field()
+	@Field(() => Number)
 	@OneToMany(() => Ticket, (ticket) => ticket.developer)
 	tickets: Ticket[];
 
 	//// user to comment relationship ////
-	@Field()
+	@Field(() => Number)
 	@OneToMany(() => Comment, (comment) => comment.user)
 	comments: Comment[];
 }
