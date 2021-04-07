@@ -12,6 +12,14 @@ import { Comment } from './Comment';
 import { User } from './User';
 import { Field, ObjectType } from 'type-graphql';
 
+export type TicketPriorityType = 'low' | 'medium' | 'high';
+
+export type TicketStatusType =
+	| 'unassigned'
+	| 'inProgress'
+	| 'awaitingConfirmation'
+	| 'resolved';
+
 @ObjectType()
 @Entity()
 export class Ticket {
@@ -29,21 +37,29 @@ export class Ticket {
 
 	@Field()
 	@Column()
-	text!: string;
+	text: string;
 
 	@Field()
-	@Column()
-	priority!: number;
+	@Column({
+		type: 'enum',
+		enum: ['low', 'medium', 'high'],
+		default: 'high',
+	})
+	priority: TicketPriorityType;
 
 	@Field()
-	@Column()
-	status: string;
+	@Column({
+		type: 'enum',
+		enum: ['unassigned', 'inProgress', 'awaitingConfirmation', 'resolved'],
+		default: 'unassigned',
+	})
+	status: TicketStatusType;
 
-	@Field()
+	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;
 
-	@Field()
+	@Field(() => String)
 	@UpdateDateColumn()
 	updatedAt: Date;
 
@@ -51,10 +67,10 @@ export class Ticket {
 	//Relationships
 	//================================================================================
 
-	//// tickets to user relationship ////
-	@Field()
+	//// tickets to assigned developer relationship ////
+	@Field(() => Number, { nullable: true })
 	@ManyToOne(() => User, (user) => user.tickets)
-	developer: User;
+	developer: User | null;
 
 	//// Tickets to project relationship ////
 	@Field(() => Number)
@@ -62,7 +78,7 @@ export class Ticket {
 	project: Project;
 
 	//// Ticket to comments relationship ////
-	@Field(() => Number)
+	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Comment, (comment) => comment.ticket)
-	comments: Comment[];
+	comments: Comment[] | null;
 }

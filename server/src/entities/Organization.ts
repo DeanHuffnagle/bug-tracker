@@ -12,11 +12,11 @@ export class Organization {
 
 	@Field()
 	@PrimaryGeneratedColumn()
-	id: number;
+	id!: number;
 
 	@Field()
 	@Column()
-	name: string;
+	name!: string;
 
 	//================================================================================
 	//Relationships
@@ -28,7 +28,7 @@ export class Organization {
 	user: User[];
 
 	//// Organization to projects relationship ////
-	@Field(() => Number)
+	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Project, (project) => project.organization)
-	projects: Project[];
+	projects: Project[] | null;
 }

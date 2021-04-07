@@ -15,6 +15,12 @@ import { Ticket } from './Ticket';
 import { Comment } from './Comment';
 import { Field, ObjectType } from 'type-graphql';
 
+export type UserRoleType =
+	| 'admin'
+	| 'projectManager'
+	| 'developer'
+	| 'submitter';
+
 @ObjectType()
 @Entity()
 export class User {
@@ -23,7 +29,7 @@ export class User {
 	//================================================================================
 	@Field()
 	@PrimaryGeneratedColumn()
-	id: number;
+	id!: number;
 
 	@Field()
 	@Column()
@@ -31,24 +37,31 @@ export class User {
 
 	@Field()
 	@Column()
-	lastName!: string;
+	lastName: string;
+
+	@Field()
+	@Column({
+		type: 'enum',
+		enum: ['admin', 'projectManager', 'developer', 'submitter'],
+		default: 'developer',
+	})
+	role!: UserRoleType;
+	// everyone will start as a developer by default.
+	// when an organization is created the creator will be switched to the admin role.
+	// only admins can change the role of other users in their organization.
 
 	@Field()
 	@Column()
-	userRole!: string;
-
-	@Field()
-	@Column()
-	email: string;
+	email!: string;
 
 	@Column()
 	password: string;
 
-	@Field()
+	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;
 
-	@Field()
+	@Field(() => String)
 	@UpdateDateColumn()
 	updatedAt: Date;
 
@@ -57,28 +70,31 @@ export class User {
 	//================================================================================
 
 	//// user to organization relationship ////
-	@Field(() => Number)
+	// the user will be default not in an organization when creating their account.
+	// they will then have to be invited into an organization by an admin sending an email with a link to join.
+	@Field(() => Number, { nullable: true })
 	@ManyToOne(() => Organization, (organization) => organization.user)
-	organization: Organization;
+	organization: Organization | null;
 
 	//// user to assigned projects relationship ////
-	@Field(() => Number)
+	// the user will not be assigned to projects, unless an admin assigns them.
+	@Field(() => Number, { nullable: true })
 	@ManyToMany(() => Project, (project) => project.developers)
 	@JoinTable()
-	assignments: Project;
+	assignments: Project | null;
 
-	//// user to project  manager relationship ////
-	@Field(() => Number)
+	//// Project manager to project relationship ////
+	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Project, (project) => project.manager)
-	projects: Project[];
+	projects: Project[] | null;
 
-	//// user to ticket relationship ////
-	@Field(() => Number)
+	//// user to assigned ticket relationship ////
+	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Ticket, (ticket) => ticket.developer)
-	tickets: Ticket[];
+	tickets: Ticket[] | null;
 
 	//// user to comment relationship ////
-	@Field(() => Number)
+	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Comment, (comment) => comment.user)
-	comments: Comment[];
+	comments: Comment[] | null;
 }

@@ -17,17 +17,17 @@ export class Comment {
 	//Columns
 	//================================================================================
 	@PrimaryGeneratedColumn()
-	id: number;
+	id!: number;
 
 	@Field()
 	@Column()
-	commentText!: string;
+	commentText: string;
 
-	@Field()
+	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;
 
-	@Field()
+	@Field(() => String)
 	@UpdateDateColumn()
 	updatedAt: Date;
 

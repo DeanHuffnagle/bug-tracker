@@ -22,7 +22,7 @@ export class Project {
 
 	@Field()
 	@PrimaryGeneratedColumn()
-	id: number;
+	id!: number;
 
 	@Field()
 	@Column()
@@ -32,11 +32,11 @@ export class Project {
 	@Column()
 	description: string;
 
-	@Field()
+	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;
 
-	@Field()
+	@Field(() => String)
 	@UpdateDateColumn()
 	updatedAt: Date;
 
@@ -45,14 +45,14 @@ export class Project {
 	//================================================================================
 
 	//// Project to project manager relationship ////
-	@Field(() => Number)
+	@Field(() => Number, { nullable: true })
 	@ManyToOne(() => User, (user) => user.projects)
-	manager: User;
+	manager: User | null;
 
 	//// Project to assigned developers relationship ////
-	@Field(() => Number)
+	@Field(() => Number, { nullable: true })
 	@ManyToMany(() => User, (user) => user.assignments)
-	developers: User[];
+	developers: User[] | null;
 
 	//// Project to organization relationship ////
 	@Field(() => Number)
@@ -60,7 +60,7 @@ export class Project {
 	organization: Organization;
 
 	//// Project to tickets relationship ////
-	@Field(() => Number)
+	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Ticket, (ticket) => ticket.project)
-	tickets: Ticket[];
+	tickets: Ticket[] | null;
 }
