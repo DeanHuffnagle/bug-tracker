@@ -1,16 +1,22 @@
-import { Field, ObjectType } from 'type-graphql';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Field, Int, ObjectType } from 'type-graphql';
+import {
+	Entity,
+	Column,
+	PrimaryGeneratedColumn,
+	OneToMany,
+	BaseEntity,
+} from 'typeorm';
 import { Project } from './Project';
 import { User } from './User';
 
 @ObjectType()
 @Entity()
-export class Organization {
+export class Organization extends BaseEntity {
 	//================================================================================
 	//Columns
 	//================================================================================
 
-	@Field()
+	@Field(() => Int)
 	@PrimaryGeneratedColumn()
 	id!: number;
 
@@ -18,12 +24,15 @@ export class Organization {
 	@Column()
 	name!: string;
 
+	@Field(() => [Int])
+	@Column('int', { array: true })
+	userId: number[];
 	//================================================================================
 	//Relationships
 	//================================================================================
 
 	//// Organization to user relationship ////
-	@Field(() => Number)
+	@Field(() => User, { nullable: true })
 	@OneToMany(() => User, (user) => user.organization)
 	user: User[];
 

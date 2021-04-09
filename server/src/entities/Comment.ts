@@ -6,13 +6,14 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	ManyToOne,
+	BaseEntity,
 } from 'typeorm';
 import { Ticket } from './Ticket';
 import { User } from './User';
 
 @ObjectType()
 @Entity()
-export class Comment {
+export class Comment extends BaseEntity {
 	//================================================================================
 	//Columns
 	//================================================================================
@@ -21,7 +22,7 @@ export class Comment {
 
 	@Field()
 	@Column()
-	commentText: string;
+	commentText!: string;
 
 	@Field(() => String)
 	@CreateDateColumn()

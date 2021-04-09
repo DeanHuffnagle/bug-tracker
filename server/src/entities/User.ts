@@ -1,4 +1,5 @@
 import {
+	BaseEntity,
 	Column,
 	CreateDateColumn,
 	Entity,
@@ -19,11 +20,15 @@ export type UserRoleType =
 	| 'admin'
 	| 'projectManager'
 	| 'developer'
-	| 'submitter';
+	| 'submitter'
+	| 'demoAdmin'
+	| 'demoProjectManager'
+	| 'demoDeveloper'
+	| 'demoSubmitter';
 
 @ObjectType()
 @Entity()
-export class User {
+export class User extends BaseEntity {
 	//================================================================================
 	//Columns
 	//================================================================================
@@ -33,16 +38,29 @@ export class User {
 
 	@Field()
 	@Column()
-	firstName: string;
+	firstName!: string;
 
 	@Field()
 	@Column()
-	lastName: string;
+	lastName!: string;
+
+	@Field()
+	@Column({ unique: true })
+	email!: string;
 
 	@Field()
 	@Column({
 		type: 'enum',
-		enum: ['admin', 'projectManager', 'developer', 'submitter'],
+		enum: [
+			'admin',
+			'projectManager',
+			'developer',
+			'submitter',
+			'demoAdmin',
+			'demoProjectManager',
+			'demoDeveloper',
+			'demoSubmitter',
+		],
 		default: 'developer',
 	})
 	role!: UserRoleType;
@@ -50,12 +68,8 @@ export class User {
 	// when an organization is created the creator will be switched to the admin role.
 	// only admins can change the role of other users in their organization.
 
-	@Field()
 	@Column()
-	email!: string;
-
-	@Column()
-	password: string;
+	password!: string;
 
 	@Field(() => String)
 	@CreateDateColumn()

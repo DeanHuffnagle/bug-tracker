@@ -6,6 +6,7 @@ import {
 	UpdateDateColumn,
 	ManyToOne,
 	OneToMany,
+	BaseEntity,
 } from 'typeorm';
 import { Project } from './Project';
 import { Comment } from './Comment';
@@ -22,7 +23,7 @@ export type TicketStatusType =
 
 @ObjectType()
 @Entity()
-export class Ticket {
+export class Ticket extends BaseEntity {
 	//================================================================================
 	//Columns
 	//================================================================================
@@ -37,7 +38,7 @@ export class Ticket {
 
 	@Field()
 	@Column()
-	text: string;
+	text!: string;
 
 	@Field()
 	@Column({
@@ -45,7 +46,7 @@ export class Ticket {
 		enum: ['low', 'medium', 'high'],
 		default: 'high',
 	})
-	priority: TicketPriorityType;
+	priority!: TicketPriorityType;
 
 	@Field()
 	@Column({
@@ -53,7 +54,7 @@ export class Ticket {
 		enum: ['unassigned', 'inProgress', 'awaitingConfirmation', 'resolved'],
 		default: 'unassigned',
 	})
-	status: TicketStatusType;
+	status!: TicketStatusType;
 
 	@Field(() => String)
 	@CreateDateColumn()
@@ -75,7 +76,7 @@ export class Ticket {
 	//// Tickets to project relationship ////
 	@Field(() => Number)
 	@ManyToOne(() => Project, (project) => project.tickets)
-	project: Project;
+	project!: Project;
 
 	//// Ticket to comments relationship ////
 	@Field(() => Number, { nullable: true })

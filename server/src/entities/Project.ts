@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import {
+	BaseEntity,
 	Column,
 	CreateDateColumn,
 	Entity,
@@ -15,7 +16,7 @@ import { User } from './User';
 
 ObjectType();
 @Entity()
-export class Project {
+export class Project extends BaseEntity {
 	//================================================================================
 	//Columns
 	//================================================================================
@@ -26,11 +27,11 @@ export class Project {
 
 	@Field()
 	@Column()
-	name: string;
+	name!: string;
 
 	@Field()
 	@Column()
-	description: string;
+	description!: string;
 
 	@Field(() => String)
 	@CreateDateColumn()
@@ -57,7 +58,7 @@ export class Project {
 	//// Project to organization relationship ////
 	@Field(() => Number)
 	@ManyToOne(() => Organization, (organization) => organization.projects)
-	organization: Organization;
+	organization!: Organization;
 
 	//// Project to tickets relationship ////
 	@Field(() => Number, { nullable: true })
