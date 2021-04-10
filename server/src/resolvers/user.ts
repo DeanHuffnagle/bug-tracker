@@ -8,10 +8,13 @@ import {
 	ObjectType,
 	Query,
 	Resolver,
+	UseMiddleware,
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { COOKIE_NAME } from '../constants';
+import { Organization } from '../entities/Organization';
 import { User } from '../entities/User';
+import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
 
 @ObjectType()
@@ -49,6 +52,22 @@ export class UserLoginInput {
 	email: string;
 	@Field()
 	password: string;
+}
+
+@InputType()
+export class JoinOrganizationInput {
+	@Field()
+	organizationId: number;
+	@Field()
+	userId: number;
+}
+
+@InputType()
+export class ChangeRoleInput {
+	@Field()
+	userId: number;
+	@Field()
+	userRole: string;
 }
 
 @Resolver(User)
@@ -182,8 +201,49 @@ export class UserResolver {
 		);
 	}
 	//================================================================================
-	//Change User Role
+	//Change User Role Mutation
 	//================================================================================
-	@Mutation(() => UserResponse)
-	changeUserRole() {}
+	// @Mutation(() => UserResponse)
+	// @UseMiddleware(isAdmin)
+	// changeUserRole() {}
+
+	//================================================================================
+	//Join Organization Mutation
+	//================================================================================
+	@Mutation(() => User, { nullable: true })
+	@UseMiddleware(isAuth)
+	async joinOrganizationMutation(
+		@Arg('options') options: JoinOrganizationInput
+	): Promise<User | null> {
+		const organization = await Organization.findOne(options.organizationId);
+		const user = await User.findOne(options.userId);
+		console.log('user: ', user);
+		console.log('organization: ', organization);
+		if (!user) {
+			console.log('user: ', user);
+			throw new Error('no user found');
+		}
+
+		if (!organization) {
+			throw new Error(' no organization found');
+		}
+		try {
+			const result = await getConnection()
+				.createQueryBuilder()
+				.update(User)
+				.set({
+					organizationId: options.organizationId,
+				})
+				.where('id = :id', { id: options.userId })
+				.returning('*')
+				.execute();
+
+			console.log('result: ', result);
+			const newUser = result.raw[0];
+			return newUser;
+		} catch (err) {
+			console.log('error: ', err);
+			return null;
+		}
+	}
 }

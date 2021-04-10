@@ -1,3 +1,4 @@
+import { Field, Int, ObjectType } from 'type-graphql';
 import {
 	BaseEntity,
 	Column,
@@ -7,14 +8,14 @@ import {
 	ManyToMany,
 	ManyToOne,
 	OneToMany,
+	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
+import { Comment } from './Comment';
 import { Organization } from './Organization';
 import { Project } from './Project';
 import { Ticket } from './Ticket';
-import { Comment } from './Comment';
-import { Field, ObjectType } from 'type-graphql';
 
 export type UserRoleType =
 	| 'admin'
@@ -32,7 +33,7 @@ export class User extends BaseEntity {
 	//================================================================================
 	//Columns
 	//================================================================================
-	@Field()
+	@Field(() => Int)
 	@PrimaryGeneratedColumn()
 	id!: number;
 
@@ -71,6 +72,10 @@ export class User extends BaseEntity {
 	@Column()
 	password!: string;
 
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	organizationId: number | null;
+
 	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;
@@ -86,9 +91,13 @@ export class User extends BaseEntity {
 	//// user to organization relationship ////
 	// the user will be default not in an organization when creating their account.
 	// they will then have to be invited into an organization by an admin sending an email with a link to join.
-	@Field(() => Number, { nullable: true })
+	@Field(() => String, { nullable: true })
 	@ManyToOne(() => Organization, (organization) => organization.user)
 	organization: Organization | null;
+
+	//// creator relationship with created organization ////
+	@OneToOne(() => Organization, (organization) => organization.creator)
+	createdOrganization: Organization;
 
 	//// user to assigned projects relationship ////
 	// the user will not be assigned to projects, unless an admin assigns them.

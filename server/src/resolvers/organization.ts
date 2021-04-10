@@ -3,13 +3,16 @@ import {
 	Ctx,
 	Field,
 	InputType,
+	Int,
 	Mutation,
 	ObjectType,
+	Query,
 	Resolver,
+	UseMiddleware,
 } from 'type-graphql';
-import { getConnection, getRepository } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { Organization } from '../entities/Organization';
-import { User } from '../entities/User';
+import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
 
 @ObjectType()
@@ -41,20 +44,11 @@ export class OrganizationResolver {
 	//Create Organization Mutation
 	//================================================================================
 	@Mutation(() => OrganizationResponse)
+	@UseMiddleware(isAuth)
 	async createOrganization(
 		@Arg('options') options: CreateOrganizationInput,
 		@Ctx() { req }: MyContext
 	) {
-		if (!req.session.UserId) {
-			return {
-				errors: [
-					{
-						field: 'user',
-						message: 'no user is logged in.',
-					},
-				],
-			};
-		}
 		let organization;
 		try {
 			console.log('req.session.userID: ', req.session.UserId);
@@ -64,7 +58,7 @@ export class OrganizationResolver {
 				.into(Organization)
 				.values({
 					name: options.name,
-					userId: [req.session.UserId],
+					creatorId: req.session.UserId,
 				})
 				.returning('*')
 				.execute();
@@ -74,5 +68,35 @@ export class OrganizationResolver {
 			console.log('error: ', err);
 		}
 		return { organization };
+	}
+
+	//================================================================================
+	//Delete Organization Mutation
+	//================================================================================
+	@Mutation(() => Boolean)
+	@UseMiddleware(isAuth)
+	async deleteOrganization(
+		@Arg('id', () => Int) id: number,
+		@Ctx() { req }: MyContext
+	): Promise<Boolean> {
+		const organization = await Organization.findOne(id);
+		if (!organization) {
+			return false;
+		}
+		if (organization.creatorId !== req.session.UserId) {
+			return false;
+		}
+
+		await Organization.delete({ id });
+		return true;
+	}
+	//================================================================================
+	//Find Organization Query
+	//================================================================================
+	@Query(() => Organization, { nullable: true })
+	findOrganization(
+		@Arg('id', () => Int) id: number
+	): Promise<Organization | undefined> {
+		return Organization.findOne(id);
 	}
 }

@@ -70,12 +70,14 @@ export class Ticket extends BaseEntity {
 
 	//// tickets to assigned developer relationship ////
 	@Field(() => Number, { nullable: true })
-	@ManyToOne(() => User, (user) => user.tickets)
+	@ManyToOne(() => User, (user) => user.tickets, { onDelete: 'SET NULL' })
 	developer: User | null;
 
 	//// Tickets to project relationship ////
 	@Field(() => Number)
-	@ManyToOne(() => Project, (project) => project.tickets)
+	@ManyToOne(() => Project, (project) => project.tickets, {
+		onDelete: 'CASCADE',
+	})
 	project!: Project;
 
 	//// Ticket to comments relationship ////

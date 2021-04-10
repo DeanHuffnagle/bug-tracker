@@ -38,11 +38,11 @@ export class Comment extends BaseEntity {
 
 	//// comments to user relationship ////
 	@Field()
-	@ManyToOne(() => User, (user) => user.comments)
+	@ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' })
 	user: User;
 
 	//// comments to ticket relationship ////
 	@Field()
-	@ManyToOne(() => Ticket, (ticket) => ticket.comments)
+	@ManyToOne(() => Ticket, (ticket) => ticket.comments, { onDelete: 'CASCADE' })
 	ticket: Ticket;
 }

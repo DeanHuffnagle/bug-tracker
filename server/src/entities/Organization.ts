@@ -5,6 +5,8 @@ import {
 	PrimaryGeneratedColumn,
 	OneToMany,
 	BaseEntity,
+	OneToOne,
+	JoinColumn,
 } from 'typeorm';
 import { Project } from './Project';
 import { User } from './User';
@@ -24,17 +26,24 @@ export class Organization extends BaseEntity {
 	@Column()
 	name!: string;
 
-	@Field(() => [Int])
-	@Column('int', { array: true })
-	userId: number[];
+	@Field(() => Int)
+	@Column()
+	creatorId!: number;
 	//================================================================================
 	//Relationships
 	//================================================================================
 
 	//// Organization to user relationship ////
-	@Field(() => User, { nullable: true })
+	@Field(() => [User], { nullable: true })
 	@OneToMany(() => User, (user) => user.organization)
 	user: User[];
+
+	//// organization to creator relationship ////
+	@OneToOne(() => User, (user) => user.createdOrganization, {
+		onDelete: 'CASCADE',
+	})
+	@JoinColumn()
+	creator: User;
 
 	//// Organization to projects relationship ////
 	@Field(() => Number, { nullable: true })

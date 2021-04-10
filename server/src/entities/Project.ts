@@ -1,4 +1,4 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 import {
 	BaseEntity,
 	Column,
@@ -14,14 +14,14 @@ import { Organization } from './Organization';
 import { Ticket } from './Ticket';
 import { User } from './User';
 
-ObjectType();
+@ObjectType()
 @Entity()
 export class Project extends BaseEntity {
 	//================================================================================
 	//Columns
 	//================================================================================
 
-	@Field()
+	@Field(() => Int)
 	@PrimaryGeneratedColumn()
 	id!: number;
 
@@ -32,6 +32,14 @@ export class Project extends BaseEntity {
 	@Field()
 	@Column()
 	description!: string;
+
+	@Field(() => Int)
+	@Column()
+	organizationId!: number;
+
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	managerId: number | null;
 
 	@Field(() => String)
 	@CreateDateColumn()
@@ -47,7 +55,7 @@ export class Project extends BaseEntity {
 
 	//// Project to project manager relationship ////
 	@Field(() => Number, { nullable: true })
-	@ManyToOne(() => User, (user) => user.projects)
+	@ManyToOne(() => User, (user) => user.projects, { onDelete: 'SET NULL' })
 	manager: User | null;
 
 	//// Project to assigned developers relationship ////
@@ -57,7 +65,9 @@ export class Project extends BaseEntity {
 
 	//// Project to organization relationship ////
 	@Field(() => Number)
-	@ManyToOne(() => Organization, (organization) => organization.projects)
+	@ManyToOne(() => Organization, (organization) => organization.projects, {
+		onDelete: 'CASCADE',
+	})
 	organization!: Organization;
 
 	//// Project to tickets relationship ////
