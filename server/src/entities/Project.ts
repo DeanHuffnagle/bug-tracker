@@ -4,7 +4,6 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	ManyToMany,
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn,
@@ -60,7 +59,7 @@ export class Project extends BaseEntity {
 
 	//// Project to assigned developers relationship ////
 	@Field(() => Number, { nullable: true })
-	@ManyToMany(() => User, (user) => user.assignments)
+	@OneToMany(() => User, (user) => user.assignment)
 	developers: User[] | null;
 
 	//// Project to organization relationship ////

@@ -12,6 +12,8 @@ import {
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { Organization } from '../entities/Organization';
+import { User } from '../entities/User';
+import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
 
@@ -31,13 +33,23 @@ class OrganizationResponse {
 	@Field(() => Organization, { nullable: true })
 	organization?: Organization;
 }
-
+//================================================================================
+//Inputs
+//================================================================================
+//// Create Organization ////
 @InputType()
 export class CreateOrganizationInput {
 	@Field()
 	name!: string;
 }
 
+@InputType()
+export class ChangeOrganizationNameInput {
+	@Field()
+	name!: string;
+}
+
+//// CRD ////
 @Resolver(Organization)
 export class OrganizationResolver {
 	//================================================================================
@@ -90,6 +102,39 @@ export class OrganizationResolver {
 		await Organization.delete({ id });
 		return true;
 	}
+
+	//================================================================================
+	//Change Organization Name
+	//================================================================================
+	@Mutation(() => OrganizationResponse)
+	@UseMiddleware(isAdmin)
+	async changeOrganizationName(
+		@Arg('options') options: ChangeOrganizationNameInput,
+		@Ctx() { req }: MyContext
+	) {
+		const isUser = await User.findOne(req.session.UserId);
+		if (!isUser?.organizationId) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'user does not belong to any organization.',
+					},
+				],
+			};
+		}
+		const isOrganization = await Organization.findOne(isUser?.organizationId);
+		console.log('organization: ', isOrganization);
+		let organization;
+
+		await Organization.update(
+			{ id: isOrganization?.id },
+			{ name: options.name }
+		);
+		organization = Organization.findOne(isOrganization?.id);
+		return { organization };
+	}
+
 	//================================================================================
 	//Find Organization Query
 	//================================================================================

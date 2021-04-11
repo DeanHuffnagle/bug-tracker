@@ -27,7 +27,8 @@ const Project_1 = require("./entities/Project");
 const Ticket_1 = require("./entities/Ticket");
 const User_1 = require("./entities/User");
 const organization_1 = require("./resolvers/organization");
-const Project_2 = require("./resolvers/Project");
+const project_1 = require("./resolvers/project");
+const ticket_1 = require("./resolvers/ticket");
 const user_1 = require("./resolvers/user");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield typeorm_1.createConnection({
@@ -61,7 +62,12 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
-            resolvers: [user_1.UserResolver, organization_1.OrganizationResolver, Project_2.ProjectResolver],
+            resolvers: [
+                user_1.UserResolver,
+                organization_1.OrganizationResolver,
+                project_1.ProjectResolver,
+                ticket_1.TicketResolver,
+            ],
             validate: false,
         }),
         context: ({ req, res }) => ({

@@ -11,7 +11,7 @@ import {
 import { Project } from './Project';
 import { Comment } from './Comment';
 import { User } from './User';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 
 export type TicketPriorityType = 'low' | 'medium' | 'high';
 
@@ -39,6 +39,18 @@ export class Ticket extends BaseEntity {
 	@Field()
 	@Column()
 	text!: string;
+
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	developerId: number;
+
+	@Field(() => Int)
+	@Column()
+	creatorId: number;
+
+	@Field(() => Int)
+	@Column()
+	projectId!: number;
 
 	@Field()
 	@Column({
@@ -72,6 +84,11 @@ export class Ticket extends BaseEntity {
 	@Field(() => Number, { nullable: true })
 	@ManyToOne(() => User, (user) => user.tickets, { onDelete: 'SET NULL' })
 	developer: User | null;
+
+	//// Ticket to creator relationship ////
+	@Field(() => Number, { nullable: true })
+	@ManyToOne(() => User, (user) => user.submissions, { onDelete: 'SET NULL' })
+	creator: User | null;
 
 	//// Tickets to project relationship ////
 	@Field(() => Number)

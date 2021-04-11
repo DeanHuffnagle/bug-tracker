@@ -13,7 +13,8 @@ import {
 import { getConnection } from 'typeorm';
 import { COOKIE_NAME } from '../constants';
 import { Organization } from '../entities/Organization';
-import { User } from '../entities/User';
+import { User, UserRoleType } from '../entities/User';
+import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
 
@@ -33,7 +34,10 @@ class UserResponse {
 	@Field(() => User, { nullable: true })
 	user?: User;
 }
-
+//================================================================================
+//Inputs
+//================================================================================
+//// Register ////
 @InputType()
 export class UserRegisterInput {
 	@Field()
@@ -46,6 +50,7 @@ export class UserRegisterInput {
 	password: string;
 }
 
+//// Login ////
 @InputType()
 export class UserLoginInput {
 	@Field()
@@ -54,6 +59,7 @@ export class UserLoginInput {
 	password: string;
 }
 
+//// Join Organization ////
 @InputType()
 export class JoinOrganizationInput {
 	@Field()
@@ -62,14 +68,23 @@ export class JoinOrganizationInput {
 	userId: number;
 }
 
+//// Make Admin ////
+@InputType()
+export class MakeAdminInput {
+	@Field()
+	userId: number;
+}
+
+//// Change Role ////
 @InputType()
 export class ChangeRoleInput {
 	@Field()
 	userId: number;
-	@Field()
-	userRole: string;
+	@Field(() => String)
+	userRole!: () => UserRoleType;
 }
 
+//// CRU ////
 @Resolver(User)
 export class UserResolver {
 	//================================================================================
@@ -201,49 +216,95 @@ export class UserResolver {
 		);
 	}
 	//================================================================================
+	//Make Admin Mutation
+	//================================================================================
+	@Mutation(() => UserResponse)
+	async makeAdmin(@Arg('options') options: MakeAdminInput) {
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		await User.update({ id: options.userId }, { role: 'admin' });
+		const user = await User.findOne(options.userId);
+		return { user };
+	}
+	//================================================================================
 	//Change User Role Mutation
 	//================================================================================
-	// @Mutation(() => UserResponse)
-	// @UseMiddleware(isAdmin)
-	// changeUserRole() {}
+	@Mutation(() => UserResponse)
+	@UseMiddleware(isAdmin)
+	async changeUserRole(@Arg('options') options: ChangeRoleInput) {
+		const unchangedUser = await User.findOne(options.userId);
+		if (!unchangedUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		await User.update({ id: options.userId }, { role: options.userRole });
+		const user = await User.findOne(options.userId);
+		return { user };
+	}
 
 	//================================================================================
 	//Join Organization Mutation
 	//================================================================================
-	@Mutation(() => User, { nullable: true })
+	@Mutation(() => UserResponse)
 	@UseMiddleware(isAuth)
 	async joinOrganizationMutation(
 		@Arg('options') options: JoinOrganizationInput
-	): Promise<User | null> {
-		const organization = await Organization.findOne(options.organizationId);
+	): Promise<UserResponse> {
+		const isOrganization = await Organization.findOne(options.organizationId);
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isOrganization) {
+			return {
+				errors: [
+					{
+						field: 'organization',
+						message: 'no organization found.',
+					},
+				],
+			};
+		}
+		await User.update(
+			{ id: options.userId },
+			{ organizationId: options.organizationId }
+		);
 		const user = await User.findOne(options.userId);
-		console.log('user: ', user);
-		console.log('organization: ', organization);
-		if (!user) {
-			console.log('user: ', user);
-			throw new Error('no user found');
-		}
-
-		if (!organization) {
-			throw new Error(' no organization found');
-		}
-		try {
-			const result = await getConnection()
-				.createQueryBuilder()
-				.update(User)
-				.set({
-					organizationId: options.organizationId,
-				})
-				.where('id = :id', { id: options.userId })
-				.returning('*')
-				.execute();
-
-			console.log('result: ', result);
-			const newUser = result.raw[0];
-			return newUser;
-		} catch (err) {
-			console.log('error: ', err);
-			return null;
-		}
+		return { user };
+	}
+	//================================================================================
+	//Leave Organization Mutation
+	//================================================================================
+	@Mutation(() => UserResponse, { nullable: true })
+	@UseMiddleware(isAuth)
+	async leaveOrganizationMutation(
+		@Ctx() { req }: MyContext
+	): Promise<UserResponse> {
+		await User.update({ id: req.session.UserId }, { role: 'developer' });
+		await User.update({ id: req.session.UserId }, { organizationId: null });
+		const user = await User.findOne(req.session.UserId);
+		return { user };
 	}
 }

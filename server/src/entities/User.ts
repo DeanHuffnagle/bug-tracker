@@ -5,7 +5,6 @@ import {
 	CreateDateColumn,
 	Entity,
 	JoinTable,
-	ManyToMany,
 	ManyToOne,
 	OneToMany,
 	OneToOne,
@@ -49,7 +48,7 @@ export class User extends BaseEntity {
 	@Column({ unique: true })
 	email!: string;
 
-	@Field()
+	@Field(() => String)
 	@Column({
 		type: 'enum',
 		enum: [
@@ -75,6 +74,10 @@ export class User extends BaseEntity {
 	@Field(() => Int, { nullable: true })
 	@Column({ nullable: true })
 	organizationId: number | null;
+
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	assignmentId: number | null;
 
 	@Field(() => String)
 	@CreateDateColumn()
@@ -102,21 +105,26 @@ export class User extends BaseEntity {
 	//// user to assigned projects relationship ////
 	// the user will not be assigned to projects, unless an admin assigns them.
 	@Field(() => Number, { nullable: true })
-	@ManyToMany(() => Project, (project) => project.developers)
+	@ManyToOne(() => Project, (project) => project.developers)
 	@JoinTable()
-	assignments: Project | null;
+	assignment: Project | null;
 
 	//// Project manager to project relationship ////
 	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Project, (project) => project.manager)
 	projects: Project[] | null;
 
-	//// user to assigned ticket relationship ////
+	//// User to assigned ticket relationship ////
 	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Ticket, (ticket) => ticket.developer)
 	tickets: Ticket[] | null;
 
-	//// user to comment relationship ////
+	//// User to submitted tickets relationship  ////
+	@Field(() => Number, { nullable: true })
+	@OneToMany(() => Ticket, (ticket) => ticket.creator)
+	submissions: Ticket[] | null;
+
+	//// User to comment relationship ////
 	@Field(() => Number, { nullable: true })
 	@OneToMany(() => Comment, (comment) => comment.user)
 	comments: Comment[] | null;
