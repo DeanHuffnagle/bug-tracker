@@ -82,23 +82,33 @@ export class Ticket extends BaseEntity {
 
 	//// tickets to assigned developer relationship ////
 	@Field(() => Number, { nullable: true })
-	@ManyToOne(() => User, (user) => user.tickets, { onDelete: 'SET NULL' })
-	developer: User | null;
+	@ManyToOne(() => User, (user) => user.assignedTickets, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	assignedDeveloper: User | null;
 
 	//// Ticket to creator relationship ////
-	@Field(() => Number, { nullable: true })
-	@ManyToOne(() => User, (user) => user.submissions, { onDelete: 'SET NULL' })
-	creator: User | null;
+	@Field(() => Number)
+	@ManyToOne(() => User, (user) => user.submittedTickets, {
+		cascade: ['insert', 'update'],
+		onDelete: 'CASCADE',
+	})
+	submitter!: User;
 
 	//// Tickets to project relationship ////
 	@Field(() => Number)
 	@ManyToOne(() => Project, (project) => project.tickets, {
+		cascade: ['insert', 'update'],
 		onDelete: 'CASCADE',
 	})
 	project!: Project;
 
 	//// Ticket to comments relationship ////
 	@Field(() => Number, { nullable: true })
-	@OneToMany(() => Comment, (comment) => comment.ticket)
+	@OneToMany(() => Comment, (comment) => comment.ticket, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
 	comments: Comment[] | null;
 }

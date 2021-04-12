@@ -26,27 +26,31 @@ export class Organization extends BaseEntity {
 	@Column()
 	name!: string;
 
-	@Field(() => Int)
-	@Column()
-	creatorId!: number;
 	//================================================================================
 	//Relationships
 	//================================================================================
 
 	//// Organization to user relationship ////
 	@Field(() => [User], { nullable: true })
-	@OneToMany(() => User, (user) => user.organization)
-	user: User[];
+	@OneToMany(() => User, (user) => user.organization, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	users: User[];
 
 	//// organization to creator relationship ////
 	@OneToOne(() => User, (user) => user.createdOrganization, {
+		cascade: ['insert', 'update'],
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()
-	creator: User;
+	creator!: User;
 
 	//// Organization to projects relationship ////
 	@Field(() => Number, { nullable: true })
-	@OneToMany(() => Project, (project) => project.organization)
+	@OneToMany(() => Project, (project) => project.organization, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
 	projects: Project[] | null;
 }

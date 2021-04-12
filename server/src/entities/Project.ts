@@ -4,6 +4,8 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinTable,
+	ManyToMany,
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn,
@@ -54,23 +56,34 @@ export class Project extends BaseEntity {
 
 	//// Project to project manager relationship ////
 	@Field(() => Number, { nullable: true })
-	@ManyToOne(() => User, (user) => user.projects, { onDelete: 'SET NULL' })
+	@ManyToOne(() => User, (user) => user.managedProjects, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
 	manager: User | null;
 
 	//// Project to assigned developers relationship ////
 	@Field(() => Number, { nullable: true })
-	@OneToMany(() => User, (user) => user.assignment)
-	developers: User[] | null;
+	@ManyToMany(() => User, (user) => user.assignedProjects, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	@JoinTable()
+	assignedDevelopers: User[] | null;
 
 	//// Project to organization relationship ////
 	@Field(() => Number)
 	@ManyToOne(() => Organization, (organization) => organization.projects, {
+		cascade: ['insert', 'update'],
 		onDelete: 'CASCADE',
 	})
 	organization!: Organization;
 
 	//// Project to tickets relationship ////
 	@Field(() => Number, { nullable: true })
-	@OneToMany(() => Ticket, (ticket) => ticket.project)
+	@OneToMany(() => Ticket, (ticket) => ticket.project, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
 	tickets: Ticket[] | null;
 }

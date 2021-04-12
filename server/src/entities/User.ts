@@ -4,7 +4,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinTable,
+	ManyToMany,
 	ManyToOne,
 	OneToMany,
 	OneToOne,
@@ -71,14 +71,6 @@ export class User extends BaseEntity {
 	@Column()
 	password!: string;
 
-	@Field(() => Int, { nullable: true })
-	@Column({ nullable: true })
-	organizationId: number | null;
-
-	@Field(() => Int, { nullable: true })
-	@Column({ nullable: true })
-	assignmentId: number | null;
-
 	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;
@@ -90,42 +82,62 @@ export class User extends BaseEntity {
 	//================================================================================
 	//Relationships
 	//================================================================================
+	//// user to assigned projects relationship ////
+	// the user will not be assigned to projects, unless an admin assigns them.
+	@Field(() => Number, { nullable: true })
+	@ManyToMany(() => Project, (project) => project.assignedDevelopers, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	assignedProjects: Project[] | null;
 
 	//// user to organization relationship ////
 	// the user will be default not in an organization when creating their account.
 	// they will then have to be invited into an organization by an admin sending an email with a link to join.
 	@Field(() => String, { nullable: true })
-	@ManyToOne(() => Organization, (organization) => organization.user)
+	@ManyToOne(() => Organization, (organization) => organization.users, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
 	organization: Organization | null;
-
-	//// creator relationship with created organization ////
-	@OneToOne(() => Organization, (organization) => organization.creator)
-	createdOrganization: Organization;
-
-	//// user to assigned projects relationship ////
-	// the user will not be assigned to projects, unless an admin assigns them.
-	@Field(() => Number, { nullable: true })
-	@ManyToOne(() => Project, (project) => project.developers)
-	@JoinTable()
-	assignment: Project | null;
 
 	//// Project manager to project relationship ////
 	@Field(() => Number, { nullable: true })
-	@OneToMany(() => Project, (project) => project.manager)
-	projects: Project[] | null;
+	@OneToMany(() => Project, (project) => project.manager, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	managedProjects: Project[] | null;
 
-	//// User to assigned ticket relationship ////
-	@Field(() => Number, { nullable: true })
-	@OneToMany(() => Ticket, (ticket) => ticket.developer)
-	tickets: Ticket[] | null;
+	//// creator relationship with created organization ////
+	@Field(() => Organization)
+	@OneToOne(() => Organization, (organization) => organization.creator, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	createdOrganization: Organization | null;
 
 	//// User to submitted tickets relationship  ////
 	@Field(() => Number, { nullable: true })
-	@OneToMany(() => Ticket, (ticket) => ticket.creator)
-	submissions: Ticket[] | null;
+	@OneToMany(() => Ticket, (ticket) => ticket.submitter, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	submittedTickets: Ticket[] | null;
 
 	//// User to comment relationship ////
 	@Field(() => Number, { nullable: true })
-	@OneToMany(() => Comment, (comment) => comment.user)
+	@OneToMany(() => Comment, (comment) => comment.commenter, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
 	comments: Comment[] | null;
+
+	//// User to assigned ticket relationship ////
+	@Field(() => Number, { nullable: true })
+	@OneToMany(() => Ticket, (ticket) => ticket.assignedDeveloper, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	assignedTickets: Ticket[] | null;
 }
