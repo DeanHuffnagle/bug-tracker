@@ -72,7 +72,7 @@ export class TicketResolver {
 			};
 		}
 		if (isUser?.role === 'submitter') {
-			if (isUser.assignmentId !== isProject?.id) {
+			if (isUser.assignedProjectsId !== isProject?.id) {
 				return {
 					errors: [
 						{
@@ -84,7 +84,7 @@ export class TicketResolver {
 			}
 		}
 		if (isUser?.role === 'projectManager') {
-			if (isUser.assignmentId !== isProject?.id) {
+			if (isUser.assignedProjectsId !== isProject?.id) {
 				return {
 					errors: [
 						{
@@ -122,6 +122,6 @@ export class TicketResolver {
 	//================================================================================
 	@Query(() => Ticket, { nullable: true })
 	findTicket(@Arg('id', () => Int) id: number): Promise<Ticket | undefined> {
-		return Ticket.findOne(id);
+		return Ticket.findOne(id, { relations: ['assignedDeveloper'] });
 	}
 }

@@ -75,7 +75,6 @@ export class OrganizationResolver {
 				.returning('*')
 				.execute();
 			organization = result.raw[0];
-			console.log('result.raw: ', result.raw);
 		} catch (err) {
 			console.log('error: ', err);
 		}
@@ -142,6 +141,6 @@ export class OrganizationResolver {
 	findOrganization(
 		@Arg('id', () => Int) id: number
 	): Promise<Organization | undefined> {
-		return Organization.findOne(id);
+		return Organization.findOne(id, { relations: ['creator'] });
 	}
 }

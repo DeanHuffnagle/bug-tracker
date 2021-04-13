@@ -26,6 +26,10 @@ export class Organization extends BaseEntity {
 	@Column()
 	name!: string;
 
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	creatorId: number;
+
 	//================================================================================
 	//Relationships
 	//================================================================================
@@ -39,6 +43,7 @@ export class Organization extends BaseEntity {
 	users: User[];
 
 	//// organization to creator relationship ////
+	@Field(() => User)
 	@OneToOne(() => User, (user) => user.createdOrganization, {
 		cascade: ['insert', 'update'],
 		onDelete: 'CASCADE',
@@ -47,7 +52,7 @@ export class Organization extends BaseEntity {
 	creator!: User;
 
 	//// Organization to projects relationship ////
-	@Field(() => Number, { nullable: true })
+	@Field(() => [Project], { nullable: true })
 	@OneToMany(() => Project, (project) => project.organization, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',

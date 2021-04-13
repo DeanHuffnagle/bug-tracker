@@ -14,6 +14,7 @@ import { getConnection } from 'typeorm';
 import { Project } from '../entities/Project';
 import { User } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
+import { isProjectManager } from '../middleware/isProjectmanager';
 import { MyContext } from '../types';
 
 @ObjectType()
@@ -42,6 +43,22 @@ export class CreateProjectInput {
 	name!: string;
 	@Field()
 	description!: string;
+}
+
+@InputType()
+export class AssignProjectInput {
+	@Field(() => Int)
+	projectId!: number;
+	@Field(() => Int)
+	userId!: number;
+}
+
+@InputType()
+export class UnassignProjectInput {
+	@Field(() => Int)
+	projectId!: number;
+	@Field(() => Int)
+	userId!: number;
 }
 
 //// CR ////
@@ -94,6 +111,86 @@ export class ProjectResolver {
 	//================================================================================
 	@Query(() => Project, { nullable: true })
 	findProject(@Arg('id', () => Int) id: number): Promise<Project | undefined> {
-		return Project.findOne(id);
+		return Project.findOne(id, { relations: ['organization'] });
+	}
+	//================================================================================
+	//Assign Project Mutation
+	//================================================================================
+	@Mutation(() => ProjectResponse)
+	@UseMiddleware(isProjectManager)
+	async assignProject(@Arg('options') options: AssignProjectInput) {
+		const isProject = await Project.findOne(options.projectId);
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isProject) {
+			return {
+				errors: [
+					{
+						field: 'project',
+						message: 'no project found.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(Project, 'assignedDevelopers')
+			.of(isProject)
+			.add(isUser);
+		const project = await Project.findOne(options.projectId, {
+			relations: ['assignedDevelopers'],
+		});
+
+		return { project };
+	}
+	//================================================================================
+	//Unassign Project Mutation
+	//================================================================================
+	@Mutation(() => ProjectResponse)
+	@UseMiddleware(isProjectManager)
+	async unassignProject(
+		@Arg('options') options: UnassignProjectInput
+	): Promise<ProjectResponse> {
+		const isProject = await Project.findOne(options.projectId);
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isProject) {
+			return {
+				errors: [
+					{
+						field: 'project',
+						message: 'no project found.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(Project, 'assignedDevelopers')
+			.of(isProject)
+			.remove(isUser);
+
+		const project = await Project.findOne(options.projectId, {
+			relations: ['assignedDevelopers'],
+		});
+		return { project };
 	}
 }

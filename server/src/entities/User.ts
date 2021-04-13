@@ -71,6 +71,18 @@ export class User extends BaseEntity {
 	@Column()
 	password!: string;
 
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	organizationId: number;
+
+	@Field(() => [Int], { nullable: true })
+	@Column({ nullable: true })
+	assignedProjectsId: number;
+
+	@Field(() => [Int], { nullable: true })
+	@Column({ nullable: true })
+	assignedTicketsId: number;
+
 	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;
@@ -84,7 +96,7 @@ export class User extends BaseEntity {
 	//================================================================================
 	//// user to assigned projects relationship ////
 	// the user will not be assigned to projects, unless an admin assigns them.
-	@Field(() => Number, { nullable: true })
+	@Field(() => [Project], { nullable: true })
 	@ManyToMany(() => Project, (project) => project.assignedDevelopers, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
@@ -94,7 +106,7 @@ export class User extends BaseEntity {
 	//// user to organization relationship ////
 	// the user will be default not in an organization when creating their account.
 	// they will then have to be invited into an organization by an admin sending an email with a link to join.
-	@Field(() => String, { nullable: true })
+	@Field(() => Organization, { nullable: true })
 	@ManyToOne(() => Organization, (organization) => organization.users, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
@@ -102,7 +114,7 @@ export class User extends BaseEntity {
 	organization: Organization | null;
 
 	//// Project manager to project relationship ////
-	@Field(() => Number, { nullable: true })
+	@Field(() => [Project], { nullable: true })
 	@OneToMany(() => Project, (project) => project.manager, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
@@ -118,7 +130,7 @@ export class User extends BaseEntity {
 	createdOrganization: Organization | null;
 
 	//// User to submitted tickets relationship  ////
-	@Field(() => Number, { nullable: true })
+	@Field(() => [Ticket], { nullable: true })
 	@OneToMany(() => Ticket, (ticket) => ticket.submitter, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
@@ -126,7 +138,7 @@ export class User extends BaseEntity {
 	submittedTickets: Ticket[] | null;
 
 	//// User to comment relationship ////
-	@Field(() => Number, { nullable: true })
+	@Field(() => Comment, { nullable: true })
 	@OneToMany(() => Comment, (comment) => comment.commenter, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
@@ -134,7 +146,7 @@ export class User extends BaseEntity {
 	comments: Comment[] | null;
 
 	//// User to assigned ticket relationship ////
-	@Field(() => Number, { nullable: true })
+	@Field(() => [Ticket], { nullable: true })
 	@OneToMany(() => Ticket, (ticket) => ticket.assignedDeveloper, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',

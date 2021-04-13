@@ -37,7 +37,7 @@ export class Comment extends BaseEntity {
 	//================================================================================
 
 	//// comments to user relationship ////
-	@Field()
+	@Field(() => User)
 	@ManyToOne(() => User, (user) => user.comments, {
 		cascade: ['insert', 'update'],
 		onDelete: 'CASCADE',
@@ -45,7 +45,7 @@ export class Comment extends BaseEntity {
 	commenter: User;
 
 	//// comments to ticket relationship ////
-	@Field()
+	@Field(() => Ticket)
 	@ManyToOne(() => Ticket, (ticket) => ticket.comments, {
 		cascade: ['insert', 'update'],
 		onDelete: 'CASCADE',

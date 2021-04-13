@@ -4,18 +4,21 @@ import {
 	Ctx,
 	Field,
 	InputType,
+	Int,
 	Mutation,
 	ObjectType,
 	Query,
 	Resolver,
 	UseMiddleware,
 } from 'type-graphql';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { COOKIE_NAME } from '../constants';
 import { Organization } from '../entities/Organization';
+import { Project } from '../entities/Project';
 import { User, UserRoleType } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
+import { isProjectManager } from '../middleware/isProjectmanager';
 import { MyContext } from '../types';
 
 @ObjectType()
@@ -34,6 +37,7 @@ class UserResponse {
 	@Field(() => User, { nullable: true })
 	user?: User;
 }
+
 //================================================================================
 //Inputs
 //================================================================================
@@ -64,6 +68,13 @@ export class UserLoginInput {
 export class JoinOrganizationInput {
 	@Field()
 	organizationId: number;
+	@Field()
+	userId: number;
+}
+
+//// Leave Organization ////
+@InputType()
+export class LeaveOrganizationInput {
 	@Field()
 	userId: number;
 }
@@ -196,7 +207,9 @@ export class UserResolver {
 		if (!req.session.UserId) {
 			return null;
 		}
-		return User.findOne(req.session.UserId);
+		return User.findOne(req.session.UserId, {
+			relations: ['organization', 'assignedProjects'],
+		});
 	}
 	//================================================================================
 	//Logout Mutation
@@ -287,24 +300,45 @@ export class UserResolver {
 				],
 			};
 		}
-		await User.update(
-			{ id: options.userId },
-			{ organizationId: options.organizationId }
-		);
-		const user = await User.findOne(options.userId);
+		await getConnection()
+			.createQueryBuilder()
+			.relation(User, 'organization')
+			.of(isUser)
+			.set(isOrganization);
+
+		const user = await User.findOne(options.userId, {
+			relations: ['organization'],
+		});
 		return { user };
 	}
 	//================================================================================
 	//Leave Organization Mutation
 	//================================================================================
-	@Mutation(() => UserResponse, { nullable: true })
+	@Mutation(() => UserResponse)
 	@UseMiddleware(isAuth)
 	async leaveOrganizationMutation(
-		@Ctx() { req }: MyContext
+		@Arg('options') options: LeaveOrganizationInput
 	): Promise<UserResponse> {
-		await User.update({ id: req.session.UserId }, { role: 'developer' });
-		await User.update({ id: req.session.UserId }, { organizationId: null });
-		const user = await User.findOne(req.session.UserId);
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(User, 'organization')
+			.of(isUser)
+			.set(null);
+
+		const user = await User.findOne(options.userId, {
+			relations: ['organization'],
+		});
 		return { user };
 	}
 }

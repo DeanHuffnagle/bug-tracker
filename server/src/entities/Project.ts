@@ -55,7 +55,7 @@ export class Project extends BaseEntity {
 	//================================================================================
 
 	//// Project to project manager relationship ////
-	@Field(() => Number, { nullable: true })
+	@Field(() => User, { nullable: true })
 	@ManyToOne(() => User, (user) => user.managedProjects, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
@@ -63,7 +63,7 @@ export class Project extends BaseEntity {
 	manager: User | null;
 
 	//// Project to assigned developers relationship ////
-	@Field(() => Number, { nullable: true })
+	@Field(() => [User], { nullable: true })
 	@ManyToMany(() => User, (user) => user.assignedProjects, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
@@ -72,7 +72,7 @@ export class Project extends BaseEntity {
 	assignedDevelopers: User[] | null;
 
 	//// Project to organization relationship ////
-	@Field(() => Number)
+	@Field(() => Organization)
 	@ManyToOne(() => Organization, (organization) => organization.projects, {
 		cascade: ['insert', 'update'],
 		onDelete: 'CASCADE',
@@ -80,7 +80,7 @@ export class Project extends BaseEntity {
 	organization!: Organization;
 
 	//// Project to tickets relationship ////
-	@Field(() => Number, { nullable: true })
+	@Field(() => [Ticket], { nullable: true })
 	@OneToMany(() => Ticket, (ticket) => ticket.project, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
