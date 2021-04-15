@@ -4,21 +4,18 @@ import {
 	Ctx,
 	Field,
 	InputType,
-	Int,
 	Mutation,
 	ObjectType,
 	Query,
 	Resolver,
 	UseMiddleware,
 } from 'type-graphql';
-import { getConnection, getRepository } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { COOKIE_NAME } from '../constants';
 import { Organization } from '../entities/Organization';
-import { Project } from '../entities/Project';
 import { User, UserRoleType } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
-import { isProjectManager } from '../middleware/isProjectmanager';
 import { MyContext } from '../types';
 
 @ObjectType()
@@ -108,12 +105,32 @@ export class UserResolver {
 	) {
 		const hashedPassword = await argon2.hash(options.password);
 		let user;
+		if (!options.firstName) {
+			return {
+				errors: [
+					{
+						field: 'firstName',
+						message: 'Must have a first name.',
+					},
+				],
+			};
+		}
+		if (!options.lastName) {
+			return {
+				errors: [
+					{
+						field: 'lastName',
+						message: 'Must have a last name.',
+					},
+				],
+			};
+		}
 		if (options.email.length < 7) {
 			return {
 				errors: [
 					{
 						field: 'email',
-						message: 'invalid email.',
+						message: 'Invalid email.',
 					},
 				],
 			};
@@ -123,7 +140,17 @@ export class UserResolver {
 				errors: [
 					{
 						field: 'email',
-						message: 'invalid email format.',
+						message: 'Invalid email format.',
+					},
+				],
+			};
+		}
+		if (options.password.length < 4) {
+			return {
+				errors: [
+					{
+						field: 'password',
+						message: 'Length must be greater than 3.',
 					},
 				],
 			};
@@ -208,7 +235,7 @@ export class UserResolver {
 			return null;
 		}
 		return User.findOne(req.session.UserId, {
-			relations: ['organization', 'assignedProjects'],
+			relations: ['organization', 'assignedProjects', 'managedProjects'],
 		});
 	}
 	//================================================================================

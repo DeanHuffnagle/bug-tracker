@@ -26,10 +26,12 @@ const Organization_1 = require("./entities/Organization");
 const Project_1 = require("./entities/Project");
 const Ticket_1 = require("./entities/Ticket");
 const User_1 = require("./entities/User");
+const comment_1 = require("./resolvers/comment");
 const organization_1 = require("./resolvers/organization");
 const project_1 = require("./resolvers/project");
 const ticket_1 = require("./resolvers/ticket");
 const user_1 = require("./resolvers/user");
+const cors_1 = __importDefault(require("cors"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield typeorm_1.createConnection({
         type: 'postgres',
@@ -41,9 +43,12 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         logging: true,
     });
     const app = express_1.default();
-    ``;
     const RedisStore = connect_redis_1.default(express_session_1.default);
     const redisClient = redis_1.default.createClient();
+    app.use(cors_1.default({
+        origin: 'http://localhost:3000',
+        credentials: true,
+    }));
     app.use(express_session_1.default({
         name: constants_1.COOKIE_NAME,
         store: new RedisStore({
@@ -67,6 +72,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 organization_1.OrganizationResolver,
                 project_1.ProjectResolver,
                 ticket_1.TicketResolver,
+                comment_1.CommentResolver,
             ],
             validate: false,
         }),
@@ -75,7 +81,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             res,
         }),
     });
-    apolloServer.applyMiddleware({ app });
+    apolloServer.applyMiddleware({
+        app,
+        cors: false,
+    });
     app.listen(4000, () => {
         console.log('server started on localhost:4000');
     });

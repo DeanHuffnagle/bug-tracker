@@ -1,4 +1,4 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 import {
 	Entity,
 	Column,
@@ -17,12 +17,21 @@ export class Comment extends BaseEntity {
 	//================================================================================
 	//Columns
 	//================================================================================
+	@Field()
 	@PrimaryGeneratedColumn()
 	id!: number;
 
 	@Field()
 	@Column()
-	commentText!: string;
+	text!: string;
+
+	@Field(() => Int)
+	@Column()
+	commenterId!: number;
+
+	@Field(() => Int)
+	@Column()
+	ticketId!: number;
 
 	@Field(() => String)
 	@CreateDateColumn()

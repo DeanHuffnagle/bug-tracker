@@ -193,4 +193,84 @@ export class ProjectResolver {
 		});
 		return { project };
 	}
+	//================================================================================
+	//Assign Project Manager
+	//================================================================================
+	@Mutation(() => ProjectResponse)
+	@UseMiddleware(isAdmin)
+	async assignProjectManager(@Arg('options') options: AssignProjectInput) {
+		const isProject = await Project.findOne(options.projectId);
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isProject) {
+			return {
+				errors: [
+					{
+						field: 'project',
+						message: 'no project found.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(Project, 'manager')
+			.of(isProject)
+			.set(isUser);
+		const project = await Project.findOne(options.projectId, {
+			relations: ['manager'],
+		});
+
+		return { project };
+	}
+	//================================================================================
+	//Unassign Project Manager
+	//================================================================================
+	@Mutation(() => ProjectResponse)
+	@UseMiddleware(isProjectManager)
+	async unassignProjectManager(
+		@Arg('options') options: UnassignProjectInput
+	): Promise<ProjectResponse> {
+		const isProject = await Project.findOne(options.projectId);
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isProject) {
+			return {
+				errors: [
+					{
+						field: 'project',
+						message: 'no project found.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(Project, 'assignedDevelopers')
+			.of(isProject)
+			.set(null);
+
+		const project = await Project.findOne(options.projectId, {
+			relations: ['manager'],
+		});
+		return { project };
+	}
 }

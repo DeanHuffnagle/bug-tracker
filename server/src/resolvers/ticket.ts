@@ -12,7 +12,7 @@ import {
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { Project } from '../entities/Project';
-import { Ticket } from '../entities/Ticket';
+import { Ticket, TicketStatusType } from '../entities/Ticket';
 import { User } from '../entities/User';
 import { isSubmitter } from '../middleware/isSubmitter';
 import { MyContext } from '../types';
@@ -45,6 +45,14 @@ export class CreateTicketInput {
 	title: string;
 	@Field()
 	text: string;
+}
+
+@InputType()
+export class ChangeTicketStatusInput {
+	@Field(() => Int)
+	ticketId: number;
+	@Field(() => String)
+	status!: TicketStatusType;
 }
 
 //// CR ////
@@ -122,6 +130,30 @@ export class TicketResolver {
 	//================================================================================
 	@Query(() => Ticket, { nullable: true })
 	findTicket(@Arg('id', () => Int) id: number): Promise<Ticket | undefined> {
-		return Ticket.findOne(id, { relations: ['assignedDeveloper'] });
+		return Ticket.findOne(id, { relations: ['assignedDeveloper', 'project'] });
+	}
+	//================================================================================
+	//Change Ticket Status
+	//================================================================================
+	@Mutation(() => TicketResponse)
+	async changeTicketStatus(
+		@Arg('options') options: ChangeTicketStatusInput,
+		@Ctx() { req }: MyContext
+	): Promise<TicketResponse> {
+		// const isTicket = await Ticket.findOne(options.ticketId);
+		const isUser = await User.findOne(req.session.UserId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user is logged in.',
+					},
+				],
+			};
+		}
+		await Ticket.update({ id: options.ticketId }, { status: options.status });
+		const ticket = await Ticket.findOne(options.ticketId);
+		return { ticket };
 	}
 }

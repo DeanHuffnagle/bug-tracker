@@ -12,11 +12,12 @@ import { Organization } from './entities/Organization';
 import { Project } from './entities/Project';
 import { Ticket } from './entities/Ticket';
 import { User } from './entities/User';
+import { CommentResolver } from './resolvers/comment';
 import { OrganizationResolver } from './resolvers/organization';
 import { ProjectResolver } from './resolvers/project';
 import { TicketResolver } from './resolvers/ticket';
 import { UserResolver } from './resolvers/user';
-
+import cors from 'cors';
 const main = async () => {
 	await createConnection({
 		type: 'postgres',
@@ -30,10 +31,14 @@ const main = async () => {
 
 	const app = express();
 
-	``;
 	const RedisStore = connectRedis(session);
 	const redisClient = redis.createClient();
-
+	app.use(
+		cors({
+			origin: 'http://localhost:3000',
+			credentials: true,
+		})
+	);
 	app.use(
 		session({
 			name: COOKIE_NAME,
@@ -60,6 +65,7 @@ const main = async () => {
 				OrganizationResolver,
 				ProjectResolver,
 				TicketResolver,
+				CommentResolver,
 			],
 			validate: false,
 		}),
@@ -70,7 +76,10 @@ const main = async () => {
 	});
 
 	//creates the graphql endpoint on localhost
-	apolloServer.applyMiddleware({ app });
+	apolloServer.applyMiddleware({
+		app,
+		cors: false,
+	});
 
 	app.listen(4000, () => {
 		console.log('server started on localhost:4000');
