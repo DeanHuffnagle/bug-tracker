@@ -1,4 +1,4 @@
-import { Box, Button } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import React from 'react';
 import { InputField } from '../components/InputField';
@@ -13,51 +13,105 @@ const Register: React.FC<registerProps> = ({}) => {
 	const router = useRouter();
 	const [, register] = useRegisterMutation();
 	return (
-		<Wrapper variant="small">
-			<Formik
-				initialValues={{ firstName: '', lastName: '', email: '', password: '' }}
-				onSubmit={async (values, { setErrors }) => {
-					const response = await register(values);
-					if (response.data?.register.errors) {
-						setErrors(toErrorMap(response.data.register.errors));
-					} else if (response.data.register.user) {
-						router.push('/');
-					}
-				}}
-			>
-				{({ isSubmitting }) => (
-					<Form>
-						<InputField
-							name="firstName"
-							placeholder="first name"
-							label="First name"
-						/>
-						<Box mt={4}>
-							<InputField
-								name="lastName"
-								placeholder="last name"
-								label="Last name"
-							/>
-							<Box mt={4}>
-								<InputField name="email" placeholder="email" label="Email" />
-							</Box>
+		<Flex
+			flex="1"
+			alignItems="center"
+			bg="black"
+			style={{
+				backgroundImage: `url("http://localhost:3000/background.png")`,
+				backgroundSize: '100%',
+			}}
+		>
+			<Box ml="auto" mr="auto">
+				<Box
+					p={8}
+					maxWidth="500px"
+					borderWidth={1}
+					borderRadius={8}
+					bg="white"
+					boxShadow="lg"
+				>
+					<Box backgroundColor="white" p={1} borderRadius={10}>
+						<Box textAlign="center">
+							<Heading>Register</Heading>
 						</Box>
-						<Box mt={4}>
-							<InputField
-								name="password"
-								placeholder="password"
-								label="Password"
-								type="password"
-							/>
-						</Box>
+						<Box my={4} textAlign="left">
+							<Formik
+								initialValues={{
+									firstName: '',
+									lastName: '',
+									email: '',
+									password: '',
+								}}
+								onSubmit={async (values, { setErrors }) => {
+									const response = await register({ options: values });
+									if (response.data?.register.errors) {
+										setErrors(toErrorMap(response.data.register.errors));
+									} else if (response.data.register.user) {
+										router.push('/');
+									}
+								}}
+							>
+								{({ isSubmitting }) => (
+									<Form>
+										<InputField
+											name="firstName"
+											placeholder="first name"
+											label="First name"
+											required
+										/>
+										<Box mt={4}>
+											<InputField
+												name="lastName"
+												placeholder="last name"
+												label="Last name"
+												required
+											/>
+											<Box mt={4}>
+												<InputField
+													name="email"
+													placeholder="email"
+													label="Email"
+													required
+												/>
+											</Box>
+										</Box>
+										<Box mt={4}>
+											<InputField
+												name="password"
+												placeholder="password"
+												label="Password"
+												type="password"
+												required
+											/>
+										</Box>
 
-						<Button mt={4} type="submit" isLoading={isSubmitting}>
-							Register
-						</Button>
-					</Form>
-				)}
-			</Formik>
-		</Wrapper>
+										<Button
+											width="full"
+											colorScheme="teal"
+											mt={10}
+											type="submit"
+											isLoading={isSubmitting}
+										>
+											Register
+										</Button>
+									</Form>
+								)}
+							</Formik>
+						</Box>
+					</Box>
+				</Box>
+			</Box>
+			<style global jsx>{`
+				html,
+				body,
+				body > div:first-child,
+				div#__next,
+				div#__next > div {
+					height: 100%;
+				}
+			`}</style>
+		</Flex>
 	);
 };
 
