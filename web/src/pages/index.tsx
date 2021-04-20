@@ -8,18 +8,9 @@ import {
 	NavDropdown,
 	Row,
 } from 'react-bootstrap';
-import {
-	Bar,
-	BarChart,
-	CartesianGrid,
-	Cell,
-	Pie,
-	PieChart,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
-} from 'recharts';
+import PriorityBarGraph from '../components/PriorityBarGraph';
+import StatusBarGraph from '../components/StatusBarGraph';
+import TypePieChart from '../components/TypePieChart';
 
 //================================================================================
 //Ticket Priority Data
@@ -27,15 +18,15 @@ import {
 const ticketPriorityColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 const ticketPriorityData = [
 	{
-		priority: 'Low',
+		name: 'Low',
 		tickets: 2,
 	},
 	{
-		priority: 'Medium',
+		name: 'Medium',
 		tickets: 4,
 	},
 	{
-		priority: 'High',
+		name: 'High',
 		tickets: 3,
 	},
 ];
@@ -46,23 +37,43 @@ const ticketPriorityData = [
 const ticketStatusColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 const ticketStatusData = [
 	{
-		priority: 'Unassigned',
+		name: 'Unassigned',
 		tickets: 2,
 	},
 	{
-		priority: 'In progress',
+		name: 'In progress',
 		tickets: 2,
 	},
 	{
-		priority: 'Awaiting confirmation',
+		name: 'Awaiting confirmation',
 		tickets: 4,
 	},
 	{
-		priority: 'Resolved',
+		name: 'Resolved',
 		tickets: 3,
 	},
 ];
 
+//================================================================================
+//assigned tickets
+//================================================================================
+const assignedTickets = [
+	{
+		id: 1,
+		userId: 1,
+	},
+	{
+		id: 2,
+		userId: 1,
+	},
+	{
+		id: 3,
+		userId: 1,
+	},
+];
+//================================================================================
+//Index Page
+//================================================================================
 const Index = () => {
 	return (
 		<>
@@ -85,155 +96,64 @@ const Index = () => {
 					</Nav>
 				</Navbar.Collapse>
 			</Navbar>
-
-			<Container className="dark">
-				<Row className="mt-5">
-					//================================================================================
-					//bar chart 1
-					//================================================================================
-					<Col md>
-						<Card>
-							<ResponsiveContainer width="50%" height={200}>
-								<BarChart
-									data={ticketPriorityData}
-									margin={{
-										top: 5,
-										right: 30,
-										left: 20,
-										bottom: 5,
-									}}
-									barSize={20}
-								>
-									<XAxis
-										dataKey="priority"
-										scale="point"
-										padding={{ left: 15, right: 15 }}
-									/>
-									<YAxis />
-									<CartesianGrid strokeDasharray="3 3" />
-									<Tooltip />
-									<Bar
-										dataKey="tickets"
-										fill="#8884d8"
-										background={{ fill: '#eee' }}
-									>
-										{ticketPriorityData.map((entry, index) => (
-											<Cell
-												key={`cell-${index}`}
-												fill={
-													ticketPriorityColors[
-														index % ticketPriorityColors.length
-													]
-												}
-											/>
-										))}
-									</Bar>
-								</BarChart>
-							</ResponsiveContainer>
+			<Container>
+				<Row>
+					<Col className="mt-1">
+						<Card
+							className="chart-card"
+							style={{
+								width: '100%',
+								height: '100%',
+								background: 'rgb(225, 225, 225)',
+							}}
+						>
+							<div className="text-center" id="dashboard-card-titles">
+								Stats and Stuff
+							</div>
+							<div id="dashboard-stats-text">
+								Assigned Tickets: {assignedTickets.length}
+							</div>
 						</Card>
 					</Col>
-					//================================================================================
-					//pie chart 1
-					//================================================================================
-					<Col md>
-						<Card>
-							<ResponsiveContainer width="100%" height={200}>
-								<PieChart width={400} height={400}>
-									<Pie
-										dataKey="tickets"
-										startAngle={360}
-										endAngle={0}
-										data={ticketPriorityData}
-										cx="50%"
-										cy="50%"
-										outerRadius={80}
-										fill="#8884d8"
-										label
-									>
-										{ticketPriorityData.map((entry, index) => (
-											<Cell
-												key={`cell-${index}`}
-												fill={
-													ticketPriorityColors[
-														index % ticketPriorityColors.length
-													]
-												}
-											/>
-										))}
-									</Pie>
-									<Tooltip />
-								</PieChart>
-							</ResponsiveContainer>
+
+					<Col className="mt-1">
+						<Card
+							style={{
+								background: 'rgb(225, 225, 225)',
+							}}
+						>
+							<div className="text-center" id="dashboard-card-titles">
+								Tickets by Type
+							</div>
+							<TypePieChart />
 						</Card>
 					</Col>
 				</Row>
 
 				<Row>
-					//================================================================================
-					//bar chart 2
-					//================================================================================
-					<Col>
-						<Card>
-							<ResponsiveContainer width="50%" height={200}>
-								<BarChart
-									data={ticketPriorityData}
-									margin={{
-										top: 5,
-										right: 30,
-										left: 20,
-										bottom: 5,
-									}}
-									barSize={20}
-								>
-									<XAxis
-										dataKey="priority"
-										scale="point"
-										padding={{ left: 15, right: 15 }}
-									/>
-									<YAxis />
-									<CartesianGrid strokeDasharray="3 3" />
-									<Tooltip />
-									<Bar
-										dataKey="tickets"
-										fill="#8884d8"
-										background={{ fill: '#eee' }}
-									>
-										{ticketPriorityData.map((entry, index) => (
-											<Cell
-												key={`cell-${index}`}
-												fill={
-													ticketPriorityColors[
-														index % ticketPriorityColors.length
-													]
-												}
-											/>
-										))}
-									</Bar>
-								</BarChart>
-							</ResponsiveContainer>
+					<Col className="mt-1">
+						<Card
+							style={{
+								background: 'rgb(225, 225, 225)',
+							}}
+						>
+							<div className="text-center" id="dashboard-card-titles">
+								Tickets by Priority
+							</div>
+							<PriorityBarGraph />
 						</Card>
 					</Col>
-					//================================================================================
-					//pie chart 2
-					//================================================================================
-					<Col>
-						<Card>
-							<ResponsiveContainer width="100%" height={200}>
-								<PieChart width={400} height={400}>
-									<Pie
-										dataKey="tickets"
-										startAngle={360}
-										endAngle={0}
-										data={ticketStatusData}
-										cx="50%"
-										cy="50%"
-										outerRadius={80}
-										fill="#8884d8"
-										label
-									/>
-									<Tooltip />
-								</PieChart>
-							</ResponsiveContainer>
+
+					<Col className="mt-1">
+						<Card
+							style={{
+								background: 'rgb(225, 225, 225)',
+							}}
+						>
+							<div className="text-center" id="dashboard-card-titles">
+								Tickets by Status
+							</div>
+							<StatusBarGraph />
 						</Card>
 					</Col>
 				</Row>

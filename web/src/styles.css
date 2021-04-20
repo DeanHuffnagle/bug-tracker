@@ -1,0 +1,17 @@
+body {
+	background-color: rgb(170, 170, 170) !important;
+}
+
+.chart-card {
+	background: 'rgb(192, 192, 192)';
+}
+
+#dashboard-card-titles {
+	font-weight: bold;
+}
+
+#dashboard-stats-text {
+	font-weight: bolder;
+	margin-left: 20px;
+	margin-top: 10px;
+}

@@ -21,6 +21,12 @@ export type TicketStatusType =
 	| 'awaitingConfirmation'
 	| 'resolved';
 
+export type TicketTypeType =
+	| 'bugOrError'
+	| 'featureRequest'
+	| 'other'
+	| 'trainingRequest';
+
 @ObjectType()
 @Entity()
 export class Ticket extends BaseEntity {
@@ -67,6 +73,14 @@ export class Ticket extends BaseEntity {
 		default: 'unassigned',
 	})
 	status!: TicketStatusType;
+
+	@Field()
+	@Column({
+		type: 'enum',
+		enum: ['bugOrError', 'featureRequest', 'other', 'trainingRequest'],
+		default: 'otherComment',
+	})
+	type!: TicketTypeType;
 
 	@Field(() => String)
 	@CreateDateColumn()

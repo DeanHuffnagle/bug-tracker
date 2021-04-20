@@ -2,6 +2,7 @@ import { ChakraProvider, ColorModeProvider, CSSReset } from '@chakra-ui/react';
 import React from 'react';
 import { createClient, Provider } from 'urql';
 import theme from '../theme';
+import '../styles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const client = createClient({
