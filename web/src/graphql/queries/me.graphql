@@ -1,0 +1,22 @@
+query Me {
+	me {
+		id
+		firstName
+		lastName
+		email
+		role
+
+		organization {
+			id
+			name
+		}
+		assignedProjects {
+			id
+			name
+		}
+		managedProjects {
+			id
+			name
+		}
+	}
+}

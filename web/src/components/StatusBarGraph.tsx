@@ -9,25 +9,60 @@ import {
 	XAxis,
 	YAxis,
 } from 'recharts';
+import { useFindAssignedTicketsByStatusQuery } from '../generated/graphql';
 
 export default function StatusBarGraph() {
+	const [{ data: unassignedData }] = useFindAssignedTicketsByStatusQuery({
+		variables: {
+			options: {
+				status: 'unassigned',
+			},
+		},
+	});
+
+	const [{ data: inProgressData }] = useFindAssignedTicketsByStatusQuery({
+		variables: {
+			options: {
+				status: 'inProgress',
+			},
+		},
+	});
+
+	const [
+		{ data: awaitingConfirmationData },
+	] = useFindAssignedTicketsByStatusQuery({
+		variables: {
+			options: {
+				status: 'awaitingConfirmation',
+			},
+		},
+	});
+
+	const [{ data: resolvedData }] = useFindAssignedTicketsByStatusQuery({
+		variables: {
+			options: {
+				status: 'resolved',
+			},
+		},
+	});
+
 	const ticketStatusColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 	const ticketStatusData = [
 		{
 			name: 'Unassigned',
-			tickets: 2,
+			tickets: unassignedData?.findAssignedTicketsByStatus.length,
 		},
 		{
 			name: 'In progress',
-			tickets: 2,
+			tickets: inProgressData?.findAssignedTicketsByStatus.length,
 		},
 		{
 			name: 'Awaiting confirmation',
-			tickets: 4,
+			tickets: awaitingConfirmationData?.findAssignedTicketsByStatus.length,
 		},
 		{
 			name: 'Resolved',
-			tickets: 3,
+			tickets: resolvedData?.findAssignedTicketsByStatus.length,
 		},
 	];
 

@@ -1,0 +1,11 @@
+query FindAssignedTicketsByStatus($options: FindAssignedTicketsByStatusInput!) {
+	findAssignedTicketsByStatus(options: $options) {
+		id
+		title
+		text
+		priority
+		status
+		type
+		assignedDeveloperId
+	}
+}

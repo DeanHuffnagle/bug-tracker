@@ -1,0 +1,11 @@
+query FindAssignedTickets {
+	findAssignedTickets {
+		id
+		title
+		text
+		priority
+		status
+		type
+		assignedDeveloperId
+	}
+}

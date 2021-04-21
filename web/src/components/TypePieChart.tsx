@@ -1,26 +1,61 @@
 import React, { PureComponent } from 'react';
 import { PieChart, Pie, Sector, ResponsiveContainer, Cell } from 'recharts';
+import {
+	useFindAssignedTicketsByTypeQuery,
+	useMeQuery,
+} from '../generated/graphql';
 
 //================================================================================
 //Ticket Priority Data
 //================================================================================
+
+// const [{ data: bugTypeData }] = useFindAssignedTicketsByTypeQuery({
+// 	variables: {
+// 		options: {
+// 			type: 'bugOrError',
+// 		},
+// 	},
+// });
+// const [{ data: otherTypeData }] = useFindAssignedTicketsByTypeQuery({
+// 	variables: {
+// 		options: {
+// 			type: 'other',
+// 		},
+// 	},
+// });
+// const [{ data: featureRequestTypeData }] = useFindAssignedTicketsByTypeQuery({
+// 	variables: {
+// 		options: {
+// 			type: 'featureRequest',
+// 		},
+// 	},
+// });
+// const [{ data: trainingRequestTypeData }] = useFindAssignedTicketsByTypeQuery(
+// 	{
+// 		variables: {
+// 			options: {
+// 				type: 'trainingRequest',
+// 			},
+// 		},
+// 	}
+// );
 const ticketTypeColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 const ticketTypeData = [
 	{
 		name: 'Bug/Errors',
-		tickets: 2,
+		tickets: 34,
 	},
 	{
 		name: 'Other',
-		tickets: 4,
+		tickets: 76,
 	},
 	{
 		name: 'Feature Requests',
-		tickets: 3,
+		tickets: 17,
 	},
 	{
 		name: 'Training Requests',
-		tickets: 3,
+		tickets: 12,
 	},
 ];
 

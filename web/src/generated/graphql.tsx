@@ -19,6 +19,11 @@ export type AssignProjectInput = {
   userId: Scalars['Int'];
 };
 
+export type AssignTicketInput = {
+  ticketId: Scalars['Int'];
+  userId: Scalars['Int'];
+};
+
 export type ChangeOrganizationNameInput = {
   name: Scalars['String'];
 };
@@ -28,9 +33,19 @@ export type ChangeRoleInput = {
   userRole: Scalars['String'];
 };
 
+export type ChangeTicketPriorityInput = {
+  ticketId: Scalars['Int'];
+  priority: Scalars['String'];
+};
+
 export type ChangeTicketStatusInput = {
   ticketId: Scalars['Int'];
   status: Scalars['String'];
+};
+
+export type ChangeTicketTypeInput = {
+  ticketId: Scalars['Int'];
+  type: Scalars['String'];
 };
 
 export type Comment = {
@@ -83,6 +98,18 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
+export type FindAssignedTicketsByPriorityInput = {
+  priority: Scalars['String'];
+};
+
+export type FindAssignedTicketsByStatusInput = {
+  status: Scalars['String'];
+};
+
+export type FindAssignedTicketsByTypeInput = {
+  type: Scalars['String'];
+};
+
 export type FindCommentInput = {
   commentId: Scalars['Float'];
 };
@@ -112,7 +139,10 @@ export type Mutation = {
   assignProjectManager: ProjectResponse;
   unassignProjectManager: ProjectResponse;
   createTicket: TicketResponse;
+  assignTicket: TicketResponse;
   changeTicketStatus: TicketResponse;
+  changeTicketPriority: TicketResponse;
+  changeTicketType: TicketResponse;
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -173,8 +203,23 @@ export type MutationCreateTicketArgs = {
 };
 
 
+export type MutationAssignTicketArgs = {
+  options: AssignTicketInput;
+};
+
+
 export type MutationChangeTicketStatusArgs = {
   options: ChangeTicketStatusInput;
+};
+
+
+export type MutationChangeTicketPriorityArgs = {
+  options: ChangeTicketPriorityInput;
+};
+
+
+export type MutationChangeTicketTypeArgs = {
+  options: ChangeTicketTypeInput;
 };
 
 
@@ -262,6 +307,11 @@ export type Query = {
   findOrganization?: Maybe<Organization>;
   findProject?: Maybe<Project>;
   findTicket?: Maybe<Ticket>;
+  findTickets: Array<Ticket>;
+  findAssignedTickets?: Maybe<Array<Ticket>>;
+  findAssignedTicketsByPriority?: Maybe<Array<Ticket>>;
+  findAssignedTicketsByStatus?: Maybe<Array<Ticket>>;
+  findAssignedTicketsByType?: Maybe<Array<Ticket>>;
   me?: Maybe<User>;
 };
 
@@ -285,16 +335,32 @@ export type QueryFindTicketArgs = {
   id: Scalars['Int'];
 };
 
+
+export type QueryFindAssignedTicketsByPriorityArgs = {
+  options: FindAssignedTicketsByPriorityInput;
+};
+
+
+export type QueryFindAssignedTicketsByStatusArgs = {
+  options: FindAssignedTicketsByStatusInput;
+};
+
+
+export type QueryFindAssignedTicketsByTypeArgs = {
+  options: FindAssignedTicketsByTypeInput;
+};
+
 export type Ticket = {
   __typename?: 'Ticket';
   id: Scalars['Float'];
   title: Scalars['String'];
   text: Scalars['String'];
-  developerId?: Maybe<Scalars['Int']>;
+  assignedDeveloperId?: Maybe<Scalars['Int']>;
   creatorId: Scalars['Int'];
   projectId: Scalars['Int'];
   priority: Scalars['String'];
   status: Scalars['String'];
+  type: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   assignedDeveloper?: Maybe<User>;
@@ -401,6 +467,77 @@ export type RegisterMutation = (
   ) }
 );
 
+export type FindAssignedTicketsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindAssignedTicketsQuery = (
+  { __typename?: 'Query' }
+  & { findAssignedTickets?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & Pick<Ticket, 'id' | 'title' | 'text' | 'priority' | 'status' | 'type' | 'assignedDeveloperId'>
+  )>> }
+);
+
+export type FindAssignedTicketsByPriorityQueryVariables = Exact<{
+  options: FindAssignedTicketsByPriorityInput;
+}>;
+
+
+export type FindAssignedTicketsByPriorityQuery = (
+  { __typename?: 'Query' }
+  & { findAssignedTicketsByPriority?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & Pick<Ticket, 'id' | 'title' | 'text' | 'priority' | 'status' | 'type' | 'assignedDeveloperId'>
+  )>> }
+);
+
+export type FindAssignedTicketsByStatusQueryVariables = Exact<{
+  options: FindAssignedTicketsByStatusInput;
+}>;
+
+
+export type FindAssignedTicketsByStatusQuery = (
+  { __typename?: 'Query' }
+  & { findAssignedTicketsByStatus?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & Pick<Ticket, 'id' | 'title' | 'text' | 'priority' | 'status' | 'type' | 'assignedDeveloperId'>
+  )>> }
+);
+
+export type FindAssignedTicketsByTypeQueryVariables = Exact<{
+  options: FindAssignedTicketsByTypeInput;
+}>;
+
+
+export type FindAssignedTicketsByTypeQuery = (
+  { __typename?: 'Query' }
+  & { findAssignedTicketsByType?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & Pick<Ticket, 'id' | 'title' | 'text' | 'priority' | 'status' | 'type' | 'assignedDeveloperId'>
+  )>> }
+);
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = (
+  { __typename?: 'Query' }
+  & { me?: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role'>
+    & { organization?: Maybe<(
+      { __typename?: 'Organization' }
+      & Pick<Organization, 'id' | 'name'>
+    )>, assignedProjects?: Maybe<Array<(
+      { __typename?: 'Project' }
+      & Pick<Project, 'id' | 'name'>
+    )>>, managedProjects?: Maybe<Array<(
+      { __typename?: 'Project' }
+      & Pick<Project, 'id' | 'name'>
+    )>> }
+  )> }
+);
+
 
 export const LoginDocument = gql`
     mutation Login($options: UserLoginInput!) {
@@ -447,4 +584,99 @@ export const RegisterDocument = gql`
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const FindAssignedTicketsDocument = gql`
+    query FindAssignedTickets {
+  findAssignedTickets {
+    id
+    title
+    text
+    priority
+    status
+    type
+    assignedDeveloperId
+  }
+}
+    `;
+
+export function useFindAssignedTicketsQuery(options: Omit<Urql.UseQueryArgs<FindAssignedTicketsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindAssignedTicketsQuery>({ query: FindAssignedTicketsDocument, ...options });
+};
+export const FindAssignedTicketsByPriorityDocument = gql`
+    query FindAssignedTicketsByPriority($options: FindAssignedTicketsByPriorityInput!) {
+  findAssignedTicketsByPriority(options: $options) {
+    id
+    title
+    text
+    priority
+    status
+    type
+    assignedDeveloperId
+  }
+}
+    `;
+
+export function useFindAssignedTicketsByPriorityQuery(options: Omit<Urql.UseQueryArgs<FindAssignedTicketsByPriorityQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindAssignedTicketsByPriorityQuery>({ query: FindAssignedTicketsByPriorityDocument, ...options });
+};
+export const FindAssignedTicketsByStatusDocument = gql`
+    query FindAssignedTicketsByStatus($options: FindAssignedTicketsByStatusInput!) {
+  findAssignedTicketsByStatus(options: $options) {
+    id
+    title
+    text
+    priority
+    status
+    type
+    assignedDeveloperId
+  }
+}
+    `;
+
+export function useFindAssignedTicketsByStatusQuery(options: Omit<Urql.UseQueryArgs<FindAssignedTicketsByStatusQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindAssignedTicketsByStatusQuery>({ query: FindAssignedTicketsByStatusDocument, ...options });
+};
+export const FindAssignedTicketsByTypeDocument = gql`
+    query FindAssignedTicketsByType($options: FindAssignedTicketsByTypeInput!) {
+  findAssignedTicketsByType(options: $options) {
+    id
+    title
+    text
+    priority
+    status
+    type
+    assignedDeveloperId
+  }
+}
+    `;
+
+export function useFindAssignedTicketsByTypeQuery(options: Omit<Urql.UseQueryArgs<FindAssignedTicketsByTypeQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindAssignedTicketsByTypeQuery>({ query: FindAssignedTicketsByTypeDocument, ...options });
+};
+export const MeDocument = gql`
+    query Me {
+  me {
+    id
+    firstName
+    lastName
+    email
+    role
+    organization {
+      id
+      name
+    }
+    assignedProjects {
+      id
+      name
+    }
+    managedProjects {
+      id
+      name
+    }
+  }
+}
+    `;
+
+export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };

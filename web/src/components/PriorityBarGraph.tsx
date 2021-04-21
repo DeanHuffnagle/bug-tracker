@@ -10,21 +10,49 @@ import {
 	Cell,
 	Tooltip,
 } from 'recharts';
+import {
+	useFindAssignedTicketsByPriorityQuery,
+	useFindAssignedTicketsQuery,
+	useMeQuery,
+} from '../generated/graphql';
 
 export default function PriorityBarGraph() {
+	const [{ data: meData }] = useMeQuery();
+	const [{ data: lowData }] = useFindAssignedTicketsByPriorityQuery({
+		variables: {
+			options: {
+				priority: 'low',
+			},
+		},
+	});
+	const [{ data: mediumData }] = useFindAssignedTicketsByPriorityQuery({
+		variables: {
+			options: {
+				priority: 'medium',
+			},
+		},
+	});
+	const [{ data: highData }] = useFindAssignedTicketsByPriorityQuery({
+		variables: {
+			options: {
+				priority: 'high',
+			},
+		},
+	});
+
 	const ticketPriorityColors = ['#264653', '#2a9d8f', '#e76f51'];
 	const ticketPriorityData = [
 		{
 			name: 'Low',
-			tickets: 2,
+			tickets: lowData?.findAssignedTicketsByPriority.length,
 		},
 		{
 			name: 'Medium',
-			tickets: 4,
+			tickets: mediumData?.findAssignedTicketsByPriority.length,
 		},
 		{
 			name: 'High',
-			tickets: 3,
+			tickets: highData?.findAssignedTicketsByPriority.length,
 		},
 	];
 
