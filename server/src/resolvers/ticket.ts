@@ -12,8 +12,14 @@ import {
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { Project } from '../entities/Project';
-import { Ticket, TicketStatusType } from '../entities/Ticket';
+import {
+	Ticket,
+	TicketPriorityType,
+	TicketStatusType,
+	TicketTypeType,
+} from '../entities/Ticket';
 import { User } from '../entities/User';
+import { isProjectManager } from '../middleware/isProjectManager';
 import { isSubmitter } from '../middleware/isSubmitter';
 import { MyContext } from '../types';
 
@@ -55,6 +61,45 @@ export class ChangeTicketStatusInput {
 	status!: TicketStatusType;
 }
 
+@InputType()
+export class ChangeTicketPriorityInput {
+	@Field(() => Int)
+	ticketId: number;
+	@Field(() => String)
+	priority!: TicketPriorityType;
+}
+
+@InputType()
+export class ChangeTicketTypeInput {
+	@Field(() => Int)
+	ticketId: number;
+	@Field(() => String)
+	type!: TicketTypeType;
+}
+
+@InputType()
+export class AssignTicketInput {
+	@Field(() => Int)
+	ticketId!: number;
+	@Field(() => Int)
+	userId!: number;
+}
+
+@InputType()
+export class FindAssignedTicketsByPriorityInput {
+	@Field(() => String)
+	priority: TicketPriorityType;
+}
+@InputType()
+export class FindAssignedTicketsByStatusInput {
+	@Field(() => String)
+	status: TicketStatusType;
+}
+@InputType()
+export class FindAssignedTicketsByTypeInput {
+	@Field(() => String)
+	type: TicketTypeType;
+}
 //// CR ////
 @Resolver(Ticket)
 export class TicketResolver {
@@ -124,13 +169,43 @@ export class TicketResolver {
 		}
 		return { ticket };
 	}
-
 	//================================================================================
-	//Find Ticket Query
+	//Assign Ticket Mutation
 	//================================================================================
-	@Query(() => Ticket, { nullable: true })
-	findTicket(@Arg('id', () => Int) id: number): Promise<Ticket | undefined> {
-		return Ticket.findOne(id, { relations: ['assignedDeveloper', 'project'] });
+	@Mutation(() => TicketResponse)
+	@UseMiddleware(isProjectManager)
+	async assignTicket(@Arg('options') options: AssignTicketInput) {
+		const isTicket = await Ticket.findOne(options.ticketId);
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isTicket) {
+			return {
+				errors: [
+					{
+						field: 'project',
+						message: 'no project found.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(Ticket, 'assignedDeveloper')
+			.of(isTicket)
+			.set(isUser);
+		const ticket = await Ticket.findOne(options.ticketId, {
+			relations: ['assignedDeveloper'],
+		});
+		return { ticket };
 	}
 	//================================================================================
 	//Change Ticket Status
@@ -155,5 +230,138 @@ export class TicketResolver {
 		await Ticket.update({ id: options.ticketId }, { status: options.status });
 		const ticket = await Ticket.findOne(options.ticketId);
 		return { ticket };
+	}
+	//================================================================================
+	//Change Ticket Priority
+	//================================================================================
+	@Mutation(() => TicketResponse)
+	async changeTicketPriority(
+		@Arg('options') options: ChangeTicketPriorityInput,
+		@Ctx() { req }: MyContext
+	): Promise<TicketResponse> {
+		// const isTicket = await Ticket.findOne(options.ticketId);
+		const isUser = await User.findOne(req.session.UserId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user is logged in.',
+					},
+				],
+			};
+		}
+		await Ticket.update(
+			{ id: options.ticketId },
+			{ priority: options.priority }
+		);
+		const ticket = await Ticket.findOne(options.ticketId);
+		return { ticket };
+	}
+	//================================================================================
+	//Change Ticket Type
+	//================================================================================
+	@Mutation(() => TicketResponse)
+	async changeTicketType(
+		@Arg('options') options: ChangeTicketTypeInput,
+		@Ctx() { req }: MyContext
+	): Promise<TicketResponse> {
+		// const isTicket = await Ticket.findOne(options.ticketId);
+		const isUser = await User.findOne(req.session.UserId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user is logged in.',
+					},
+				],
+			};
+		}
+		await Ticket.update({ id: options.ticketId }, { type: options.type });
+		const ticket = await Ticket.findOne(options.ticketId);
+		return { ticket };
+	}
+	//================================================================================
+	//Find Ticket Query
+	//================================================================================
+	@Query(() => Ticket, { nullable: true })
+	findTicket(@Arg('id', () => Int) id: number): Promise<Ticket | undefined> {
+		return Ticket.findOne(id, { relations: ['assignedDeveloper', 'project'] });
+	}
+	//================================================================================
+	//Find Tickets Query
+	//================================================================================
+	@Query(() => [Ticket])
+	async findTickets(): Promise<Ticket[]> {
+		return Ticket.find();
+	}
+	//================================================================================
+	//Find Assigned Tickets Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findAssignedTickets(@Ctx() { req }: MyContext): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const assignedTickets = await getConnection()
+			.createQueryBuilder()
+			.select('ticket')
+			.from(Ticket, 'ticket')
+			.where('ticket.assignedDeveloperId = :id', { id: isUser?.id })
+			.getMany();
+		return assignedTickets;
+	}
+	//================================================================================
+	//Find Assigned Tickets By Priority Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findAssignedTicketsByPriority(
+		@Arg('options') options: FindAssignedTicketsByPriorityInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByPriority = await getConnection()
+			.createQueryBuilder()
+			.select('ticket')
+			.from(Ticket, 'ticket')
+			.where('ticket.priority = :priority', { priority: options.priority })
+			.andWhere('ticket.assignedDeveloperId = :id', { id: isUser?.id })
+			.getMany();
+		return ticketsByPriority;
+	}
+	//================================================================================
+	//Find Assigned Tickets By Status Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findAssignedTicketsByStatus(
+		@Arg('options') options: FindAssignedTicketsByStatusInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByStatus = await getConnection()
+			.createQueryBuilder()
+			.select('ticket')
+			.from(Ticket, 'ticket')
+			.where('ticket.status = :status', { status: options.status })
+			.andWhere('ticket.assignedDeveloperId = :id', { id: isUser?.id })
+			.getMany();
+		return ticketsByStatus;
+	}
+	//================================================================================
+	//Find Assigned Tickets By Type Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findAssignedTicketsByType(
+		@Arg('options') options: FindAssignedTicketsByTypeInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByType = await getConnection()
+			.createQueryBuilder()
+			.select('ticket')
+			.from(Ticket, 'ticket')
+			.where('ticket.type = :type', { type: options.type })
+			.andWhere('ticket.assignedDeveloperId = :id', { id: isUser?.id })
+			.getMany();
+		return ticketsByType;
 	}
 }

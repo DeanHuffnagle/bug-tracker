@@ -14,7 +14,7 @@ import { getConnection } from 'typeorm';
 import { Project } from '../entities/Project';
 import { User } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
-import { isProjectManager } from '../middleware/isProjectmanager';
+import { isProjectManager } from '../middleware/isProjectManager';
 import { MyContext } from '../types';
 
 @ObjectType()

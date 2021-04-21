@@ -48,7 +48,7 @@ export class Ticket extends BaseEntity {
 
 	@Field(() => Int, { nullable: true })
 	@Column({ nullable: true })
-	developerId: number;
+	assignedDeveloperId: number;
 
 	@Field(() => Int)
 	@Column()
@@ -78,7 +78,7 @@ export class Ticket extends BaseEntity {
 	@Column({
 		type: 'enum',
 		enum: ['bugOrError', 'featureRequest', 'other', 'trainingRequest'],
-		default: 'otherComment',
+		default: 'other',
 	})
 	type!: TicketTypeType;
 
