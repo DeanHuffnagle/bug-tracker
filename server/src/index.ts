@@ -2,7 +2,7 @@ import { ApolloServer } from 'apollo-server-express';
 import connectRedis from 'connect-redis';
 import express from 'express';
 import session from 'express-session';
-import redis from 'redis';
+import Redis from 'ioredis';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
@@ -18,6 +18,7 @@ import { ProjectResolver } from './resolvers/project';
 import { TicketResolver } from './resolvers/ticket';
 import { UserResolver } from './resolvers/user';
 import cors from 'cors';
+
 const main = async () => {
 	await createConnection({
 		type: 'postgres',
@@ -32,7 +33,7 @@ const main = async () => {
 	const app = express();
 
 	const RedisStore = connectRedis(session);
-	const redisClient = redis.createClient();
+	const redis = new Redis();
 	app.use(
 		cors({
 			origin: 'http://localhost:3000',
@@ -43,7 +44,7 @@ const main = async () => {
 		session({
 			name: COOKIE_NAME,
 			store: new RedisStore({
-				client: redisClient,
+				client: redis,
 				disableTouch: true,
 			}),
 			cookie: {
@@ -72,6 +73,7 @@ const main = async () => {
 		context: ({ req, res }) => ({
 			req,
 			res,
+			redis,
 		}),
 	});
 

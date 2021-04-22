@@ -11,12 +11,14 @@ import {
 	UseMiddleware,
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
-import { COOKIE_NAME } from '../constants';
+import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from '../constants';
 import { Organization } from '../entities/Organization';
 import { User, UserRoleType } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
+import { sendEmail } from '../utils/sendEmail';
+import { v4 } from 'uuid';
 
 @ObjectType()
 class FieldError {
@@ -224,6 +226,35 @@ export class UserResolver {
 		console.log('second req.session.User.id: ', req.session.UserId);
 
 		return { user };
+	}
+	//================================================================================
+	//Forgot Password Mutation
+	//================================================================================
+	@Mutation(() => Boolean)
+	async forgotPassword(
+		@Arg('email') email: string,
+		@Ctx() { redis }: MyContext
+	): Promise<Boolean> {
+		const user = await User.findOne({ where: { email } });
+		if (!user) {
+			//the email is not in the database
+			return true;
+		}
+
+		const token = v4();
+
+		await redis.set(
+			FORGOT_PASSWORD_PREFIX + token,
+			user.id,
+			'ex',
+			1000 * 60 * 60 * 24 * 3
+		); // 3 days
+
+		sendEmail(
+			email,
+			`<a href="http:localhost:3000/change-password/${token}">reset password</a>`
+		);
+		return true;
 	}
 
 	//================================================================================

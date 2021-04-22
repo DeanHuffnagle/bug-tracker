@@ -8,9 +8,12 @@ import {
 	NavDropdown,
 	Row,
 } from 'react-bootstrap';
-import PriorityBarGraph from '../components/PriorityBarGraph';
-import StatusBarGraph from '../components/StatusBarGraph';
-import TypePieChart from '../components/TypePieChart';
+import DeveloperPriorityBarGraph from '../components/DeveloperPriorityBarGraph';
+import PriorityBarGraph from '../components/DeveloperPriorityBarGraph';
+import DeveloperStatusBarGraph from '../components/DeveloperStatusBarGraph';
+import StatusBarGraph from '../components/DeveloperStatusBarGraph';
+import DeveloperTypePieChart from '../components/DeveloperTypePieChart';
+import TypePieChart from '../components/DeveloperTypePieChart';
 import { useFindAssignedTicketsQuery, useMeQuery } from '../generated/graphql';
 
 //================================================================================
@@ -71,7 +74,7 @@ const Index = () => {
 							<div className="text-center" id="dashboard-card-titles">
 								Tickets by Type
 							</div>
-							<TypePieChart />
+							<DeveloperTypePieChart />
 						</Card>
 					</Col>
 				</Row>
@@ -86,7 +89,7 @@ const Index = () => {
 							<div className="text-center" id="dashboard-card-titles">
 								Tickets by Priority
 							</div>
-							<PriorityBarGraph />
+							<DeveloperPriorityBarGraph />
 						</Card>
 					</Col>
 
@@ -99,7 +102,7 @@ const Index = () => {
 							<div className="text-center" id="dashboard-card-titles">
 								Tickets by Status
 							</div>
-							<StatusBarGraph />
+							<DeveloperStatusBarGraph />
 						</Card>
 					</Col>
 				</Row>
