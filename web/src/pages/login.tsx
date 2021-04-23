@@ -51,7 +51,7 @@ const login: React.FC<loginProps> = ({}) => {
 									const response = await login({ options: values });
 									if (response.data?.login.errors) {
 										setErrors(toErrorMap(response.data.login.errors));
-									} else if (response.data.login.user) {
+									} else if (response.data?.login.user) {
 										router.push('/');
 									}
 								}}

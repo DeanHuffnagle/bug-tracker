@@ -28,6 +28,11 @@ export type ChangeOrganizationNameInput = {
   name: Scalars['String'];
 };
 
+export type ChangePasswordInput = {
+  newPassword: Scalars['String'];
+  repeatPassword: Scalars['String'];
+};
+
 export type ChangeRoleInput = {
   userId: Scalars['Float'];
   userRole: Scalars['String'];
@@ -145,6 +150,8 @@ export type Mutation = {
   changeTicketType: TicketResponse;
   register: UserResponse;
   login: UserResponse;
+  forgotPassword: Scalars['Boolean'];
+  changePassword: UserResponse;
   logout: Scalars['Boolean'];
   makeAdmin: UserResponse;
   changeUserRole: UserResponse;
@@ -230,6 +237,17 @@ export type MutationRegisterArgs = {
 
 export type MutationLoginArgs = {
   options: UserLoginInput;
+};
+
+
+export type MutationForgotPasswordArgs = {
+  email: Scalars['String'];
+};
+
+
+export type MutationChangePasswordArgs = {
+  token: Scalars['String'];
+  options: ChangePasswordInput;
 };
 
 
@@ -425,6 +443,26 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
+export type ChangePasswordMutationVariables = Exact<{
+  options: ChangePasswordInput;
+  token: Scalars['String'];
+}>;
+
+
+export type ChangePasswordMutation = (
+  { __typename?: 'Mutation' }
+  & { changePassword: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+    )> }
+  ) }
+);
+
 export type LoginMutationVariables = Exact<{
   options: UserLoginInput;
 }>;
@@ -539,6 +577,26 @@ export type MeQuery = (
 );
 
 
+export const ChangePasswordDocument = gql`
+    mutation ChangePassword($options: ChangePasswordInput!, $token: String!) {
+  changePassword(options: $options, token: $token) {
+    errors {
+      field
+      message
+    }
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+}
+    `;
+
+export function useChangePasswordMutation() {
+  return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
 export const LoginDocument = gql`
     mutation Login($options: UserLoginInput!) {
   login(options: $options) {

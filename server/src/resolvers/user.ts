@@ -44,22 +44,22 @@ class UserResponse {
 @InputType()
 export class UserRegisterInput {
 	@Field()
-	firstName: string;
+	firstName!: string;
 	@Field()
-	lastName: string;
+	lastName!: string;
 	@Field()
-	email: string;
+	email!: string;
 	@Field()
-	password: string;
+	password!: string;
 }
 
 //// Login ////
 @InputType()
 export class UserLoginInput {
 	@Field()
-	email: string;
+	email!: string;
 	@Field()
-	password: string;
+	password!: string;
 }
 
 //// Join Organization ////
@@ -68,21 +68,21 @@ export class JoinOrganizationInput {
 	@Field()
 	organizationId: number;
 	@Field()
-	userId: number;
+	userId!: number;
 }
 
 //// Leave Organization ////
 @InputType()
 export class LeaveOrganizationInput {
 	@Field()
-	userId: number;
+	userId!: number;
 }
 
 //// Make Admin ////
 @InputType()
 export class MakeAdminInput {
 	@Field()
-	userId: number;
+	userId!: number;
 }
 
 //// Change Role ////
@@ -92,6 +92,15 @@ export class ChangeRoleInput {
 	userId: number;
 	@Field(() => String)
 	userRole!: () => UserRoleType;
+}
+
+//// Change Password ////
+@InputType()
+export class ChangePasswordInput {
+	@Field()
+	newPassword!: string;
+	@Field()
+	repeatPassword!: string;
 }
 
 //// CRU ////
@@ -247,14 +256,80 @@ export class UserResolver {
 			FORGOT_PASSWORD_PREFIX + token,
 			user.id,
 			'ex',
-			1000 * 60 * 60 * 24 * 3
-		); // 3 days
+			1000 * 60 * 60 * 24 * 3 // 3 days
+		);
 
 		sendEmail(
 			email,
 			`<a href="http:localhost:3000/change-password/${token}">reset password</a>`
 		);
 		return true;
+	}
+	//================================================================================
+	//Change Password Mutation
+	//================================================================================
+	@Mutation(() => UserResponse)
+	async changePassword(
+		@Arg('options') options: ChangePasswordInput,
+		@Arg('token') token: string,
+		@Ctx() { req, redis }: MyContext
+	): Promise<UserResponse> {
+		const key = FORGOT_PASSWORD_PREFIX + token;
+		const userId = await redis.get(key);
+		if (!userId) {
+			return {
+				errors: [
+					{
+						field: 'token',
+						message: 'token expired.',
+					},
+				],
+			};
+		}
+		if (options.newPassword !== options.repeatPassword) {
+			return {
+				errors: [
+					{
+						field: 'repeatPassword',
+						message: 'Passwords do not match.',
+					},
+				],
+			};
+		}
+		if (options.newPassword.length < 4) {
+			return {
+				errors: [
+					{
+						field: 'newPassword',
+						message: 'Length must be greater than 3.',
+					},
+				],
+			};
+		}
+		const userIdNum = parseInt(userId);
+		const user = await User.findOne(userIdNum);
+
+		if (!user) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user exists.',
+					},
+				],
+			};
+		}
+
+		await User.update(
+			{ id: user.id },
+			{ password: await argon2.hash(options.newPassword) }
+		);
+
+		await redis.del(key);
+
+		req.session.UserId = user.id;
+
+		return { user };
 	}
 
 	//================================================================================
