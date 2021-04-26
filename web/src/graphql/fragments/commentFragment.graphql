@@ -3,4 +3,6 @@ fragment commentFragment on Comment {
 	text
 	ticketId
 	commenterId
+	createdAt
+	updatedAt
 }

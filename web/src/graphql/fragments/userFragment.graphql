@@ -4,4 +4,6 @@ fragment userFragment on User {
 	lastName
 	email
 	role
+	createdAt
+	updatedAt
 }

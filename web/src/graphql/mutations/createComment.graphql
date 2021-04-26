@@ -1,5 +1,5 @@
-mutation CreateComment($options: CreateCommentInput!) {
-	createComment(options: $options) {
+mutation CreateComment($commentText: String!, $ticketId: Int!) {
+	createComment(commentText: $commentText, ticketId: $ticketId) {
 		errors {
 			...errorFragment
 		}

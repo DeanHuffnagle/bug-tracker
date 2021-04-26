@@ -65,21 +65,10 @@ export type Comment = {
   ticket: Ticket;
 };
 
-export type CommentFieldError = {
-  __typename?: 'CommentFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
-};
-
 export type CommentResponse = {
   __typename?: 'CommentResponse';
-  errors?: Maybe<Array<CommentFieldError>>;
+  errors?: Maybe<Array<FieldError>>;
   comment?: Maybe<Comment>;
-};
-
-export type CreateCommentInput = {
-  ticketId: Scalars['Int'];
-  commentText: Scalars['String'];
 };
 
 export type CreateOrganizationInput = {
@@ -165,7 +154,8 @@ export type Mutation = {
 
 
 export type MutationCreateCommentArgs = {
-  options: CreateCommentInput;
+  ticketId: Scalars['Int'];
+  commentText: Scalars['String'];
 };
 
 
@@ -279,20 +269,16 @@ export type Organization = {
   id: Scalars['Int'];
   name: Scalars['String'];
   creatorId?: Maybe<Scalars['Int']>;
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
   users?: Maybe<Array<User>>;
   creator: User;
   projects?: Maybe<Array<Project>>;
 };
 
-export type OrganizationFieldError = {
-  __typename?: 'OrganizationFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
-};
-
 export type OrganizationResponse = {
   __typename?: 'OrganizationResponse';
-  errors?: Maybe<Array<OrganizationFieldError>>;
+  errors?: Maybe<Array<FieldError>>;
   organization?: Maybe<Organization>;
 };
 
@@ -311,15 +297,9 @@ export type Project = {
   tickets?: Maybe<Array<Ticket>>;
 };
 
-export type ProjectFieldError = {
-  __typename?: 'ProjectFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
-};
-
 export type ProjectResponse = {
   __typename?: 'ProjectResponse';
-  errors?: Maybe<Array<ProjectFieldError>>;
+  errors?: Maybe<Array<FieldError>>;
   project?: Maybe<Project>;
 };
 
@@ -398,15 +378,9 @@ export type Ticket = {
   comments?: Maybe<Comment>;
 };
 
-export type TicketFieldError = {
-  __typename?: 'TicketFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
-};
-
 export type TicketResponse = {
   __typename?: 'TicketResponse';
-  errors?: Maybe<Array<TicketFieldError>>;
+  errors?: Maybe<Array<FieldError>>;
   ticket?: Maybe<Ticket>;
 };
 
@@ -456,7 +430,7 @@ export type UserResponse = {
 
 export type CommentFragmentFragment = (
   { __typename?: 'Comment' }
-  & Pick<Comment, 'id' | 'text' | 'ticketId' | 'commenterId'>
+  & Pick<Comment, 'id' | 'text' | 'ticketId' | 'commenterId' | 'createdAt' | 'updatedAt'>
 );
 
 export type ErrorFragmentFragment = (
@@ -466,22 +440,22 @@ export type ErrorFragmentFragment = (
 
 export type OrganizationFragmentFragment = (
   { __typename?: 'Organization' }
-  & Pick<Organization, 'id' | 'name' | 'creatorId'>
+  & Pick<Organization, 'id' | 'name' | 'creatorId' | 'createdAt' | 'updatedAt'>
 );
 
 export type ProjectFragmentFragment = (
   { __typename?: 'Project' }
-  & Pick<Project, 'id' | 'name' | 'description' | 'managerId' | 'organizationId'>
+  & Pick<Project, 'id' | 'name' | 'description' | 'managerId' | 'organizationId' | 'createdAt' | 'updatedAt'>
 );
 
 export type TicketFragmentFragment = (
   { __typename?: 'Ticket' }
-  & Pick<Ticket, 'id' | 'title' | 'text' | 'status' | 'priority' | 'type' | 'assignedDeveloperId' | 'creatorId' | 'projectId'>
+  & Pick<Ticket, 'id' | 'title' | 'text' | 'status' | 'priority' | 'type' | 'assignedDeveloperId' | 'creatorId' | 'projectId' | 'createdAt' | 'updatedAt'>
 );
 
 export type UserFragmentFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role'>
+  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'createdAt' | 'updatedAt'>
 );
 
 export type ChangePasswordMutationVariables = Exact<{
@@ -500,6 +474,26 @@ export type ChangePasswordMutation = (
     )>>, user?: Maybe<(
       { __typename?: 'User' }
       & UserFragmentFragment
+    )> }
+  ) }
+);
+
+export type CreateCommentMutationVariables = Exact<{
+  commentText: Scalars['String'];
+  ticketId: Scalars['Int'];
+}>;
+
+
+export type CreateCommentMutation = (
+  { __typename?: 'Mutation' }
+  & { createComment: (
+    { __typename?: 'CommentResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, comment?: Maybe<(
+      { __typename?: 'Comment' }
+      & CommentFragmentFragment
     )> }
   ) }
 );
@@ -679,6 +673,8 @@ export const CommentFragmentFragmentDoc = gql`
   text
   ticketId
   commenterId
+  createdAt
+  updatedAt
 }
     `;
 export const ErrorFragmentFragmentDoc = gql`
@@ -692,6 +688,8 @@ export const OrganizationFragmentFragmentDoc = gql`
   id
   name
   creatorId
+  createdAt
+  updatedAt
 }
     `;
 export const ProjectFragmentFragmentDoc = gql`
@@ -701,6 +699,8 @@ export const ProjectFragmentFragmentDoc = gql`
   description
   managerId
   organizationId
+  createdAt
+  updatedAt
 }
     `;
 export const TicketFragmentFragmentDoc = gql`
@@ -714,6 +714,8 @@ export const TicketFragmentFragmentDoc = gql`
   assignedDeveloperId
   creatorId
   projectId
+  createdAt
+  updatedAt
 }
     `;
 export const UserFragmentFragmentDoc = gql`
@@ -723,6 +725,8 @@ export const UserFragmentFragmentDoc = gql`
   lastName
   email
   role
+  createdAt
+  updatedAt
 }
     `;
 export const ChangePasswordDocument = gql`
@@ -741,6 +745,23 @@ ${UserFragmentFragmentDoc}`;
 
 export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
+export const CreateCommentDocument = gql`
+    mutation CreateComment($commentText: String!, $ticketId: Int!) {
+  createComment(commentText: $commentText, ticketId: $ticketId) {
+    errors {
+      ...errorFragment
+    }
+    comment {
+      ...commentFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${CommentFragmentFragmentDoc}`;
+
+export function useCreateCommentMutation() {
+  return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
 };
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {

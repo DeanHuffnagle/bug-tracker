@@ -4,4 +4,6 @@ fragment projectFragment on Project {
 	description
 	managerId
 	organizationId
+	createdAt
+	updatedAt
 }

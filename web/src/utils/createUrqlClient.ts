@@ -1,6 +1,9 @@
-import { cacheExchange } from '@urql/exchange-graphcache';
+import { cacheExchange, Cache } from '@urql/exchange-graphcache';
 import { dedupExchange, fetchExchange } from 'urql';
 import {
+	CreateCommentMutation,
+	FindCommentsByTicketDocument,
+	FindCommentsByTicketQuery,
 	LoginMutation,
 	LogoutMutation,
 	MeDocument,
@@ -8,6 +11,16 @@ import {
 	RegisterMutation,
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
+
+// function invalidateAllComments(cache: Cache) {
+// 	console.log('before: ', cache.inspectFields('Query'));
+// 	const allFields = cache.inspectFields('Query');
+// 	const fieldInfos = allFields.filter((info) => info.fieldName === 'comments');
+// 	fieldInfos.forEach((fi) => {
+// 		cache.invalidate('Query', 'findCommentsByTicket', fi.arguments || {});
+// 	});
+// 	console.log('after: ', cache.inspectFields('Query'));
+// }
 
 export const createUrqlClient = (ssrExchange: any) => {
 	return {
@@ -20,7 +33,24 @@ export const createUrqlClient = (ssrExchange: any) => {
 			cacheExchange({
 				updates: {
 					Mutation: {
+						createComment: (result, _args, cache) => {
+							console.log('update started: ', _args);
+							cache.updateQuery(
+								{
+									query: FindCommentsByTicketDocument,
+									variables: { options: { ticketId: _args.ticketId } },
+								},
+								(data) => {
+									if (!data) return null;
+									if (!data.findCommentsByTicket) return null;
+									data.findCommentsByTicket.push(result.createComment);
+									return data;
+								}
+							);
+						},
+
 						login: (_result, args, cache, info) => {
+							console.log('login: ');
 							betterUpdateQuery<LoginMutation, MeQuery>(
 								cache,
 								{ query: MeDocument },

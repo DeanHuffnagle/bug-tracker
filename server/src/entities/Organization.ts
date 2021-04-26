@@ -7,6 +7,8 @@ import {
 	BaseEntity,
 	OneToOne,
 	JoinColumn,
+	CreateDateColumn,
+	UpdateDateColumn,
 } from 'typeorm';
 import { Project } from './Project';
 import { User } from './User';
@@ -29,6 +31,14 @@ export class Organization extends BaseEntity {
 	@Field(() => Int, { nullable: true })
 	@Column({ nullable: true })
 	creatorId: number;
+
+	@Field(() => String)
+	@CreateDateColumn()
+	createdAt: Date;
+
+	@Field(() => String)
+	@UpdateDateColumn()
+	updatedAt: Date;
 
 	//================================================================================
 	//Relationships

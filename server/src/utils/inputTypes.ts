@@ -12,8 +12,6 @@ import { UserRoleType } from '../entities/User';
 //// Create Comment ////
 @InputType()
 export class CreateCommentInput {
-	@Field(() => Int)
-	ticketId!: number;
 	@Field(() => String)
 	commentText!: string;
 }

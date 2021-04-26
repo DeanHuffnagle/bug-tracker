@@ -20,11 +20,9 @@ export default function DevTicketsTable() {
 				<tbody>
 					{ticketData?.findAssignedTickets?.map((t) =>
 						!t ? null : (
-							<tr>
+							<tr key={t.id}>
 								<NextLink href="ticket/[id]" as={`/ticket/${t.id}`}>
-									<Link>
-										<td>{t.title}</td>
-									</Link>
+									<td id="tickets-table-title">{t.title}</td>
 								</NextLink>
 								<td>{t.text}</td>
 								<td>{t.priority}</td>

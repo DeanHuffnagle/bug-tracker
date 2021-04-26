@@ -1,6 +1,7 @@
 import {
 	Arg,
 	Ctx,
+	Int,
 	Mutation,
 	Query,
 	Resolver,
@@ -27,27 +28,37 @@ export class CommentResolver {
 	@Mutation(() => CommentResponse)
 	@UseMiddleware(isAuth)
 	async createComment(
-		@Arg('options') options: CreateCommentInput,
+		@Arg('commentText') commentText: string,
+		@Arg('ticketId', () => Int) ticketId: number,
 		@Ctx() { req }: MyContext
 	) {
 		const isUser = await User.findOne(req.session.UserId);
-		const isTicket = await Ticket.findOne(options.ticketId);
+		const isTicket = await Ticket.findOne(ticketId);
 		if (!isUser) {
 			return {
 				errors: [
 					{
-						field: 'user',
+						field: 'text',
 						message: 'no user is logged in.',
 					},
 				],
 			};
 		}
+		if (!commentText)
+			return {
+				errors: [
+					{
+						field: 'commentText',
+						message: 'comment text is blank.',
+					},
+				],
+			};
 
 		if (!isTicket) {
 			return {
 				errors: [
 					{
-						field: 'ticket',
+						field: 'text',
 						message: 'no ticket found.',
 					},
 				],
@@ -59,9 +70,9 @@ export class CommentResolver {
 			.insert()
 			.into(Comment)
 			.values({
-				text: options.commentText,
+				text: commentText,
 				commenterId: isUser.id,
-				ticketId: options.ticketId,
+				ticketId: isTicket.id,
 			})
 			.returning('*')
 			.execute();
