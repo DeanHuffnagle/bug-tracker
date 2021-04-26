@@ -46,18 +46,6 @@ export class Ticket extends BaseEntity {
 	@Column()
 	text!: string;
 
-	@Field(() => Int, { nullable: true })
-	@Column({ nullable: true })
-	assignedDeveloperId: number;
-
-	@Field(() => Int)
-	@Column()
-	creatorId: number;
-
-	@Field(() => Int)
-	@Column()
-	projectId!: number;
-
 	@Field()
 	@Column({
 		type: 'enum',
@@ -81,6 +69,18 @@ export class Ticket extends BaseEntity {
 		default: 'other',
 	})
 	type!: TicketTypeType;
+
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	assignedDeveloperId: number;
+
+	@Field(() => Int)
+	@Column()
+	creatorId: number;
+
+	@Field(() => Int)
+	@Column()
+	projectId!: number;
 
 	@Field(() => String)
 	@CreateDateColumn()

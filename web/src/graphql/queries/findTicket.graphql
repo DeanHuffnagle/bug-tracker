@@ -1,5 +1,5 @@
-query FindAssignedTickets {
-	findAssignedTickets {
+query FindTicket($id: Int!) {
+	findTicket(id: $id) {
 		...ticketFragment
 		assignedDeveloper {
 			...userFragment

@@ -1,0 +1,11 @@
+fragment ticketFragment on Ticket {
+	id
+	title
+	text
+	status
+	priority
+	type
+	assignedDeveloperId
+	creatorId
+	projectId
+}

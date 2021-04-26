@@ -76,7 +76,7 @@ const renderActiveShape = (props) => {
 	);
 };
 
-export default function TypePieChart() {
+export default function DevTypePieChart() {
 	//================================================================================
 	//Ticket Priority Data
 	//================================================================================

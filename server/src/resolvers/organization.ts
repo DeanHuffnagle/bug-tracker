@@ -1,11 +1,8 @@
 import {
 	Arg,
 	Ctx,
-	Field,
-	InputType,
 	Int,
 	Mutation,
-	ObjectType,
 	Query,
 	Resolver,
 	UseMiddleware,
@@ -16,40 +13,12 @@ import { User } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
+import {
+	ChangeOrganizationNameInput,
+	CreateOrganizationInput,
+} from '../utils/inputTypes';
+import { OrganizationResponse } from '../utils/objectTypes';
 
-@ObjectType()
-class OrganizationFieldError {
-	@Field()
-	field: string;
-	@Field()
-	message: string;
-}
-
-@ObjectType()
-class OrganizationResponse {
-	@Field(() => [OrganizationFieldError], { nullable: true })
-	errors?: OrganizationFieldError[];
-
-	@Field(() => Organization, { nullable: true })
-	organization?: Organization;
-}
-//================================================================================
-//Inputs
-//================================================================================
-//// Create Organization ////
-@InputType()
-export class CreateOrganizationInput {
-	@Field()
-	name!: string;
-}
-
-@InputType()
-export class ChangeOrganizationNameInput {
-	@Field()
-	name!: string;
-}
-
-//// CRD ////
 @Resolver(Organization)
 export class OrganizationResolver {
 	//================================================================================

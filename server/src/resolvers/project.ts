@@ -1,11 +1,8 @@
 import {
 	Arg,
 	Ctx,
-	Field,
-	InputType,
 	Int,
 	Mutation,
-	ObjectType,
 	Query,
 	Resolver,
 	UseMiddleware,
@@ -16,52 +13,13 @@ import { User } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
 import { isProjectManager } from '../middleware/isProjectManager';
 import { MyContext } from '../types';
+import {
+	AssignProjectInput,
+	CreateProjectInput,
+	UnassignProjectInput,
+} from '../utils/inputTypes';
+import { ProjectResponse } from '../utils/objectTypes';
 
-@ObjectType()
-class ProjectFieldError {
-	@Field()
-	field: string;
-	@Field()
-	message: string;
-}
-
-@ObjectType()
-class ProjectResponse {
-	@Field(() => [ProjectFieldError], { nullable: true })
-	errors?: ProjectFieldError[];
-
-	@Field(() => Project, { nullable: true })
-	project?: Project;
-}
-//================================================================================
-//Inputs
-//================================================================================
-//// Create Project ////
-@InputType()
-export class CreateProjectInput {
-	@Field()
-	name!: string;
-	@Field()
-	description!: string;
-}
-
-@InputType()
-export class AssignProjectInput {
-	@Field(() => Int)
-	projectId!: number;
-	@Field(() => Int)
-	userId!: number;
-}
-
-@InputType()
-export class UnassignProjectInput {
-	@Field(() => Int)
-	projectId!: number;
-	@Field(() => Int)
-	userId!: number;
-}
-
-//// CR ////
 @Resolver(Project)
 export class ProjectResolver {
 	//================================================================================
@@ -111,7 +69,9 @@ export class ProjectResolver {
 	//================================================================================
 	@Query(() => Project, { nullable: true })
 	findProject(@Arg('id', () => Int) id: number): Promise<Project | undefined> {
-		return Project.findOne(id, { relations: ['organization'] });
+		return Project.findOne(id, {
+			relations: ['organization', 'assignedDevelopers'],
+		});
 	}
 	//================================================================================
 	//Assign Project Mutation

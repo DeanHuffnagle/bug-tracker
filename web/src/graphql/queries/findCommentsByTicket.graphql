@@ -1,0 +1,8 @@
+query FindCommentsByTicket($options: FindCommentsByTicketInput!) {
+	findCommentsByTicket(options: $options) {
+		...commentFragment
+		commenter {
+			...userFragment
+		}
+	}
+}

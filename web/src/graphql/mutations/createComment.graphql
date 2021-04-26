@@ -1,0 +1,10 @@
+mutation CreateComment($options: CreateCommentInput!) {
+	createComment(options: $options) {
+		errors {
+			...errorFragment
+		}
+		comment {
+			...commentFragment
+		}
+	}
+}

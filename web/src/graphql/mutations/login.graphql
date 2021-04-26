@@ -1,19 +1,12 @@
 mutation Login($options: UserLoginInput!) {
 	login(options: $options) {
 		errors {
-			field
-			message
+			...errorFragment
 		}
 		user {
-			id
-			firstName
-			lastName
-			email
-			role
+			...userFragment
 			organization {
-				id
-				name
-				creatorId
+				...organizationFragment
 			}
 		}
 	}

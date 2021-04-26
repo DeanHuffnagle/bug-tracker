@@ -1,24 +1,25 @@
 import { ChakraProvider, ColorModeProvider, CSSReset } from '@chakra-ui/react';
 import React from 'react';
-import { createClient, Provider } from 'urql';
+import { createClient, dedupExchange, fetchExchange, Provider } from 'urql';
+import { cacheExchange } from '@urql/exchange-graphcache';
 import theme from '../theme';
 import '../styles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {
+	LoginMutation,
+	LogoutMutation,
+	MeDocument,
+	MeQuery,
+	RegisterMutation,
+} from '../generated/graphql';
+import { betterUpdateQuery } from '../utils/betterUpdateQuery';
+import { AnyMxRecord } from 'node:dns';
 
-const client = createClient({
-	url: 'http://localhost:4000/graphql',
-	fetchOptions: {
-		credentials: 'include',
-	},
-});
-
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: any) {
 	return (
-		<Provider value={client}>
-			<ChakraProvider resetCSS theme={theme}>
-				<Component {...pageProps} />
-			</ChakraProvider>
-		</Provider>
+		<ChakraProvider resetCSS theme={theme}>
+			<Component {...pageProps} />
+		</ChakraProvider>
 	);
 }
 

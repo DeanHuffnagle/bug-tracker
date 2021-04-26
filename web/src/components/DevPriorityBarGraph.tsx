@@ -16,7 +16,7 @@ import {
 	useMeQuery,
 } from '../generated/graphql';
 
-export default function PriorityBarGraph() {
+export default function DevPriorityBarGraph() {
 	const [{ data: meData }] = useMeQuery();
 	const [{ data: lowData }] = useFindAssignedTicketsByPriorityQuery({
 		variables: {

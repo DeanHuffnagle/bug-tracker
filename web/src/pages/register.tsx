@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Link } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import React from 'react';
 import { InputField } from '../components/InputField';
@@ -6,6 +6,9 @@ import { Wrapper } from '../components/Wrapper';
 import { useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/router';
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../utils/createUrqlClient';
+import NextLink from 'next/link';
 
 interface registerProps {}
 
@@ -95,6 +98,14 @@ const Register: React.FC<registerProps> = ({}) => {
 										>
 											Register
 										</Button>
+										<Box textAlign="center" mt={2}>
+											{'Already have an account? '}
+											<NextLink href="/login">
+												<Link ml="auto" color="blue" fontWeight="semibold">
+													Sign in.
+												</Link>
+											</NextLink>
+										</Box>
 									</Form>
 								)}
 							</Formik>
@@ -115,4 +126,4 @@ const Register: React.FC<registerProps> = ({}) => {
 	);
 };
 
-export default Register;
+export default withUrqlClient(createUrqlClient)(Register);

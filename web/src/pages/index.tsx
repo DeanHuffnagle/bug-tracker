@@ -1,3 +1,4 @@
+import { withUrqlClient } from 'next-urql';
 import React from 'react';
 import {
 	Card,
@@ -8,13 +9,15 @@ import {
 	NavDropdown,
 	Row,
 } from 'react-bootstrap';
-import DeveloperPriorityBarGraph from '../components/DeveloperPriorityBarGraph';
-import PriorityBarGraph from '../components/DeveloperPriorityBarGraph';
-import DeveloperStatusBarGraph from '../components/DeveloperStatusBarGraph';
-import StatusBarGraph from '../components/DeveloperStatusBarGraph';
-import DeveloperTypePieChart from '../components/DeveloperTypePieChart';
-import TypePieChart from '../components/DeveloperTypePieChart';
+import DevPriorityBarGraph from '../components/DevPriorityBarGraph';
+import PriorityBarGraph from '../components/DevPriorityBarGraph';
+import DevStatusBarGraph from '../components/DevStatusBarGraph';
+import StatusBarGraph from '../components/DevStatusBarGraph';
+import DevTypePieChart from '../components/DevTypePieChart';
+import TypePieChart from '../components/DevTypePieChart';
+import NavBar from '../components/NavBar';
 import { useFindAssignedTicketsQuery, useMeQuery } from '../generated/graphql';
+import { createUrqlClient } from '../utils/createUrqlClient';
 
 //================================================================================
 //Index Page
@@ -22,93 +25,84 @@ import { useFindAssignedTicketsQuery, useMeQuery } from '../generated/graphql';
 const Index = () => {
 	const [{ data: meData }] = useMeQuery();
 	const [{ data: assignedTicketsData }] = useFindAssignedTicketsQuery();
+	let body = null;
+	if (!meData?.me) {
+		body = null;
+	} else {
+		body = (
+			<>
+				<Container>
+					<Row>
+						<Col className="mt-1">
+							<Card
+								className="chart-card"
+								style={{
+									width: '100%',
+									height: '100%',
+									background: 'rgb(225, 225, 225)',
+								}}
+							>
+								<div className="text-center" id="dashboard-card-titles">
+									Stats and Stuff
+								</div>
+								<div id="dashboard-stats-text">
+									Assigned Tickets:{' '}
+									{assignedTicketsData?.findAssignedTickets?.length}
+								</div>
+							</Card>
+						</Col>
 
+						<Col className="mt-1">
+							<Card
+								style={{
+									background: 'rgb(225, 225, 225)',
+								}}
+							>
+								<div className="text-center" id="dashboard-card-titles">
+									Tickets by Type
+								</div>
+								<DevTypePieChart />
+							</Card>
+						</Col>
+					</Row>
+
+					<Row>
+						<Col className="mt-1">
+							<Card
+								style={{
+									background: 'rgb(225, 225, 225)',
+								}}
+							>
+								<div className="text-center" id="dashboard-card-titles">
+									Tickets by Priority
+								</div>
+								<DevPriorityBarGraph />
+							</Card>
+						</Col>
+
+						<Col className="mt-1">
+							<Card
+								style={{
+									background: 'rgb(225, 225, 225)',
+								}}
+							>
+								<div className="text-center" id="dashboard-card-titles">
+									Tickets by Status
+								</div>
+								<DevStatusBarGraph />
+							</Card>
+						</Col>
+					</Row>
+				</Container>
+			</>
+		);
+	}
 	return (
 		<>
-			<Navbar bg="dark" variant="dark" expand="lg">
-				<Navbar.Brand href="#home">Bug-Tracker</Navbar.Brand>
-				<Navbar.Toggle aria-controls="basic-navbar-nav" />
-				<Navbar.Collapse id="basic-navbar-nav">
-					<Nav className="ml-auto">
-						<NavDropdown title="User" id="basic-nav-dropdown">
-							<NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-							<NavDropdown.Item href="#action/3.2">
-								Another action
-							</NavDropdown.Item>
-							<NavDropdown.Item href="#action/3.3">thing</NavDropdown.Item>
-							<NavDropdown.Divider />
-							<NavDropdown.Item href="#action/3.4">logout</NavDropdown.Item>
-						</NavDropdown>
-						<Nav.Link href="#link">My Tickets</Nav.Link>
-						<Nav.Link href="#home">Projects</Nav.Link>
-					</Nav>
-				</Navbar.Collapse>
-			</Navbar>
-			<Container>
-				<Row>
-					<Col className="mt-1">
-						<Card
-							className="chart-card"
-							style={{
-								width: '100%',
-								height: '100%',
-								background: 'rgb(225, 225, 225)',
-							}}
-						>
-							<div className="text-center" id="dashboard-card-titles">
-								Stats and Stuff
-							</div>
-							<div id="dashboard-stats-text">
-								Assigned Tickets:{' '}
-								{assignedTicketsData?.findAssignedTickets.length}
-							</div>
-						</Card>
-					</Col>
-
-					<Col className="mt-1">
-						<Card
-							style={{
-								background: 'rgb(225, 225, 225)',
-							}}
-						>
-							<div className="text-center" id="dashboard-card-titles">
-								Tickets by Type
-							</div>
-							<DeveloperTypePieChart />
-						</Card>
-					</Col>
-				</Row>
-
-				<Row>
-					<Col className="mt-1">
-						<Card
-							style={{
-								background: 'rgb(225, 225, 225)',
-							}}
-						>
-							<div className="text-center" id="dashboard-card-titles">
-								Tickets by Priority
-							</div>
-							<DeveloperPriorityBarGraph />
-						</Card>
-					</Col>
-
-					<Col className="mt-1">
-						<Card
-							style={{
-								background: 'rgb(225, 225, 225)',
-							}}
-						>
-							<div className="text-center" id="dashboard-card-titles">
-								Tickets by Status
-							</div>
-							<DeveloperStatusBarGraph />
-						</Card>
-					</Col>
-				</Row>
-			</Container>
+			<NavBar />
+			{body}
 		</>
 	);
 };
 
-export default Index;
+export default withUrqlClient(createUrqlClient)(Index);

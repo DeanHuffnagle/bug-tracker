@@ -1,11 +1,5 @@
 query FindAssignedTicketsByType($options: FindAssignedTicketsByTypeInput!) {
 	findAssignedTicketsByType(options: $options) {
-		id
-		title
-		text
-		priority
-		status
-		type
-		assignedDeveloperId
+		...ticketFragment
 	}
 }

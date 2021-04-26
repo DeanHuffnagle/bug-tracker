@@ -1,22 +1,14 @@
 query Me {
 	me {
-		id
-		firstName
-		lastName
-		email
-		role
-
+		...userFragment
 		organization {
-			id
-			name
+			...organizationFragment
 		}
 		assignedProjects {
-			id
-			name
+			...projectFragment
 		}
 		managedProjects {
-			id
-			name
+			...projectFragment
 		}
 	}
 }

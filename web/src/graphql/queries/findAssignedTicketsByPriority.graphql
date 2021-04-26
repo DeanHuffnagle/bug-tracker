@@ -2,12 +2,6 @@ query FindAssignedTicketsByPriority(
 	$options: FindAssignedTicketsByPriorityInput!
 ) {
 	findAssignedTicketsByPriority(options: $options) {
-		id
-		title
-		text
-		priority
-		status
-		type
-		assignedDeveloperId
+		...ticketFragment
 	}
 }

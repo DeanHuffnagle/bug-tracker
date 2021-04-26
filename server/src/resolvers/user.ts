@@ -2,108 +2,31 @@ import argon2 from 'argon2';
 import {
 	Arg,
 	Ctx,
-	Field,
-	InputType,
 	Mutation,
-	ObjectType,
 	Query,
 	Resolver,
 	UseMiddleware,
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
+import { v4 } from 'uuid';
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from '../constants';
 import { Organization } from '../entities/Organization';
-import { User, UserRoleType } from '../entities/User';
+import { User } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
+import {
+	ChangePasswordInput,
+	ChangeRoleInput,
+	JoinOrganizationInput,
+	LeaveOrganizationInput,
+	MakeAdminInput,
+	UserLoginInput,
+	UserRegisterInput,
+} from '../utils/inputTypes';
+import { UserResponse } from '../utils/objectTypes';
 import { sendEmail } from '../utils/sendEmail';
-import { v4 } from 'uuid';
 
-@ObjectType()
-class FieldError {
-	@Field()
-	field: string;
-	@Field()
-	message: string;
-}
-
-@ObjectType()
-class UserResponse {
-	@Field(() => [FieldError], { nullable: true })
-	errors?: FieldError[];
-
-	@Field(() => User, { nullable: true })
-	user?: User;
-}
-
-//================================================================================
-//Inputs
-//================================================================================
-//// Register ////
-@InputType()
-export class UserRegisterInput {
-	@Field()
-	firstName!: string;
-	@Field()
-	lastName!: string;
-	@Field()
-	email!: string;
-	@Field()
-	password!: string;
-}
-
-//// Login ////
-@InputType()
-export class UserLoginInput {
-	@Field()
-	email!: string;
-	@Field()
-	password!: string;
-}
-
-//// Join Organization ////
-@InputType()
-export class JoinOrganizationInput {
-	@Field()
-	organizationId: number;
-	@Field()
-	userId!: number;
-}
-
-//// Leave Organization ////
-@InputType()
-export class LeaveOrganizationInput {
-	@Field()
-	userId!: number;
-}
-
-//// Make Admin ////
-@InputType()
-export class MakeAdminInput {
-	@Field()
-	userId!: number;
-}
-
-//// Change Role ////
-@InputType()
-export class ChangeRoleInput {
-	@Field()
-	userId: number;
-	@Field(() => String)
-	userRole!: () => UserRoleType;
-}
-
-//// Change Password ////
-@InputType()
-export class ChangePasswordInput {
-	@Field()
-	newPassword!: string;
-	@Field()
-	repeatPassword!: string;
-}
-
-//// CRU ////
 @Resolver(User)
 export class UserResolver {
 	//================================================================================

@@ -3,16 +3,15 @@ import { Formik, Form } from 'formik';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { withUrqlClient } from 'next-urql'
+import { withUrqlClient } from 'next-urql';
 
 import { InputField } from '../../components/InputField';
 import { useChangePasswordMutation } from '../../generated/graphql';
 import { toErrorMap } from '../../utils/toErrorMap';
 import login from '../login';
+import { createUrqlClient } from '../../utils/createUrqlClient';
 
-interface ChangePasswordProps {}
-
-const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
+const ChangePassword: NextPage = ({ token }) => {
 	const router = useRouter();
 	const [, changePassword] = useChangePasswordMutation();
 	const [tokenError, setTokenError] = useState();
@@ -127,4 +126,4 @@ ChangePassword.getInitialProps = ({ query }) => {
 	};
 };
 
-export default withUrqlClient(createUrqlClient) ChangePassword;
+export default withUrqlClient(createUrqlClient)(ChangePassword);

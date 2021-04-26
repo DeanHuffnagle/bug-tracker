@@ -1,52 +1,23 @@
 import {
 	Arg,
 	Ctx,
-	Field,
-	InputType,
-	Int,
 	Mutation,
-	ObjectType,
 	Query,
 	Resolver,
 	UseMiddleware,
 } from 'type-graphql';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { Comment } from '../entities/Comment';
 import { Ticket } from '../entities/Ticket';
 import { User } from '../entities/User';
 import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
-
-@ObjectType()
-class CommentFieldError {
-	@Field()
-	field: string;
-	@Field()
-	message: string;
-}
-
-@ObjectType()
-class CommentResponse {
-	@Field(() => [CommentFieldError], { nullable: true })
-	errors?: CommentFieldError[];
-
-	@Field(() => Comment, { nullable: true })
-	comment?: Comment;
-}
-
-@InputType()
-export class CreateCommentInput {
-	@Field(() => Int)
-	ticketId!: number;
-	@Field(() => String)
-	commentText!: string;
-}
-
-@InputType()
-export class FindCommentInput {
-	@Field()
-	commentId!: number;
-}
+import {
+	CreateCommentInput,
+	FindCommentInput,
+	FindCommentsByTicketInput,
+} from '../utils/inputTypes';
+import { CommentResponse } from '../utils/objectTypes';
 
 @Resolver(Comment)
 export class CommentResolver {
@@ -120,5 +91,27 @@ export class CommentResolver {
 			};
 		}
 		return { comment };
+	}
+	//================================================================================
+	//Find Comments Query
+	//================================================================================
+	@Query(() => [Comment])
+	async findComments(): Promise<Comment[]> {
+		return Comment.find();
+	}
+	//================================================================================
+	//Find Comments By Ticket Query
+	//================================================================================
+	@Query(() => [Comment])
+	async findCommentsByTicket(
+		@Arg('options') options: FindCommentsByTicketInput
+	): Promise<Comment[]> {
+		const commentByTicket = await getRepository(Comment)
+			.createQueryBuilder('comment')
+			.leftJoinAndSelect('comment.commenter', 'commenter')
+			.where('comment.ticketId = :ticketId', { ticketId: options.ticketId })
+			.getMany();
+
+		return commentByTicket;
 	}
 }

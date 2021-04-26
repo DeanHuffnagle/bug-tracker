@@ -4,6 +4,7 @@ import {
 	Center,
 	Flex,
 	Heading,
+	Link,
 	Spacer,
 	Stack,
 } from '@chakra-ui/react';
@@ -14,10 +15,11 @@ import { Wrapper } from '../components/Wrapper';
 import { useLoginMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/router';
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../utils/createUrqlClient';
+import NextLink from 'next/link';
 
-interface loginProps {}
-
-const login: React.FC<loginProps> = ({}) => {
+const login: React.FC<{}> = ({}) => {
 	const router = useRouter();
 	const [, login] = useLoginMutation();
 	return (
@@ -72,16 +74,30 @@ const login: React.FC<loginProps> = ({}) => {
 												type="password"
 											/>
 										</Box>
-
+										<Flex mt={1}>
+											<NextLink href="/forgot-password">
+												<Link mr="auto" color="blue" fontWeight="semibold">
+													Forgot password?
+												</Link>
+											</NextLink>
+										</Flex>
 										<Button
 											width="full"
 											colorScheme="teal"
-											mt={10}
+											mt={5}
 											type="submit"
 											isLoading={isSubmitting}
 										>
 											sign in
 										</Button>
+										<Box textAlign="center" mt={2}>
+											{'New to bug tracker? '}
+											<NextLink href="/register">
+												<Link ml="auto" color="blue" fontWeight="semibold">
+													Sign up.
+												</Link>
+											</NextLink>
+										</Box>
 									</Form>
 								)}
 							</Formik>
@@ -103,4 +119,4 @@ const login: React.FC<loginProps> = ({}) => {
 	);
 };
 
-export default login;
+export default withUrqlClient(createUrqlClient)(login);

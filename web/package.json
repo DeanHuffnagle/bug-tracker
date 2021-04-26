@@ -12,6 +12,7 @@
     "@chakra-ui/react": "^1.0.0",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
+    "@urql/exchange-graphcache": "^4.0.0",
     "bootstrap": "^4.6.0",
     "cors": "^2.8.5",
     "datatables.net": "^1.10.24",

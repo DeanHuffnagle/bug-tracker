@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { useFindAssignedTicketsByStatusQuery } from '../generated/graphql';
 
-export default function StatusBarGraph() {
+export default function DevStatusBarGraph() {
 	const [{ data: unassignedData }] = useFindAssignedTicketsByStatusQuery({
 		variables: {
 			options: {

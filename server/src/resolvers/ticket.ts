@@ -1,106 +1,31 @@
 import {
 	Arg,
 	Ctx,
-	Field,
-	InputType,
 	Int,
 	Mutation,
-	ObjectType,
 	Query,
 	Resolver,
 	UseMiddleware,
 } from 'type-graphql';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { Project } from '../entities/Project';
-import {
-	Ticket,
-	TicketPriorityType,
-	TicketStatusType,
-	TicketTypeType,
-} from '../entities/Ticket';
+import { Ticket } from '../entities/Ticket';
 import { User } from '../entities/User';
 import { isProjectManager } from '../middleware/isProjectManager';
 import { isSubmitter } from '../middleware/isSubmitter';
 import { MyContext } from '../types';
+import {
+	AssignTicketInput,
+	ChangeTicketPriorityInput,
+	ChangeTicketStatusInput,
+	ChangeTicketTypeInput,
+	CreateTicketInput,
+	FindAssignedTicketsByPriorityInput,
+	FindAssignedTicketsByStatusInput,
+	FindAssignedTicketsByTypeInput,
+} from '../utils/inputTypes';
+import { TicketResponse } from '../utils/objectTypes';
 
-@ObjectType()
-class TicketFieldError {
-	@Field()
-	field: string;
-	@Field()
-	message: string;
-}
-
-@ObjectType()
-class TicketResponse {
-	@Field(() => [TicketFieldError], { nullable: true })
-	errors?: TicketFieldError[];
-
-	@Field(() => Ticket, { nullable: true })
-	ticket?: Ticket;
-}
-
-//================================================================================
-//Inputs
-//================================================================================
-@InputType()
-export class CreateTicketInput {
-	@Field(() => Int)
-	projectId: number;
-	@Field()
-	title: string;
-	@Field()
-	text: string;
-}
-
-@InputType()
-export class ChangeTicketStatusInput {
-	@Field(() => Int)
-	ticketId: number;
-	@Field(() => String)
-	status!: TicketStatusType;
-}
-
-@InputType()
-export class ChangeTicketPriorityInput {
-	@Field(() => Int)
-	ticketId: number;
-	@Field(() => String)
-	priority!: TicketPriorityType;
-}
-
-@InputType()
-export class ChangeTicketTypeInput {
-	@Field(() => Int)
-	ticketId: number;
-	@Field(() => String)
-	type!: TicketTypeType;
-}
-
-@InputType()
-export class AssignTicketInput {
-	@Field(() => Int)
-	ticketId!: number;
-	@Field(() => Int)
-	userId!: number;
-}
-
-@InputType()
-export class FindAssignedTicketsByPriorityInput {
-	@Field(() => String)
-	priority: TicketPriorityType;
-}
-@InputType()
-export class FindAssignedTicketsByStatusInput {
-	@Field(() => String)
-	status: TicketStatusType;
-}
-@InputType()
-export class FindAssignedTicketsByTypeInput {
-	@Field(() => String)
-	type: TicketTypeType;
-}
-//// CR ////
 @Resolver(Ticket)
 export class TicketResolver {
 	//================================================================================
@@ -294,7 +219,7 @@ export class TicketResolver {
 	//================================================================================
 	@Query(() => [Ticket])
 	async findTickets(): Promise<Ticket[]> {
-		return Ticket.find();
+		return Ticket.find({ relations: ['assignedDeveloper', 'submitter'] });
 	}
 	//================================================================================
 	//Find Assigned Tickets Query
@@ -302,10 +227,9 @@ export class TicketResolver {
 	@Query(() => [Ticket], { nullable: true })
 	async findAssignedTickets(@Ctx() { req }: MyContext): Promise<Ticket[]> {
 		const isUser = await User.findOne(req.session.UserId);
-		const assignedTickets = await getConnection()
-			.createQueryBuilder()
-			.select('ticket')
-			.from(Ticket, 'ticket')
+		const assignedTickets = await getRepository(Ticket)
+			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
 			.where('ticket.assignedDeveloperId = :id', { id: isUser?.id })
 			.getMany();
 		return assignedTickets;
@@ -319,10 +243,9 @@ export class TicketResolver {
 		@Ctx() { req }: MyContext
 	): Promise<Ticket[]> {
 		const isUser = await User.findOne(req.session.UserId);
-		const ticketsByPriority = await getConnection()
-			.createQueryBuilder()
-			.select('ticket')
-			.from(Ticket, 'ticket')
+		const ticketsByPriority = await getRepository(Ticket)
+			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
 			.where('ticket.priority = :priority', { priority: options.priority })
 			.andWhere('ticket.assignedDeveloperId = :id', { id: isUser?.id })
 			.getMany();

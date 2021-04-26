@@ -1,0 +1,6 @@
+fragment commentFragment on Comment {
+	id
+	text
+	ticketId
+	commenterId
+}

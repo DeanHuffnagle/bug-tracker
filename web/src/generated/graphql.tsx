@@ -116,7 +116,11 @@ export type FindAssignedTicketsByTypeInput = {
 };
 
 export type FindCommentInput = {
-  commentId: Scalars['Float'];
+  commentId: Scalars['Int'];
+};
+
+export type FindCommentsByTicketInput = {
+  ticketId: Scalars['Int'];
 };
 
 export type JoinOrganizationInput = {
@@ -322,6 +326,8 @@ export type ProjectResponse = {
 export type Query = {
   __typename?: 'Query';
   findComment: CommentResponse;
+  findComments: Array<Comment>;
+  findCommentsByTicket: Array<Comment>;
   findOrganization?: Maybe<Organization>;
   findProject?: Maybe<Project>;
   findTicket?: Maybe<Ticket>;
@@ -336,6 +342,11 @@ export type Query = {
 
 export type QueryFindCommentArgs = {
   options: FindCommentInput;
+};
+
+
+export type QueryFindCommentsByTicketArgs = {
+  options: FindCommentsByTicketInput;
 };
 
 
@@ -373,12 +384,12 @@ export type Ticket = {
   id: Scalars['Float'];
   title: Scalars['String'];
   text: Scalars['String'];
-  assignedDeveloperId?: Maybe<Scalars['Int']>;
-  creatorId: Scalars['Int'];
-  projectId: Scalars['Int'];
   priority: Scalars['String'];
   status: Scalars['String'];
   type: Scalars['String'];
+  assignedDeveloperId?: Maybe<Scalars['Int']>;
+  creatorId: Scalars['Int'];
+  projectId: Scalars['Int'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   assignedDeveloper?: Maybe<User>;
@@ -443,6 +454,36 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
+export type CommentFragmentFragment = (
+  { __typename?: 'Comment' }
+  & Pick<Comment, 'id' | 'text' | 'ticketId' | 'commenterId'>
+);
+
+export type ErrorFragmentFragment = (
+  { __typename?: 'FieldError' }
+  & Pick<FieldError, 'field' | 'message'>
+);
+
+export type OrganizationFragmentFragment = (
+  { __typename?: 'Organization' }
+  & Pick<Organization, 'id' | 'name' | 'creatorId'>
+);
+
+export type ProjectFragmentFragment = (
+  { __typename?: 'Project' }
+  & Pick<Project, 'id' | 'name' | 'description' | 'managerId' | 'organizationId'>
+);
+
+export type TicketFragmentFragment = (
+  { __typename?: 'Ticket' }
+  & Pick<Ticket, 'id' | 'title' | 'text' | 'status' | 'priority' | 'type' | 'assignedDeveloperId' | 'creatorId' | 'projectId'>
+);
+
+export type UserFragmentFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role'>
+);
+
 export type ChangePasswordMutationVariables = Exact<{
   options: ChangePasswordInput;
   token: Scalars['String'];
@@ -455,12 +496,22 @@ export type ChangePasswordMutation = (
     { __typename?: 'UserResponse' }
     & { errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
-      & Pick<FieldError, 'field' | 'message'>
+      & ErrorFragmentFragment
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+      & UserFragmentFragment
     )> }
   ) }
+);
+
+export type ForgotPasswordMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type ForgotPasswordMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'forgotPassword'>
 );
 
 export type LoginMutationVariables = Exact<{
@@ -474,16 +525,24 @@ export type LoginMutation = (
     { __typename?: 'UserResponse' }
     & { errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
-      & Pick<FieldError, 'field' | 'message'>
+      & ErrorFragmentFragment
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role'>
       & { organization?: Maybe<(
         { __typename?: 'Organization' }
-        & Pick<Organization, 'id' | 'name' | 'creatorId'>
+        & OrganizationFragmentFragment
       )> }
+      & UserFragmentFragment
     )> }
   ) }
+);
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'logout'>
 );
 
 export type RegisterMutationVariables = Exact<{
@@ -497,10 +556,10 @@ export type RegisterMutation = (
     { __typename?: 'UserResponse' }
     & { errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
-      & Pick<FieldError, 'field' | 'message'>
+      & ErrorFragmentFragment
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+      & UserFragmentFragment
     )> }
   ) }
 );
@@ -512,7 +571,11 @@ export type FindAssignedTicketsQuery = (
   { __typename?: 'Query' }
   & { findAssignedTickets?: Maybe<Array<(
     { __typename?: 'Ticket' }
-    & Pick<Ticket, 'id' | 'title' | 'text' | 'priority' | 'status' | 'type' | 'assignedDeveloperId'>
+    & { assignedDeveloper?: Maybe<(
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+    & TicketFragmentFragment
   )>> }
 );
 
@@ -525,7 +588,7 @@ export type FindAssignedTicketsByPriorityQuery = (
   { __typename?: 'Query' }
   & { findAssignedTicketsByPriority?: Maybe<Array<(
     { __typename?: 'Ticket' }
-    & Pick<Ticket, 'id' | 'title' | 'text' | 'priority' | 'status' | 'type' | 'assignedDeveloperId'>
+    & TicketFragmentFragment
   )>> }
 );
 
@@ -538,7 +601,7 @@ export type FindAssignedTicketsByStatusQuery = (
   { __typename?: 'Query' }
   & { findAssignedTicketsByStatus?: Maybe<Array<(
     { __typename?: 'Ticket' }
-    & Pick<Ticket, 'id' | 'title' | 'text' | 'priority' | 'status' | 'type' | 'assignedDeveloperId'>
+    & TicketFragmentFragment
   )>> }
 );
 
@@ -551,8 +614,42 @@ export type FindAssignedTicketsByTypeQuery = (
   { __typename?: 'Query' }
   & { findAssignedTicketsByType?: Maybe<Array<(
     { __typename?: 'Ticket' }
-    & Pick<Ticket, 'id' | 'title' | 'text' | 'priority' | 'status' | 'type' | 'assignedDeveloperId'>
+    & TicketFragmentFragment
   )>> }
+);
+
+export type FindCommentsByTicketQueryVariables = Exact<{
+  options: FindCommentsByTicketInput;
+}>;
+
+
+export type FindCommentsByTicketQuery = (
+  { __typename?: 'Query' }
+  & { findCommentsByTicket: Array<(
+    { __typename?: 'Comment' }
+    & { commenter: (
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    ) }
+    & CommentFragmentFragment
+  )> }
+);
+
+export type FindTicketQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FindTicketQuery = (
+  { __typename?: 'Query' }
+  & { findTicket?: Maybe<(
+    { __typename?: 'Ticket' }
+    & { assignedDeveloper?: Maybe<(
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+    & TicketFragmentFragment
+  )> }
 );
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
@@ -562,83 +659,141 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { me?: Maybe<(
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role'>
     & { organization?: Maybe<(
       { __typename?: 'Organization' }
-      & Pick<Organization, 'id' | 'name'>
+      & OrganizationFragmentFragment
     )>, assignedProjects?: Maybe<Array<(
       { __typename?: 'Project' }
-      & Pick<Project, 'id' | 'name'>
+      & ProjectFragmentFragment
     )>>, managedProjects?: Maybe<Array<(
       { __typename?: 'Project' }
-      & Pick<Project, 'id' | 'name'>
+      & ProjectFragmentFragment
     )>> }
+    & UserFragmentFragment
   )> }
 );
 
-
+export const CommentFragmentFragmentDoc = gql`
+    fragment commentFragment on Comment {
+  id
+  text
+  ticketId
+  commenterId
+}
+    `;
+export const ErrorFragmentFragmentDoc = gql`
+    fragment errorFragment on FieldError {
+  field
+  message
+}
+    `;
+export const OrganizationFragmentFragmentDoc = gql`
+    fragment organizationFragment on Organization {
+  id
+  name
+  creatorId
+}
+    `;
+export const ProjectFragmentFragmentDoc = gql`
+    fragment projectFragment on Project {
+  id
+  name
+  description
+  managerId
+  organizationId
+}
+    `;
+export const TicketFragmentFragmentDoc = gql`
+    fragment ticketFragment on Ticket {
+  id
+  title
+  text
+  status
+  priority
+  type
+  assignedDeveloperId
+  creatorId
+  projectId
+}
+    `;
+export const UserFragmentFragmentDoc = gql`
+    fragment userFragment on User {
+  id
+  firstName
+  lastName
+  email
+  role
+}
+    `;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($options: ChangePasswordInput!, $token: String!) {
   changePassword(options: $options, token: $token) {
     errors {
-      field
-      message
+      ...errorFragment
     }
     user {
-      id
-      firstName
-      lastName
-      email
+      ...userFragment
     }
   }
 }
-    `;
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
 
 export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
+export const ForgotPasswordDocument = gql`
+    mutation ForgotPassword($email: String!) {
+  forgotPassword(email: $email)
+}
+    `;
+
+export function useForgotPasswordMutation() {
+  return Urql.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument);
 };
 export const LoginDocument = gql`
     mutation Login($options: UserLoginInput!) {
   login(options: $options) {
     errors {
-      field
-      message
+      ...errorFragment
     }
     user {
-      id
-      firstName
-      lastName
-      email
-      role
+      ...userFragment
       organization {
-        id
-        name
-        creatorId
+        ...organizationFragment
       }
     }
   }
 }
-    `;
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}
+${OrganizationFragmentFragmentDoc}`;
 
 export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout
+}
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RegisterDocument = gql`
     mutation Register($options: UserRegisterInput!) {
   register(options: $options) {
     errors {
-      field
-      message
+      ...errorFragment
     }
     user {
-      id
-      firstName
-      lastName
-      email
+      ...userFragment
     }
   }
 }
-    `;
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
@@ -646,16 +801,14 @@ export function useRegisterMutation() {
 export const FindAssignedTicketsDocument = gql`
     query FindAssignedTickets {
   findAssignedTickets {
-    id
-    title
-    text
-    priority
-    status
-    type
-    assignedDeveloperId
+    ...ticketFragment
+    assignedDeveloper {
+      ...userFragment
+    }
   }
 }
-    `;
+    ${TicketFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
 
 export function useFindAssignedTicketsQuery(options: Omit<Urql.UseQueryArgs<FindAssignedTicketsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindAssignedTicketsQuery>({ query: FindAssignedTicketsDocument, ...options });
@@ -663,16 +816,10 @@ export function useFindAssignedTicketsQuery(options: Omit<Urql.UseQueryArgs<Find
 export const FindAssignedTicketsByPriorityDocument = gql`
     query FindAssignedTicketsByPriority($options: FindAssignedTicketsByPriorityInput!) {
   findAssignedTicketsByPriority(options: $options) {
-    id
-    title
-    text
-    priority
-    status
-    type
-    assignedDeveloperId
+    ...ticketFragment
   }
 }
-    `;
+    ${TicketFragmentFragmentDoc}`;
 
 export function useFindAssignedTicketsByPriorityQuery(options: Omit<Urql.UseQueryArgs<FindAssignedTicketsByPriorityQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindAssignedTicketsByPriorityQuery>({ query: FindAssignedTicketsByPriorityDocument, ...options });
@@ -680,16 +827,10 @@ export function useFindAssignedTicketsByPriorityQuery(options: Omit<Urql.UseQuer
 export const FindAssignedTicketsByStatusDocument = gql`
     query FindAssignedTicketsByStatus($options: FindAssignedTicketsByStatusInput!) {
   findAssignedTicketsByStatus(options: $options) {
-    id
-    title
-    text
-    priority
-    status
-    type
-    assignedDeveloperId
+    ...ticketFragment
   }
 }
-    `;
+    ${TicketFragmentFragmentDoc}`;
 
 export function useFindAssignedTicketsByStatusQuery(options: Omit<Urql.UseQueryArgs<FindAssignedTicketsByStatusQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindAssignedTicketsByStatusQuery>({ query: FindAssignedTicketsByStatusDocument, ...options });
@@ -697,43 +838,62 @@ export function useFindAssignedTicketsByStatusQuery(options: Omit<Urql.UseQueryA
 export const FindAssignedTicketsByTypeDocument = gql`
     query FindAssignedTicketsByType($options: FindAssignedTicketsByTypeInput!) {
   findAssignedTicketsByType(options: $options) {
-    id
-    title
-    text
-    priority
-    status
-    type
-    assignedDeveloperId
+    ...ticketFragment
   }
 }
-    `;
+    ${TicketFragmentFragmentDoc}`;
 
 export function useFindAssignedTicketsByTypeQuery(options: Omit<Urql.UseQueryArgs<FindAssignedTicketsByTypeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindAssignedTicketsByTypeQuery>({ query: FindAssignedTicketsByTypeDocument, ...options });
 };
-export const MeDocument = gql`
-    query Me {
-  me {
-    id
-    firstName
-    lastName
-    email
-    role
-    organization {
-      id
-      name
-    }
-    assignedProjects {
-      id
-      name
-    }
-    managedProjects {
-      id
-      name
+export const FindCommentsByTicketDocument = gql`
+    query FindCommentsByTicket($options: FindCommentsByTicketInput!) {
+  findCommentsByTicket(options: $options) {
+    ...commentFragment
+    commenter {
+      ...userFragment
     }
   }
 }
-    `;
+    ${CommentFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useFindCommentsByTicketQuery(options: Omit<Urql.UseQueryArgs<FindCommentsByTicketQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindCommentsByTicketQuery>({ query: FindCommentsByTicketDocument, ...options });
+};
+export const FindTicketDocument = gql`
+    query FindTicket($id: Int!) {
+  findTicket(id: $id) {
+    ...ticketFragment
+    assignedDeveloper {
+      ...userFragment
+    }
+  }
+}
+    ${TicketFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useFindTicketQuery(options: Omit<Urql.UseQueryArgs<FindTicketQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindTicketQuery>({ query: FindTicketDocument, ...options });
+};
+export const MeDocument = gql`
+    query Me {
+  me {
+    ...userFragment
+    organization {
+      ...organizationFragment
+    }
+    assignedProjects {
+      ...projectFragment
+    }
+    managedProjects {
+      ...projectFragment
+    }
+  }
+}
+    ${UserFragmentFragmentDoc}
+${OrganizationFragmentFragmentDoc}
+${ProjectFragmentFragmentDoc}`;
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
