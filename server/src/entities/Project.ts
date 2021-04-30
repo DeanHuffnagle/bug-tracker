@@ -9,6 +9,7 @@ import {
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn,
+	RelationId,
 	UpdateDateColumn,
 } from 'typeorm';
 import { Organization } from './Organization';
@@ -70,6 +71,10 @@ export class Project extends BaseEntity {
 	})
 	@JoinTable()
 	assignedDevelopers: User[] | null;
+
+	@Field(() => [Int], { nullable: true })
+	@RelationId((project: Project) => project.assignedDevelopers)
+	assignedDeveloperIds: number[];
 
 	//// Project to organization relationship ////
 	@Field(() => Organization)

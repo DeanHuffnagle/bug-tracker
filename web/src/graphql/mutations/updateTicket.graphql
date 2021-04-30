@@ -1,0 +1,10 @@
+mutation UpdateTicket($options: UpdateTicketInput!, $ticketId: Int!) {
+	updateTicket(options: $options, ticketId: $ticketId) {
+		errors {
+			...errorFragment
+		}
+		ticket {
+			...ticketFragment
+		}
+	}
+}

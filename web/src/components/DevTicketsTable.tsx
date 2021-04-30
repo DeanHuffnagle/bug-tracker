@@ -14,6 +14,8 @@ export default function DevTicketsTable() {
 						<th>Title</th>
 						<th>Description</th>
 						<th>Priority</th>
+						<th>Status</th>
+						<th>Type</th>
 						<th>Developer</th>
 					</tr>
 				</thead>
@@ -24,8 +26,29 @@ export default function DevTicketsTable() {
 								<NextLink href="ticket/[id]" as={`/ticket/${t.id}`}>
 									<td id="tickets-table-title">{t.title}</td>
 								</NextLink>
-								<td>{t.text}</td>
-								<td>{t.priority}</td>
+								{/* description */}
+								<NextLink href="ticket/[id]" as={`/ticket/${t.id}`}>
+									<td>{t.text}</td>
+								</NextLink>
+								{/* priority */}
+								{t.priority === 'low' ? <td>Low</td> : null}
+								{t.priority === 'medium' ? <td>Medium</td> : null}
+								{t.priority === 'high' ? <td>High</td> : null}
+								{/* status */}
+								{t.status === 'unassigned' ? <td>Unassigned</td> : null}
+								{t.status === 'inProgress' ? <td>In Progress</td> : null}
+								{t.status === 'resolved' ? <td>Resolved</td> : null}
+								{t.status === 'awaitingConfirmation' ? (
+									<td>Awaiting Confirmation</td>
+								) : null}
+								{/* type */}
+								{t.type === 'bugOrError' ? <td>Bug/Error</td> : null}
+								{t.type === 'featureRequest' ? <td>Feature Request</td> : null}
+								{t.type === 'other' ? <td>Other</td> : null}
+								{t.type === 'trainingRequest' ? (
+									<td>Training Request</td>
+								) : null}
+								{/* assigned developer */}
 								<td>
 									{t.assignedDeveloper?.firstName}{' '}
 									{t.assignedDeveloper?.lastName}

@@ -112,6 +112,14 @@ export type FindCommentsByTicketInput = {
   ticketId: Scalars['Int'];
 };
 
+export type FindUsersByOrganizationInput = {
+  organizationId: Scalars['Int'];
+};
+
+export type FindUsersByProjectInput = {
+  projectId: Scalars['Int'];
+};
+
 export type JoinOrganizationInput = {
   organizationId: Scalars['Float'];
   userId: Scalars['Float'];
@@ -138,6 +146,7 @@ export type Mutation = {
   unassignProjectManager: ProjectResponse;
   createTicket: TicketResponse;
   assignTicket: TicketResponse;
+  updateTicket: TicketResponse;
   changeTicketStatus: TicketResponse;
   changeTicketPriority: TicketResponse;
   changeTicketType: TicketResponse;
@@ -206,6 +215,12 @@ export type MutationCreateTicketArgs = {
 
 export type MutationAssignTicketArgs = {
   options: AssignTicketInput;
+};
+
+
+export type MutationUpdateTicketArgs = {
+  ticketId: Scalars['Int'];
+  options: UpdateTicketInput;
 };
 
 
@@ -293,6 +308,7 @@ export type Project = {
   updatedAt: Scalars['String'];
   manager?: Maybe<User>;
   assignedDevelopers?: Maybe<Array<User>>;
+  assignedDeveloperIds?: Maybe<Array<Scalars['Int']>>;
   organization: Organization;
   tickets?: Maybe<Array<Ticket>>;
 };
@@ -317,6 +333,8 @@ export type Query = {
   findAssignedTicketsByStatus?: Maybe<Array<Ticket>>;
   findAssignedTicketsByType?: Maybe<Array<Ticket>>;
   me?: Maybe<User>;
+  findUsersByOrganization?: Maybe<Array<User>>;
+  findUsersByProject?: Maybe<Array<User>>;
 };
 
 
@@ -359,6 +377,16 @@ export type QueryFindAssignedTicketsByTypeArgs = {
   options: FindAssignedTicketsByTypeInput;
 };
 
+
+export type QueryFindUsersByOrganizationArgs = {
+  options: FindUsersByOrganizationInput;
+};
+
+
+export type QueryFindUsersByProjectArgs = {
+  options: FindUsersByProjectInput;
+};
+
 export type Ticket = {
   __typename?: 'Ticket';
   id: Scalars['Float'];
@@ -387,6 +415,15 @@ export type TicketResponse = {
 export type UnassignProjectInput = {
   projectId: Scalars['Int'];
   userId: Scalars['Int'];
+};
+
+export type UpdateTicketInput = {
+  ticketTitle: Scalars['String'];
+  ticketText: Scalars['String'];
+  ticketPriority: Scalars['String'];
+  ticketStatus: Scalars['String'];
+  ticketType: Scalars['String'];
+  userEmail?: Maybe<Scalars['String']>;
 };
 
 export type User = {
@@ -558,6 +595,26 @@ export type RegisterMutation = (
   ) }
 );
 
+export type UpdateTicketMutationVariables = Exact<{
+  options: UpdateTicketInput;
+  ticketId: Scalars['Int'];
+}>;
+
+
+export type UpdateTicketMutation = (
+  { __typename?: 'Mutation' }
+  & { updateTicket: (
+    { __typename?: 'TicketResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, ticket?: Maybe<(
+      { __typename?: 'Ticket' }
+      & TicketFragmentFragment
+    )> }
+  ) }
+);
+
 export type FindAssignedTicketsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -644,6 +701,32 @@ export type FindTicketQuery = (
     )> }
     & TicketFragmentFragment
   )> }
+);
+
+export type FindUsersByOrganizationQueryVariables = Exact<{
+  options: FindUsersByOrganizationInput;
+}>;
+
+
+export type FindUsersByOrganizationQuery = (
+  { __typename?: 'Query' }
+  & { findUsersByOrganization?: Maybe<Array<(
+    { __typename?: 'User' }
+    & UserFragmentFragment
+  )>> }
+);
+
+export type FindUsersByProjectQueryVariables = Exact<{
+  options: FindUsersByProjectInput;
+}>;
+
+
+export type FindUsersByProjectQuery = (
+  { __typename?: 'Query' }
+  & { findUsersByProject?: Maybe<Array<(
+    { __typename?: 'User' }
+    & UserFragmentFragment
+  )>> }
 );
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
@@ -819,6 +902,23 @@ ${UserFragmentFragmentDoc}`;
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
+export const UpdateTicketDocument = gql`
+    mutation UpdateTicket($options: UpdateTicketInput!, $ticketId: Int!) {
+  updateTicket(options: $options, ticketId: $ticketId) {
+    errors {
+      ...errorFragment
+    }
+    ticket {
+      ...ticketFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${TicketFragmentFragmentDoc}`;
+
+export function useUpdateTicketMutation() {
+  return Urql.useMutation<UpdateTicketMutation, UpdateTicketMutationVariables>(UpdateTicketDocument);
+};
 export const FindAssignedTicketsDocument = gql`
     query FindAssignedTickets {
   findAssignedTickets {
@@ -896,6 +996,28 @@ ${UserFragmentFragmentDoc}`;
 
 export function useFindTicketQuery(options: Omit<Urql.UseQueryArgs<FindTicketQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindTicketQuery>({ query: FindTicketDocument, ...options });
+};
+export const FindUsersByOrganizationDocument = gql`
+    query FindUsersByOrganization($options: FindUsersByOrganizationInput!) {
+  findUsersByOrganization(options: $options) {
+    ...userFragment
+  }
+}
+    ${UserFragmentFragmentDoc}`;
+
+export function useFindUsersByOrganizationQuery(options: Omit<Urql.UseQueryArgs<FindUsersByOrganizationQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindUsersByOrganizationQuery>({ query: FindUsersByOrganizationDocument, ...options });
+};
+export const FindUsersByProjectDocument = gql`
+    query FindUsersByProject($options: FindUsersByProjectInput!) {
+  findUsersByProject(options: $options) {
+    ...userFragment
+  }
+}
+    ${UserFragmentFragmentDoc}`;
+
+export function useFindUsersByProjectQuery(options: Omit<Urql.UseQueryArgs<FindUsersByProjectQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindUsersByProjectQuery>({ query: FindUsersByProjectDocument, ...options });
 };
 export const MeDocument = gql`
     query Me {

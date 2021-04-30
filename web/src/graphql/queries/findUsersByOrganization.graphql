@@ -1,0 +1,5 @@
+query FindUsersByOrganization($options: FindUsersByOrganizationInput!) {
+	findUsersByOrganization(options: $options) {
+		...userFragment
+	}
+}

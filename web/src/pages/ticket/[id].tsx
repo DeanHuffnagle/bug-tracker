@@ -50,15 +50,60 @@ const ticket = ({}) => {
 				<NavBar />
 				<Container>
 					<Row>
-						<Col className="mt-1">
+						<Col md={12} lg={6} className="mt-1">
 							<Card>
-								<Heading>{ticketData?.findTicket?.title}</Heading>
-								<Box mb={4}>{ticketData?.findTicket?.text}</Box>
+								<Heading className="text-center">
+									{ticketData?.findTicket?.title}
+								</Heading>
+								<Text ml={2} my={2}>
+									Description: {ticketData?.findTicket?.text}
+								</Text>
+								<Text ml={2} mb={2}>
+									Assigned Developer:{' '}
+									{ticketData?.findTicket?.assignedDeveloper?.firstName}{' '}
+									{ticketData?.findTicket?.assignedDeveloper?.lastName}
+								</Text>
+								<Text ml={2} mb={4}>
+									Priority:{' '}
+									{ticketData?.findTicket?.priority === 'low' ? 'Low' : null}
+									{ticketData?.findTicket?.priority === 'medium'
+										? 'Medium'
+										: null}
+									{ticketData?.findTicket?.priority === 'high' ? 'High' : null}
+								</Text>
+								<Text ml={2} mb={4}>
+									Status:{' '}
+									{ticketData?.findTicket?.status === 'unassigned'
+										? 'Unassigned'
+										: null}
+									{ticketData?.findTicket?.status === 'inProgress'
+										? 'In Progress'
+										: null}
+									{ticketData?.findTicket?.status === 'awaitingConfirmation'
+										? 'Awaiting Confirmation'
+										: null}
+									{ticketData?.findTicket?.status === 'resolved'
+										? 'Resolved'
+										: null}
+								</Text>
+								<Text ml={2} mb={4}>
+									Type:{' '}
+									{ticketData?.findTicket?.type === 'bugOrError'
+										? 'Bug/Error'
+										: null}
+									{ticketData?.findTicket?.type === 'featureRequest'
+										? 'Feature Request'
+										: null}
+									{ticketData?.findTicket?.type === 'trainingRequest'
+										? 'Training Request'
+										: null}
+									{ticketData?.findTicket?.type === 'other' ? 'Other' : null}
+								</Text>
 							</Card>
 						</Col>
-						<Col className="mt-1">
+						<Col md={12} lg={6} className="mt-1">
 							<Card>
-								<Table striped bordered hover responsive variant="dark">
+								<Table striped bordered hover responsive>
 									<thead>
 										<tr>
 											<th>Comment</th>
@@ -85,6 +130,8 @@ const ticket = ({}) => {
 										)}
 									</tbody>
 								</Table>
+							</Card>
+							<Card>
 								<Formik
 									initialValues={{ commentText: '' }}
 									onSubmit={async (values, { setErrors }) => {
@@ -107,7 +154,7 @@ const ticket = ({}) => {
 													textarea
 													name="commentText"
 													placeholder="comment text"
-													label="Comment Text"
+													label="Create Comment:"
 												/>
 											</Box>
 

@@ -9,13 +9,6 @@ import { UserRoleType } from '../entities/User';
 //================================================================================
 //Comment Input Types
 //================================================================================
-//// Create Comment ////
-@InputType()
-export class CreateCommentInput {
-	@Field(() => String)
-	commentText!: string;
-}
-
 //// Find Comment ////
 @InputType()
 export class FindCommentInput {
@@ -84,18 +77,35 @@ export class UnassignProjectInput {
 @InputType()
 export class CreateTicketInput {
 	@Field(() => Int)
-	projectId: number;
+	projectId!: number;
 	@Field()
-	title: string;
+	title!: string;
 	@Field()
-	text: string;
+	text!: string;
+}
+
+//// Update Ticket ////
+@InputType()
+export class UpdateTicketInput {
+	@Field()
+	ticketTitle!: string;
+	@Field()
+	ticketText!: string;
+	@Field()
+	ticketPriority!: TicketPriorityType;
+	@Field()
+	ticketStatus!: TicketStatusType;
+	@Field()
+	ticketType!: TicketTypeType;
+	@Field(() => String, { nullable: true })
+	userEmail: string | undefined;
 }
 
 //// Change Ticket Status ////
 @InputType()
 export class ChangeTicketStatusInput {
 	@Field(() => Int)
-	ticketId: number;
+	ticketId!: number;
 	@Field(() => String)
 	status!: TicketStatusType;
 }
@@ -212,4 +222,18 @@ export class ChangePasswordInput {
 	newPassword!: string;
 	@Field()
 	repeatPassword!: string;
+}
+
+//// Find User By Organization ////
+@InputType()
+export class FindUsersByOrganizationInput {
+	@Field(() => Int)
+	organizationId: number;
+}
+
+//// Find User By Project ////
+@InputType()
+export class FindUsersByProjectInput {
+	@Field(() => Int)
+	projectId: number;
 }

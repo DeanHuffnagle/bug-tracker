@@ -1,0 +1,5 @@
+query FindUsersByProject($options: FindUsersByProjectInput!) {
+	findUsersByProject(options: $options) {
+		...userFragment
+	}
+}

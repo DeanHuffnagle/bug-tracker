@@ -7,10 +7,11 @@ import {
 	Resolver,
 	UseMiddleware,
 } from 'type-graphql';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { v4 } from 'uuid';
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from '../constants';
 import { Organization } from '../entities/Organization';
+import { Project } from '../entities/Project';
 import { User } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
@@ -18,6 +19,8 @@ import { MyContext } from '../types';
 import {
 	ChangePasswordInput,
 	ChangeRoleInput,
+	FindUsersByOrganizationInput,
+	FindUsersByProjectInput,
 	JoinOrganizationInput,
 	LeaveOrganizationInput,
 	MakeAdminInput,
@@ -266,6 +269,38 @@ export class UserResolver {
 		return User.findOne(req.session.UserId, {
 			relations: ['organization', 'assignedProjects', 'managedProjects'],
 		});
+	}
+	//================================================================================
+	//Find Users By Organization Query
+	//================================================================================
+	@Query(() => [User], { nullable: true })
+	async findUsersByOrganization(
+		@Arg('options') options: FindUsersByOrganizationInput
+	): Promise<User[]> {
+		const usersByOrganization = await getRepository(User)
+			.createQueryBuilder('user')
+			.where('user.organizationId = :organizationId', {
+				organizationId: options.organizationId,
+			})
+			.getMany();
+		return usersByOrganization;
+	}
+	//================================================================================
+	//Find Users By Project Query
+	//================================================================================
+	@Query(() => [User], { nullable: true })
+	async findUsersByProject(
+		@Arg('options') options: FindUsersByProjectInput
+	): Promise<User[]> {
+		const isProject = await Project.findOne(options.projectId);
+		const usersByProject = await getRepository(User)
+			.createQueryBuilder('user')
+			.where('user.id in (:...assignedDeveloperIds)', {
+				assignedDeveloperIds: isProject?.assignedDeveloperIds,
+			})
+			.getMany();
+
+		return usersByProject;
 	}
 	//================================================================================
 	//Logout Mutation

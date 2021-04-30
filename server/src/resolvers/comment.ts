@@ -14,7 +14,6 @@ import { User } from '../entities/User';
 import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
 import {
-	CreateCommentInput,
 	FindCommentInput,
 	FindCommentsByTicketInput,
 } from '../utils/inputTypes';

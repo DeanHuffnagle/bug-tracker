@@ -11,6 +11,7 @@ import { getConnection, getRepository } from 'typeorm';
 import { Project } from '../entities/Project';
 import { Ticket } from '../entities/Ticket';
 import { User } from '../entities/User';
+import { isAuth } from '../middleware/isAuth';
 import { isProjectManager } from '../middleware/isProjectManager';
 import { isSubmitter } from '../middleware/isSubmitter';
 import { MyContext } from '../types';
@@ -23,6 +24,7 @@ import {
 	FindAssignedTicketsByPriorityInput,
 	FindAssignedTicketsByStatusInput,
 	FindAssignedTicketsByTypeInput,
+	UpdateTicketInput,
 } from '../utils/inputTypes';
 import { TicketResponse } from '../utils/objectTypes';
 
@@ -130,6 +132,69 @@ export class TicketResolver {
 		const ticket = await Ticket.findOne(options.ticketId, {
 			relations: ['assignedDeveloper'],
 		});
+		return { ticket };
+	}
+	//================================================================================
+	//Update Ticket Mutation
+	//================================================================================
+	@Mutation(() => TicketResponse)
+	@UseMiddleware(isAuth)
+	async updateTicket(
+		@Arg('options') options: UpdateTicketInput,
+		@Arg('ticketId', () => Int) ticketId: number
+	): Promise<TicketResponse> {
+		const isUser = await User.findOne({ where: { email: options.userEmail } });
+		if (!options.ticketText) {
+			return {
+				errors: [
+					{
+						field: 'ticketText',
+						message: 'cannot be blank.',
+					},
+				],
+			};
+		}
+		if (!options.ticketTitle) {
+			return {
+				errors: [
+					{
+						field: 'ticketTitle',
+						message: 'cannot be blank.',
+					},
+				],
+			};
+		}
+		if (!isUser) {
+			await await getConnection()
+				.createQueryBuilder()
+				.update(Ticket)
+				.set({
+					title: options.ticketTitle,
+					text: options.ticketText,
+					status: options.ticketStatus,
+					type: options.ticketType,
+					priority: options.ticketPriority,
+				})
+				.where('id = :id', { id: ticketId })
+				.execute();
+		}
+		if (isUser) {
+			await await getConnection()
+				.createQueryBuilder()
+				.update(Ticket)
+				.set({
+					title: options.ticketTitle,
+					text: options.ticketText,
+					status: options.ticketStatus,
+					type: options.ticketType,
+					priority: options.ticketPriority,
+					assignedDeveloperId: isUser.id,
+				})
+				.where('id = :id', { id: ticketId })
+				.execute();
+		}
+
+		const ticket = await Ticket.findOne(ticketId);
 		return { ticket };
 	}
 	//================================================================================
