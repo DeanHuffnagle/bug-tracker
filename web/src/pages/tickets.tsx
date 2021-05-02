@@ -1,3 +1,5 @@
+import { Box } from '@chakra-ui/layout';
+import { Input } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';

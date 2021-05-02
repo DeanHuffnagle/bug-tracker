@@ -1,0 +1,67 @@
+[
+	{
+		"ticket_id": 3,
+		"ticket_title": "get a rough backend working",
+		"ticket_text": "get basic CRUD functions working in the backend and then we can start on the front end",
+		"ticket_type": "featureRequest",
+		"ticket_priority": "low",
+		"ticket_status": "resolved",
+		"assignedDeveloper_id": 1,
+		"assignedDeveloper_firstName": "Dean",
+		"assignedDeveloper_lastName": "Huffnagle",
+		"assignedDeveloper_email": "Dean@Dean.com",
+		"assignedDeveloper_role": "admin"
+	},
+	{
+		"ticket_id": 4,
+		"ticket_title": "prettify the dashboard",
+		"ticket_text": "get that dashboard looking nice",
+		"ticket_type": "featureRequest",
+		"ticket_priority": "high",
+		"ticket_status": "resolved",
+		"assignedDeveloper_id": 1,
+		"assignedDeveloper_firstName": "Dean",
+		"assignedDeveloper_lastName": "Huffnagle",
+		"assignedDeveloper_email": "Dean@Dean.com",
+		"assignedDeveloper_role": "admin"
+	},
+	{
+		"ticket_id": 7,
+		"ticket_title": "My tickets Page",
+		"ticket_text": "we need a page to display a users tickets. implement it for developers first then later we can customize it for project managers and admins.",
+		"ticket_type": "other",
+		"ticket_priority": "high",
+		"ticket_status": "inProgress",
+		"assignedDeveloper_id": 1,
+		"assignedDeveloper_firstName": "Dean",
+		"assignedDeveloper_lastName": "Huffnagle",
+		"assignedDeveloper_email": "Dean@Dean.com",
+		"assignedDeveloper_role": "admin"
+	},
+	{
+		"ticket_id": 5,
+		"ticket_title": "backend for dashboard",
+		"ticket_text": "get those graphs displaying actual data",
+		"ticket_type": "featureRequest",
+		"ticket_priority": "high",
+		"ticket_status": "awaitingConfirmation",
+		"assignedDeveloper_id": 1,
+		"assignedDeveloper_firstName": "Dean",
+		"assignedDeveloper_lastName": "Huffnagle",
+		"assignedDeveloper_email": "Dean@Dean.com",
+		"assignedDeveloper_role": "admin"
+	},
+	{
+		"ticket_id": 6,
+		"ticket_title": "pie chart not working",
+		"ticket_text": "change the pie chart to a function component to allow it to use hooks.",
+		"ticket_type": "bugOrError",
+		"ticket_priority": "medium",
+		"ticket_status": "resolved",
+		"assignedDeveloper_id": 1,
+		"assignedDeveloper_firstName": "Dean",
+		"assignedDeveloper_lastName": "Huffnagle",
+		"assignedDeveloper_email": "Dean@Dean.com",
+		"assignedDeveloper_role": "admin"
+	}
+]

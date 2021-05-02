@@ -26,7 +26,7 @@ import {
 	FindAssignedTicketsByTypeInput,
 	UpdateTicketInput,
 } from '../utils/inputTypes';
-import { TicketResponse } from '../utils/objectTypes';
+import { RawTicketResponse, TicketResponse } from '../utils/objectTypes';
 
 @Resolver(Ticket)
 export class TicketResolver {
@@ -297,6 +297,25 @@ export class TicketResolver {
 			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
 			.where('ticket.assignedDeveloperId = :id', { id: isUser?.id })
 			.getMany();
+
+		console.log('data: ', JSON.stringify(assignedTickets));
+		return assignedTickets;
+	}
+	//================================================================================
+	//Find Raw Assigned Tickets Query
+	//================================================================================
+	@Query(() => [RawTicketResponse], { nullable: true })
+	async findRawAssignedTickets(
+		@Ctx() { req }: MyContext
+	): Promise<RawTicketResponse[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const assignedTickets = await getRepository(Ticket)
+			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
+			.where('ticket.assignedDeveloperId = :id', { id: isUser?.id })
+			.getRawMany();
+
+		console.log('data: ', assignedTickets);
 		return assignedTickets;
 	}
 	//================================================================================

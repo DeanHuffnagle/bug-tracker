@@ -6,6 +6,9 @@ import {
 	Heading,
 	Text,
 	Select,
+	Link,
+	Flex,
+	IconButton,
 } from '@chakra-ui/react';
 import { Field, Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
@@ -24,6 +27,8 @@ import { createUrqlClient } from '../../../utils/createUrqlClient';
 import { toErrorMap } from '../../../utils/toErrorMap';
 import { useGetIntId } from '../../../utils/useGetIntId';
 import { useGetTicketFromUrl } from '../../../utils/useGetTicketFromUrl';
+import NextLink from 'next/link';
+import { ArrowBackIcon } from '@chakra-ui/icons';
 
 const editTicket = ({}) => {
 	const router = useRouter();
@@ -59,9 +64,24 @@ const editTicket = ({}) => {
 					<Row>
 						<Col md={12} lg={6} className="mt-1">
 							<Card>
-								<Heading className="text-center">
-									{ticketData?.findTicket?.title}
-								</Heading>
+								<Flex width="full">
+									<Box width="full">
+										<Heading ml={2} mt={1}>
+											{ticketData?.findTicket?.title}
+										</Heading>
+									</Box>
+									<Box mr="auto" mt={1}>
+										<NextLink href="/ticket/[id]" as={`/ticket/${isTicketId}`}>
+											<IconButton
+												as={Link}
+												aria-label="arrow back icon"
+												icon={<ArrowBackIcon />}
+												size="xs"
+												mr={1}
+											/>
+										</NextLink>
+									</Box>
+								</Flex>
 								<Text ml={2} my={2}>
 									Description: {ticketData?.findTicket?.text}
 								</Text>
@@ -93,6 +113,7 @@ const editTicket = ({}) => {
 										? 'Resolved'
 										: null}
 								</Text>
+
 								<Text ml={2} mb={4}>
 									Type:{' '}
 									{ticketData?.findTicket?.type === 'bugOrError'
@@ -162,49 +183,53 @@ const editTicket = ({}) => {
 													label="Text:"
 												/>
 											</Box>
-											<Box mt={1}>
-												<SelectField
-													label="Assigned Developer:"
-													name="userEmail"
-												>
-													{data?.findUsersByProject?.map((u) =>
-														!u ? null : (
-															<option key={u.id} value={u.email}>
-																{u.firstName} {u.lastName}
-															</option>
-														)
-													)}
-												</SelectField>
-											</Box>
-											<Box mt={1}>
-												<SelectField label="Priority" name="ticketPriority">
-													<option value="low">Low</option>
-													<option value="medium">Medium</option>
-													<option value="high">High</option>
-												</SelectField>
-											</Box>
-											<Box mt={1}>
-												<SelectField label="Status:" name="ticketStatus">
-													<option value="unassigned">Unassigned</option>
-													<option value="inProgress">In Progress</option>
-													<option value="awaitingConfirmation">
-														Awaiting Confirmation
-													</option>
-													<option value="resolved">Resolved</option>
-												</SelectField>
-											</Box>
-											<Box mt={1}>
-												<SelectField label="Type:" name="ticketType">
-													<option value="bugOrError">Bug/Error</option>
-													<option value="featureRequest">
-														Feature Request
-													</option>
-													<option value="trainingRequest">
-														Training Request
-													</option>
-													<option value="other">Other</option>
-												</SelectField>
-											</Box>
+											<Flex>
+												<Box mt={1} width="full">
+													<SelectField
+														label="Assigned Developer:"
+														name="userEmail"
+													>
+														{data?.findUsersByProject?.map((u) =>
+															!u ? null : (
+																<option key={u.id} value={u.email}>
+																	{u.firstName} {u.lastName}
+																</option>
+															)
+														)}
+													</SelectField>
+												</Box>
+												<Box mt={1} width="full">
+													<SelectField label="Priority:" name="ticketPriority">
+														<option value="low">Low</option>
+														<option value="medium">Medium</option>
+														<option value="high">High</option>
+													</SelectField>
+												</Box>
+											</Flex>
+											<Flex>
+												<Box mt={1} width="full">
+													<SelectField label="Status:" name="ticketStatus">
+														<option value="unassigned">Unassigned</option>
+														<option value="inProgress">In Progress</option>
+														<option value="awaitingConfirmation">
+															Awaiting Confirmation
+														</option>
+														<option value="resolved">Resolved</option>
+													</SelectField>
+												</Box>
+												<Box mt={1} width="full">
+													<SelectField label="Type:" name="ticketType">
+														<option value="bugOrError">Bug/Error</option>
+														<option value="featureRequest">
+															Feature Request
+														</option>
+														<option value="trainingRequest">
+															Training Request
+														</option>
+														<option value="other">Other</option>
+													</SelectField>
+												</Box>
+											</Flex>
 
 											<Button
 												width="full"

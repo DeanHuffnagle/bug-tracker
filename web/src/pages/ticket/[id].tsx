@@ -1,4 +1,13 @@
-import { Box, Button, Heading, Text } from '@chakra-ui/react';
+import { EditIcon } from '@chakra-ui/icons';
+import {
+	Box,
+	Button,
+	Heading,
+	IconButton,
+	Link,
+	Text,
+	Flex,
+} from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
@@ -14,6 +23,7 @@ import { createUrqlClient } from '../../utils/createUrqlClient';
 import { toErrorMap } from '../../utils/toErrorMap';
 import { useGetIntId } from '../../utils/useGetIntId';
 import { useGetTicketFromUrl } from '../../utils/useGetTicketFromUrl';
+import NextLink from 'next/link';
 
 const ticket = ({}) => {
 	const router = useRouter();
@@ -52,9 +62,27 @@ const ticket = ({}) => {
 					<Row>
 						<Col md={12} lg={6} className="mt-1">
 							<Card>
-								<Heading className="text-center">
-									{ticketData?.findTicket?.title}
-								</Heading>
+								<Flex width="full">
+									<Box width="full">
+										<Heading ml={2} mt={1}>
+											{ticketData?.findTicket?.title}
+										</Heading>
+									</Box>
+									<Box mr="auto" mt={1}>
+										<NextLink
+											href="/ticket/edit/[id]"
+											as={`/ticket/edit/${isTicketId}`}
+										>
+											<IconButton
+												as={Link}
+												aria-label="edit post"
+												icon={<EditIcon />}
+												size="xs"
+												mr={1}
+											/>
+										</NextLink>
+									</Box>
+								</Flex>
 								<Text ml={2} my={2}>
 									Description: {ticketData?.findTicket?.text}
 								</Text>
@@ -86,6 +114,7 @@ const ticket = ({}) => {
 										? 'Resolved'
 										: null}
 								</Text>
+
 								<Text ml={2} mb={4}>
 									Type:{' '}
 									{ticketData?.findTicket?.type === 'bugOrError'

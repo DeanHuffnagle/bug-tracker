@@ -4,7 +4,7 @@ import { useFindAssignedTicketsQuery } from '../generated/graphql';
 import NextLink from 'next/link';
 import { Box, Input, Link } from '@chakra-ui/react';
 
-export default function DevTicketsTable() {
+export default function FilteringTable() {
 	const [{ data: ticketData }] = useFindAssignedTicketsQuery();
 	const [filter, setFilter] = useState('');
 
@@ -22,7 +22,7 @@ export default function DevTicketsTable() {
 					</tr>
 				</thead>
 				<tbody>
-					{ticketData?.findAssignedTickets?.filter('ghg').map((t) =>
+					{ticketData?.findAssignedTickets?.map((t) =>
 						!t ? null : (
 							<tr key={t.id}>
 								{/* title */}
