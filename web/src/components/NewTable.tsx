@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { Table } from 'react-bootstrap';
 import { Column, useTable } from 'react-table';
 import {
-	useFindAssignedTicketsQuery,
 	useFindRawAssignedTicketsQuery,
 	useMeQuery,
 } from '../generated/graphql';
@@ -25,7 +24,7 @@ export const NewTable = () => {
 			developer: string;
 		}>[]
 	>(() => TICKET_COLUMNS, []);
-	const data = useMemo(() => realData, []);
+	const data = useMemo(() => realData, [realData, meData?.me]);
 
 	const tableInstance = useTable({
 		columns,
@@ -43,38 +42,42 @@ export const NewTable = () => {
 		return <>no data</>;
 	} else {
 		return (
-			<Table
-				{...getTableProps()}
-				striped
-				bordered
-				hover
-				responsive
-				variant="dark"
-			>
-				<thead>
-					{headerGroups.map((headerGroup) => (
-						<tr {...headerGroup.getHeaderGroupProps()}>
-							{headerGroup.headers.map((column) => (
-								<th {...column.getHeaderProps()}>{column.render('Header')}</th>
-							))}
-						</tr>
-					))}
-				</thead>
-				<tbody {...getTableBodyProps()}>
-					{rows.map((row) => {
-						prepareRow(row);
-						return (
-							<tr {...row.getRowProps()}>
-								{row.cells.map((cell) => {
-									return (
-										<td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-									);
-								})}
+			<>
+				<Table
+					{...getTableProps()}
+					striped
+					bordered
+					hover
+					responsive
+					variant="dark"
+				>
+					<thead>
+						{headerGroups.map((headerGroup) => (
+							<tr {...headerGroup.getHeaderGroupProps()}>
+								{headerGroup.headers.map((column) => (
+									<th {...column.getHeaderProps()}>
+										{column.render('Header')}
+									</th>
+								))}
 							</tr>
-						);
-					})}
-				</tbody>
-			</Table>
+						))}
+					</thead>
+					<tbody {...getTableBodyProps()}>
+						{rows.map((row) => {
+							prepareRow(row);
+							return (
+								<tr {...row.getRowProps()}>
+									{row.cells.map((cell) => {
+										return (
+											<td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+										);
+									})}
+								</tr>
+							);
+						})}
+					</tbody>
+				</Table>
+			</>
 		);
 	}
 };

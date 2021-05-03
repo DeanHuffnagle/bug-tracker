@@ -17,7 +17,7 @@ import React from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
 
 import { InputField } from '../../../components/InputField';
-import NavBar from '../../../components/NavBar';
+import { NavBar } from '../../../components/NavBar';
 import { SelectField } from '../../../components/SelectField';
 import {
 	useFindUsersByProjectQuery,

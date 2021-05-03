@@ -15,7 +15,7 @@ import DevStatusBarGraph from '../components/DevStatusBarGraph';
 import StatusBarGraph from '../components/DevStatusBarGraph';
 import DevTypePieChart from '../components/DevTypePieChart';
 import TypePieChart from '../components/DevTypePieChart';
-import NavBar from '../components/NavBar';
+import { NavBar } from '../components/NavBar';
 import { useFindAssignedTicketsQuery, useMeQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 

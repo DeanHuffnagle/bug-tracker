@@ -2,7 +2,11 @@ import React from 'react';
 import { Button, Dropdown, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 
-export default function NavBar() {
+type NavBarProps = {
+	brand?: string;
+};
+
+export const NavBar: React.FC<NavBarProps> = ({ brand }) => {
 	const [{ data: meData }] = useMeQuery();
 	const [, logout] = useLogoutMutation();
 
@@ -30,7 +34,11 @@ export default function NavBar() {
 	return (
 		<div>
 			<Navbar bg="dark" variant="dark" expand="lg">
-				<Navbar.Brand href="/">Bug-Tracker</Navbar.Brand>
+				{brand ? (
+					<Navbar.Brand href="/">{brand}</Navbar.Brand>
+				) : (
+					<Navbar.Brand href="/">Bug-Tracker</Navbar.Brand>
+				)}
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ml-auto">
@@ -42,4 +50,4 @@ export default function NavBar() {
 			</Navbar>
 		</div>
 	);
-}
+};

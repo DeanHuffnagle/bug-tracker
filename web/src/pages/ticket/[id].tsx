@@ -14,7 +14,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { InputField } from '../../components/InputField';
-import NavBar from '../../components/NavBar';
+import { NavBar } from '../../components/NavBar';
 import {
 	useCreateCommentMutation,
 	useFindCommentsByTicketQuery,

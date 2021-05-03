@@ -4,7 +4,7 @@ import { withUrqlClient } from 'next-urql';
 import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import DevTicketsTable from '../components/DevTicketsTable';
-import NavBar from '../components/NavBar';
+import { NavBar } from '../components/NavBar';
 import { useMeQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
@@ -28,7 +28,7 @@ const Tickets = () => {
 	}
 	return (
 		<>
-			<NavBar />
+			<NavBar page="Tickets" />
 			{body}
 		</>
 	);
