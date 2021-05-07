@@ -6,7 +6,7 @@ type NavBarProps = {
 	brand?: string;
 };
 
-export const NavBar: React.FC<NavBarProps> = ({ brand }) => {
+export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 	const [{ data: meData }] = useMeQuery();
 	const [, logout] = useLogoutMutation();
 
@@ -33,12 +33,13 @@ export const NavBar: React.FC<NavBarProps> = ({ brand }) => {
 
 	return (
 		<div>
-			<Navbar bg="dark" variant="dark" expand="lg">
+			<Navbar bg="light" variant="light" expand="lg">
 				{brand ? (
 					<Navbar.Brand href="/">{brand}</Navbar.Brand>
 				) : (
 					<Navbar.Brand href="/">Bug-Tracker</Navbar.Brand>
 				)}
+				{children}
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ml-auto">

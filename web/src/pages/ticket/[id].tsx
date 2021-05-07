@@ -10,12 +10,13 @@ import {
 } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
-import { useRouter } from 'next/router';
-import React from 'react';
+import { Router, useRouter } from 'next/router';
+import React, { useState } from 'react';
 import { Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { InputField } from '../../components/InputField';
 import { NavBar } from '../../components/NavBar';
 import {
+	FindCommentsByTicketDocument,
 	useCreateCommentMutation,
 	useFindCommentsByTicketQuery,
 } from '../../generated/graphql';
@@ -24,6 +25,8 @@ import { toErrorMap } from '../../utils/toErrorMap';
 import { useGetIntId } from '../../utils/useGetIntId';
 import { useGetTicketFromUrl } from '../../utils/useGetTicketFromUrl';
 import NextLink from 'next/link';
+import { CustomTable } from '../../components/CustomTable';
+import { COMMENT_COLUMNS } from '../../components/Columns';
 
 const ticket = ({}) => {
 	const router = useRouter();
@@ -31,13 +34,17 @@ const ticket = ({}) => {
 	const [{}, createComment] = useCreateCommentMutation();
 	const isTicketId = ticketData?.findTicket?.id;
 	const intId = useGetIntId();
-	const [{ data }] = useFindCommentsByTicketQuery({
+	const [loading, setLoading] = useState(false);
+	const [{ data: commentData }] = useFindCommentsByTicketQuery({
 		variables: {
 			options: {
 				ticketId: isTicketId as number,
 			},
 		},
 	});
+	const tableData = commentData?.findCommentsByTicket
+		? commentData.findCommentsByTicket
+		: [{}];
 
 	if (fetching) {
 		return (
@@ -132,38 +139,16 @@ const ticket = ({}) => {
 						</Col>
 						<Col md={12} lg={6} className="mt-1">
 							<Card>
-								<Table striped bordered hover responsive>
-									<thead>
-										<tr>
-											<th>Comment</th>
-											<th>User</th>
-											<th>Date</th>
-										</tr>
-									</thead>
-									<tbody>
-										{data?.findCommentsByTicket.map((c) =>
-											!c ? null : (
-												<tr key={c.id}>
-													<td>{c.text}</td>
-
-													<td>
-														{c.commenter.firstName} {c.commenter.lastName}
-													</td>
-													<td>
-														{new Date(parseInt(c.createdAt)).toLocaleDateString(
-															'en-US'
-														)}
-													</td>
-												</tr>
-											)
-										)}
-									</tbody>
-								</Table>
+								<CustomTable
+									dataInput={tableData}
+									columnInput={COMMENT_COLUMNS}
+									pageSizeInput={5}
+								/>
 							</Card>
 							<Card>
 								<Formik
 									initialValues={{ commentText: '' }}
-									onSubmit={async (values, { setErrors }) => {
+									onSubmit={async (values, { resetForm, setErrors }) => {
 										const response = await createComment({
 											commentText: values.commentText,
 											ticketId: isTicketId,
@@ -173,6 +158,7 @@ const ticket = ({}) => {
 												toErrorMap(response?.data?.createComment.errors)
 											);
 										} else {
+											resetForm();
 										}
 									}}
 								>

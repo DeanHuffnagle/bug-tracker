@@ -1,0 +1,11 @@
+fragment rawCommentFragment on RawCommentResponse {
+	comment_id
+	comment_text
+	comment_ticketId
+	comment_createdAt
+	commenter_id
+	commenter_firstName
+	commenter_lastName
+	commenter_email
+	commenter_role
+}

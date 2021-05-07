@@ -323,7 +323,7 @@ export type Query = {
   __typename?: 'Query';
   findComment: CommentResponse;
   findComments: Array<Comment>;
-  findCommentsByTicket: Array<Comment>;
+  findCommentsByTicket: Array<RawCommentResponse>;
   findOrganization?: Maybe<Organization>;
   findProject?: Maybe<Project>;
   findTicket?: Maybe<Ticket>;
@@ -386,6 +386,20 @@ export type QueryFindUsersByOrganizationArgs = {
 
 export type QueryFindUsersByProjectArgs = {
   options: FindUsersByProjectInput;
+};
+
+export type RawCommentResponse = {
+  __typename?: 'RawCommentResponse';
+  comment_id: Scalars['Int'];
+  comment_text: Scalars['String'];
+  comment_commenterId: Scalars['Int'];
+  comment_ticketId: Scalars['Int'];
+  comment_createdAt: Scalars['String'];
+  commenter_id: Scalars['Int'];
+  commenter_firstName: Scalars['String'];
+  commenter_lastName: Scalars['String'];
+  commenter_email: Scalars['String'];
+  commenter_role: Scalars['String'];
 };
 
 export type RawTicketResponse = {
@@ -506,6 +520,11 @@ export type OrganizationFragmentFragment = (
 export type ProjectFragmentFragment = (
   { __typename?: 'Project' }
   & Pick<Project, 'id' | 'name' | 'description' | 'managerId' | 'organizationId' | 'createdAt' | 'updatedAt'>
+);
+
+export type RawCommentFragmentFragment = (
+  { __typename?: 'RawCommentResponse' }
+  & Pick<RawCommentResponse, 'comment_id' | 'comment_text' | 'comment_ticketId' | 'comment_createdAt' | 'commenter_id' | 'commenter_firstName' | 'commenter_lastName' | 'commenter_email' | 'commenter_role'>
 );
 
 export type RawTicketFragmentFragment = (
@@ -705,12 +724,8 @@ export type FindCommentsByTicketQueryVariables = Exact<{
 export type FindCommentsByTicketQuery = (
   { __typename?: 'Query' }
   & { findCommentsByTicket: Array<(
-    { __typename?: 'Comment' }
-    & { commenter: (
-      { __typename?: 'User' }
-      & UserFragmentFragment
-    ) }
-    & CommentFragmentFragment
+    { __typename?: 'RawCommentResponse' }
+    & RawCommentFragmentFragment
   )> }
 );
 
@@ -823,6 +838,19 @@ export const ProjectFragmentFragmentDoc = gql`
   organizationId
   createdAt
   updatedAt
+}
+    `;
+export const RawCommentFragmentFragmentDoc = gql`
+    fragment rawCommentFragment on RawCommentResponse {
+  comment_id
+  comment_text
+  comment_ticketId
+  comment_createdAt
+  commenter_id
+  commenter_firstName
+  commenter_lastName
+  commenter_email
+  commenter_role
 }
     `;
 export const RawTicketFragmentFragmentDoc = gql`
@@ -1024,14 +1052,10 @@ export function useFindAssignedTicketsByTypeQuery(options: Omit<Urql.UseQueryArg
 export const FindCommentsByTicketDocument = gql`
     query FindCommentsByTicket($options: FindCommentsByTicketInput!) {
   findCommentsByTicket(options: $options) {
-    ...commentFragment
-    commenter {
-      ...userFragment
-    }
+    ...rawCommentFragment
   }
 }
-    ${CommentFragmentFragmentDoc}
-${UserFragmentFragmentDoc}`;
+    ${RawCommentFragmentFragmentDoc}`;
 
 export function useFindCommentsByTicketQuery(options: Omit<Urql.UseQueryArgs<FindCommentsByTicketQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindCommentsByTicketQuery>({ query: FindCommentsByTicketDocument, ...options });

@@ -19,3 +19,20 @@ body {
 #tickets-table-title {
 	cursor: 'pointer' !important;
 }
+
+/*========== Table Styles ==========*/
+#clickable-text {
+	color: blue;
+	font-weight: bold;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+table th,
+table td {
+	font-size: 13px !important;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: center;
+	vertical-align: middle !important;
+}

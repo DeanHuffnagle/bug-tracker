@@ -1,20 +1,9 @@
 import { withUrqlClient } from 'next-urql';
 import React from 'react';
-import {
-	Card,
-	Col,
-	Container,
-	Nav,
-	Navbar,
-	NavDropdown,
-	Row,
-} from 'react-bootstrap';
+import { Card, Col, Container, Row } from 'react-bootstrap';
 import DevPriorityBarGraph from '../components/DevPriorityBarGraph';
-import PriorityBarGraph from '../components/DevPriorityBarGraph';
 import DevStatusBarGraph from '../components/DevStatusBarGraph';
-import StatusBarGraph from '../components/DevStatusBarGraph';
 import DevTypePieChart from '../components/DevTypePieChart';
-import TypePieChart from '../components/DevTypePieChart';
 import { NavBar } from '../components/NavBar';
 import { useFindAssignedTicketsQuery, useMeQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';

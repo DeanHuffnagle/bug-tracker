@@ -95,6 +95,30 @@ export class RawTicketResponse {
 }
 
 @ObjectType()
+export class RawCommentResponse {
+	@Field(() => Int)
+	comment_id: number;
+	@Field()
+	comment_text: string;
+	@Field(() => Int)
+	comment_commenterId: number;
+	@Field(() => Int)
+	comment_ticketId: number;
+	@Field()
+	comment_createdAt: string;
+	@Field(() => Int)
+	commenter_id: number;
+	@Field()
+	commenter_firstName: string;
+	@Field()
+	commenter_lastName: string;
+	@Field()
+	commenter_email: string;
+	@Field()
+	commenter_role: UserRoleType;
+}
+
+@ObjectType()
 export class UserResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];

@@ -17,7 +17,7 @@ import {
 	FindCommentInput,
 	FindCommentsByTicketInput,
 } from '../utils/inputTypes';
-import { CommentResponse } from '../utils/objectTypes';
+import { CommentResponse, RawCommentResponse } from '../utils/objectTypes';
 
 @Resolver(Comment)
 export class CommentResolver {
@@ -112,16 +112,17 @@ export class CommentResolver {
 	//================================================================================
 	//Find Comments By Ticket Query
 	//================================================================================
-	@Query(() => [Comment])
+	@Query(() => [RawCommentResponse])
 	async findCommentsByTicket(
 		@Arg('options') options: FindCommentsByTicketInput
-	): Promise<Comment[]> {
+	): Promise<RawCommentResponse[]> {
 		const commentByTicket = await getRepository(Comment)
 			.createQueryBuilder('comment')
 			.leftJoinAndSelect('comment.commenter', 'commenter')
 			.where('comment.ticketId = :ticketId', { ticketId: options.ticketId })
-			.getMany();
+			.getRawMany();
 
+		console.log('raw data: ', commentByTicket);
 		return commentByTicket;
 	}
 }

@@ -1,35 +1,35 @@
-import { Box } from '@chakra-ui/layout';
-import { Input } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import React from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
-import DevTicketsTable from '../components/DevTicketsTable';
+import { Card, Container } from 'react-bootstrap';
+import { TICKET_COLUMNS } from '../components/Columns';
+import { CustomTable } from '../components/CustomTable';
 import { NavBar } from '../components/NavBar';
-import { useMeQuery } from '../generated/graphql';
+import {
+	useFindRawAssignedTicketsQuery,
+	useMeQuery,
+} from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
 const Tickets = () => {
 	const [{ data: meData }] = useMeQuery();
-	let body = null;
-	if (!meData?.me) {
-		body = null;
-	} else {
-		body = (
-			<>
-				<Container>
-					<Row>
-						<Col className="mt-2">
-							<DevTicketsTable />
-						</Col>
-					</Row>
-				</Container>
-			</>
-		);
-	}
+	const [{ data: ticketData }] = useFindRawAssignedTicketsQuery();
+	const tableData = ticketData?.findRawAssignedTickets
+		? ticketData.findRawAssignedTickets
+		: [{}];
 	return (
 		<>
-			<NavBar page="Tickets" />
-			{body}
+			<NavBar brand="Assigned Tickets" />
+
+			<Container>
+				<Card>
+					{/* plug in any data you want. very flexible and reusable*/}
+					<CustomTable
+						dataInput={tableData}
+						columnInput={TICKET_COLUMNS}
+						userInput={meData?.me}
+					/>
+				</Card>
+			</Container>
 		</>
 	);
 };

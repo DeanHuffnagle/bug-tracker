@@ -34,19 +34,13 @@ export const createUrqlClient = (ssrExchange: any) => {
 				updates: {
 					Mutation: {
 						createComment: (result, _args, cache) => {
-							console.log('update started: ', _args);
-							cache.updateQuery(
-								{
-									query: FindCommentsByTicketDocument,
-									variables: { options: { ticketId: _args.ticketId } },
+							console.log(cache.inspectFields('Query'));
+							cache.invalidate('Query', 'findCommentsByTicket', {
+								options: {
+									ticketId: _args.ticketId,
 								},
-								(data) => {
-									if (!data) return null;
-									if (!data.findCommentsByTicket) return null;
-									data.findCommentsByTicket.push(result.createComment);
-									return data;
-								}
-							);
+							});
+							console.log(cache.inspectFields('Query'));
 						},
 
 						login: (_result, args, cache, info) => {
