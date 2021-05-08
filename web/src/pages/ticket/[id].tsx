@@ -18,7 +18,9 @@ import { NavBar } from '../../components/NavBar';
 import {
 	FindCommentsByTicketDocument,
 	useCreateCommentMutation,
+	useDeleteCommentMutation,
 	useFindCommentsByTicketQuery,
+	useMeQuery,
 } from '../../generated/graphql';
 import { createUrqlClient } from '../../utils/createUrqlClient';
 import { toErrorMap } from '../../utils/toErrorMap';
@@ -31,10 +33,12 @@ import { COMMENT_COLUMNS } from '../../components/Columns';
 const ticket = ({}) => {
 	const router = useRouter();
 	const [{ data: ticketData, error, fetching }] = useGetTicketFromUrl();
+	const [{ data: meData }] = useMeQuery();
 	const [{}, createComment] = useCreateCommentMutation();
+	const [{}, deleteComment] = useDeleteCommentMutation();
 	const isTicketId = ticketData?.findTicket?.id;
 	const intId = useGetIntId();
-	const [loading, setLoading] = useState(false);
+	// const [loading, setLoading] = useState(false);
 	const [{ data: commentData }] = useFindCommentsByTicketQuery({
 		variables: {
 			options: {
@@ -45,6 +49,16 @@ const ticket = ({}) => {
 	const tableData = commentData?.findCommentsByTicket
 		? commentData.findCommentsByTicket
 		: [{}];
+	let hiddenColumns: string[] = [''];
+
+	switch (meData?.me?.role) {
+		case 'developer':
+			hiddenColumns = ['delete'];
+			break;
+		case 'submitter':
+			hiddenColumns = ['delete'];
+			break;
+	}
 
 	if (fetching) {
 		return (
@@ -143,6 +157,7 @@ const ticket = ({}) => {
 									dataInput={tableData}
 									columnInput={COMMENT_COLUMNS}
 									pageSizeInput={5}
+									hiddenColumnsInput={hiddenColumns}
 								/>
 							</Card>
 							<Card>

@@ -1,4 +1,5 @@
 import { cacheExchange } from '@urql/exchange-graphcache';
+import { inspectFields } from '@urql/exchange-graphcache/dist/types/store/data';
 import { dedupExchange, fetchExchange } from 'urql';
 import {
 	LoginMutation,
@@ -18,6 +19,9 @@ export const createUrqlClient = (ssrExchange: any) => {
 		exchanges: [
 			dedupExchange,
 			cacheExchange({
+				keys: {
+					findCommentsByTicket: () => 'comment_id',
+				},
 				updates: {
 					Mutation: {
 						updateTicket: (result, args, cache, info) => {
@@ -32,6 +36,16 @@ export const createUrqlClient = (ssrExchange: any) => {
 									ticketId: _args.ticketId,
 								},
 							});
+						},
+						deleteComment: (result, _args, cache) => {
+							console.log(cache.inspectFields('Query'));
+							console.log('result: ', result);
+							cache.invalidate('Query', 'findCommentsByTicket', {
+								options: {
+									ticketId: result.deleteComment,
+								},
+							});
+							console.log(cache.inspectFields('Query'));
 						},
 
 						login: (_result, args, cache, info) => {

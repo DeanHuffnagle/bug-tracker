@@ -110,6 +110,24 @@ export class CommentResolver {
 		return Comment.find();
 	}
 	//================================================================================
+	//Delete Comment Mutation
+	//================================================================================
+	@Mutation(() => Int)
+	async deleteComment(
+		@Arg('commentId', () => Int) commentId: number
+	): Promise<Number> {
+		const isComment = await Comment.findOne(commentId);
+		let ticketId = -1;
+		if (!isComment) {
+			return ticketId;
+		} else {
+			ticketId = isComment?.ticketId;
+			await Comment.delete(commentId);
+			return ticketId;
+		}
+	}
+
+	//================================================================================
 	//Find Comments By Ticket Query
 	//================================================================================
 	@Query(() => [RawCommentResponse])

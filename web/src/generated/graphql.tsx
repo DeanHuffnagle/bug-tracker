@@ -136,6 +136,7 @@ export type MakeAdminInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   createComment: CommentResponse;
+  deleteComment: Scalars['Int'];
   createOrganization: OrganizationResponse;
   deleteOrganization: Scalars['Boolean'];
   changeOrganizationName: OrganizationResponse;
@@ -165,6 +166,11 @@ export type Mutation = {
 export type MutationCreateCommentArgs = {
   ticketId: Scalars['Int'];
   commentText: Scalars['String'];
+};
+
+
+export type MutationDeleteCommentArgs = {
+  commentId: Scalars['Int'];
 };
 
 
@@ -582,6 +588,16 @@ export type CreateCommentMutation = (
   ) }
 );
 
+export type DeleteCommentMutationVariables = Exact<{
+  commentId: Scalars['Int'];
+}>;
+
+
+export type DeleteCommentMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteComment'>
+);
+
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
 }>;
@@ -927,6 +943,15 @@ ${CommentFragmentFragmentDoc}`;
 
 export function useCreateCommentMutation() {
   return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
+};
+export const DeleteCommentDocument = gql`
+    mutation DeleteComment($commentId: Int!) {
+  deleteComment(commentId: $commentId)
+}
+    `;
+
+export function useDeleteCommentMutation() {
+  return Urql.useMutation<DeleteCommentMutation, DeleteCommentMutationVariables>(DeleteCommentDocument);
 };
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {

@@ -1,6 +1,10 @@
+import { IconButton } from '@chakra-ui/button';
+import { DeleteIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import React from 'react';
+import { useDeleteCommentMutation } from '../generated/graphql';
 import { tableFormatted } from '../utils/tableFormatted';
+import { DeleteButton } from './DeleteButton';
 
 //================================================================================
 //Assigned Ticket Table Columns
@@ -43,20 +47,44 @@ export const TICKET_COLUMNS = [
 //================================================================================
 //Comment Table Columns
 //================================================================================
+
 export const COMMENT_COLUMNS = [
 	{
 		Header: 'Comment',
+		id: 'comment',
 		accessor: 'comment_text',
 	},
 	{
 		Header: 'User',
+		id: 'user',
 		accessor: (d) => `${d.commenter_firstName} ${d.commenter_lastName}`,
 	},
 	{
 		Header: 'Date',
+		id: 'date',
 		accessor: 'comment_createdAt',
 		Cell: (props) => {
 			return new Date(parseInt(props.value)).toLocaleDateString('en-US');
+		},
+	},
+	{
+		Header: 'Delete',
+		id: 'delete',
+		accessor: 'comment_id',
+		Cell: (props) => {
+			return (
+				<span>
+					<DeleteButton commentIdInput={props.value} />
+					{/* <IconButton
+						aria-label="delete comment"
+						icon={<DeleteIcon />}
+						size="xs"
+						onClick={() => {
+							console.log('deleted comment', props.value);
+						}}
+					/> */}
+				</span>
+			);
 		},
 	},
 ];
