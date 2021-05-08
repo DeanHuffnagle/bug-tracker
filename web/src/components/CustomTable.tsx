@@ -1,8 +1,15 @@
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { Box, Flex } from '@chakra-ui/layout';
 import { Button } from '@chakra-ui/react';
 import React, { useMemo } from 'react';
 import { Table } from 'react-bootstrap';
-import { Column, useGlobalFilter, usePagination, useTable } from 'react-table';
+import {
+	Column,
+	useGlobalFilter,
+	usePagination,
+	useSortBy,
+	useTable,
+} from 'react-table';
 import { GlobalFilter } from './GlobalFilter';
 
 type CustomTableProps = {
@@ -53,6 +60,7 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 			initialState: { pageSize: size },
 		},
 		useGlobalFilter,
+		useSortBy,
 		usePagination
 	);
 
@@ -80,8 +88,21 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 							{headerGroups.map((headerGroup) => (
 								<tr {...headerGroup.getHeaderGroupProps()}>
 									{headerGroup.headers.map((column) => (
-										<th {...column.getHeaderProps()}>
+										<th
+											{...column.getHeaderProps(column.getSortByToggleProps())}
+										>
 											{column.render('Header')}
+											<span>
+												{column.isSorted ? (
+													column.isSortedDesc ? (
+														<ChevronDownIcon w={5} h={5} />
+													) : (
+														<ChevronUpIcon w={5} h={5} />
+													)
+												) : (
+													''
+												)}
+											</span>
 										</th>
 									))}
 								</tr>

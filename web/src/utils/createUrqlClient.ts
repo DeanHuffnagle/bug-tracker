@@ -1,9 +1,6 @@
-import { cacheExchange, Cache } from '@urql/exchange-graphcache';
+import { cacheExchange } from '@urql/exchange-graphcache';
 import { dedupExchange, fetchExchange } from 'urql';
 import {
-	CreateCommentMutation,
-	FindCommentsByTicketDocument,
-	FindCommentsByTicketQuery,
 	LoginMutation,
 	LogoutMutation,
 	MeDocument,
@@ -11,16 +8,6 @@ import {
 	RegisterMutation,
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
-
-// function invalidateAllComments(cache: Cache) {
-// 	console.log('before: ', cache.inspectFields('Query'));
-// 	const allFields = cache.inspectFields('Query');
-// 	const fieldInfos = allFields.filter((info) => info.fieldName === 'comments');
-// 	fieldInfos.forEach((fi) => {
-// 		cache.invalidate('Query', 'findCommentsByTicket', fi.arguments || {});
-// 	});
-// 	console.log('after: ', cache.inspectFields('Query'));
-// }
 
 export const createUrqlClient = (ssrExchange: any) => {
 	return {
@@ -33,18 +20,21 @@ export const createUrqlClient = (ssrExchange: any) => {
 			cacheExchange({
 				updates: {
 					Mutation: {
+						updateTicket: (result, args, cache, info) => {
+							cache.invalidate('Query', 'findTicket', {
+								id: 4,
+							});
+						},
+
 						createComment: (result, _args, cache) => {
-							console.log(cache.inspectFields('Query'));
 							cache.invalidate('Query', 'findCommentsByTicket', {
 								options: {
 									ticketId: _args.ticketId,
 								},
 							});
-							console.log(cache.inspectFields('Query'));
 						},
 
 						login: (_result, args, cache, info) => {
-							console.log('login: ');
 							betterUpdateQuery<LoginMutation, MeQuery>(
 								cache,
 								{ query: MeDocument },
@@ -60,6 +50,7 @@ export const createUrqlClient = (ssrExchange: any) => {
 								}
 							);
 						},
+
 						register: (_result, args, cache, info) => {
 							betterUpdateQuery<RegisterMutation, MeQuery>(
 								cache,
@@ -76,6 +67,7 @@ export const createUrqlClient = (ssrExchange: any) => {
 								}
 							);
 						},
+
 						logout: (_result, args, cache, info) => {
 							betterUpdateQuery<LogoutMutation, MeQuery>(
 								cache,

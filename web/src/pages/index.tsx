@@ -1,5 +1,7 @@
+import { Heading } from '@chakra-ui/layout';
 import { withUrqlClient } from 'next-urql';
-import React from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
 import DevPriorityBarGraph from '../components/DevPriorityBarGraph';
 import DevStatusBarGraph from '../components/DevStatusBarGraph';
@@ -12,14 +14,27 @@ import { createUrqlClient } from '../utils/createUrqlClient';
 //Index Page
 //================================================================================
 const Index = () => {
-	const [{ data: meData }] = useMeQuery();
+	const router = useRouter();
+	const [{ data: meData, fetching }] = useMeQuery();
 	const [{ data: assignedTicketsData }] = useFindAssignedTicketsQuery();
-	let body = null;
+
+	useEffect(() => {
+		if (!(meData?.me || fetching)) {
+			router.push('/login');
+		}
+	});
+
 	if (!meData?.me) {
-		body = null;
-	} else {
-		body = (
+		return (
 			<>
+				<NavBar />
+				<Heading>Loading...</Heading>
+			</>
+		);
+	} else {
+		return (
+			<>
+				<NavBar />
 				<Container>
 					<Row>
 						<Col className="mt-1">
@@ -86,12 +101,6 @@ const Index = () => {
 			</>
 		);
 	}
-	return (
-		<>
-			<NavBar />
-			{body}
-		</>
-	);
 };
 
 export default withUrqlClient(createUrqlClient)(Index);
