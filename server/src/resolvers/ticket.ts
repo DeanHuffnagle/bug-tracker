@@ -17,6 +17,7 @@ import { isSubmitter } from '../middleware/isSubmitter';
 import { MyContext } from '../types';
 import {
 	AssignTicketInput,
+	AssignTicketManagerInput,
 	ChangeTicketPriorityInput,
 	ChangeTicketStatusInput,
 	ChangeTicketTypeInput,
@@ -39,7 +40,9 @@ export class TicketResolver {
 		@Arg('options') options: CreateTicketInput,
 		@Ctx() { req }: MyContext
 	): Promise<TicketResponse> {
-		const isUser = await User.findOne(req.session.UserId);
+		const isUser = await User.findOne(req.session.UserId, {
+			relations: ['assignedProjects', 'managedProjects'],
+		});
 		const isProject = await Project.findOne(options.projectId);
 		if (!isProject) {
 			return {
@@ -51,30 +54,7 @@ export class TicketResolver {
 				],
 			};
 		}
-		if (isUser?.role === 'submitter') {
-			if (isUser.assignedProjectsId !== isProject?.id) {
-				return {
-					errors: [
-						{
-							field: 'user',
-							message: 'this user is not assigned to this project.',
-						},
-					],
-				};
-			}
-		}
-		if (isUser?.role === 'projectManager') {
-			if (isUser.assignedProjectsId !== isProject?.id) {
-				return {
-					errors: [
-						{
-							field: 'user',
-							message: 'this user is not assigned to this project.',
-						},
-					],
-				};
-			}
-		}
+
 		let ticket;
 		try {
 			const result = await getConnection()
@@ -84,8 +64,11 @@ export class TicketResolver {
 				.values({
 					title: options.title,
 					text: options.text,
-					creatorId: req.session.UserId,
+					submitterId: isUser?.id,
+					managerId: isProject.managerId,
 					projectId: isProject?.id,
+					organizationId: isUser?.organizationId,
+					assignedDeveloperId: isUser?.id,
 				})
 				.returning('*')
 				.execute();
@@ -131,6 +114,44 @@ export class TicketResolver {
 			.set(isUser);
 		const ticket = await Ticket.findOne(options.ticketId, {
 			relations: ['assignedDeveloper'],
+		});
+		return { ticket };
+	}
+	//================================================================================
+	//Assign Ticket Manager Mutation
+	//================================================================================
+	@Mutation(() => TicketResponse)
+	@UseMiddleware(isProjectManager)
+	async assignTicketManager(@Arg('options') options: AssignTicketManagerInput) {
+		const isTicket = await Ticket.findOne(options.ticketId);
+		const isUser = await User.findOne(options.userId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isTicket) {
+			return {
+				errors: [
+					{
+						field: 'project',
+						message: 'no project found.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(Ticket, 'manager')
+			.of(isTicket)
+			.set(isUser);
+		const ticket = await Ticket.findOne(options.ticketId, {
+			relations: ['manager'],
 		});
 		return { ticket };
 	}
@@ -311,12 +332,55 @@ export class TicketResolver {
 		const isUser = await User.findOne(req.session.UserId);
 		const assignedTickets = await getRepository(Ticket)
 			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.manager', 'manager')
+			.leftJoinAndSelect('ticket.submitter', 'submitter')
 			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
 			.where('ticket.assignedDeveloperId = :id', { id: isUser?.id })
 			.getRawMany();
-
-		console.log('data: ', assignedTickets);
 		return assignedTickets;
+	}
+	//================================================================================
+	//Find Raw Organization Tickets Query
+	//================================================================================
+	@Query(() => [RawTicketResponse], { nullable: true })
+	async findRawOrganizationTickets(
+		@Ctx() { req }: MyContext
+	): Promise<RawTicketResponse[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const organizationTickets = await getRepository(Ticket)
+			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.manager', 'manager')
+			.leftJoinAndSelect('ticket.submitter', 'submitter')
+			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
+			.where('ticket.organizationId = :id', { id: isUser?.organizationId })
+			.getRawMany();
+		console.log('data: ', organizationTickets);
+		return organizationTickets;
+	}
+	//================================================================================
+	//Find Raw Managed Tickets Query
+	//================================================================================
+	@Query(() => [RawTicketResponse], { nullable: true })
+	@UseMiddleware(isProjectManager)
+	async findRawManagedTickets(
+		@Ctx() { req }: MyContext
+	): Promise<RawTicketResponse[] | null> {
+		const isUser = await User.findOne(req.session.UserId, {
+			relations: ['managedProjects'],
+		});
+		if (!isUser?.managedProjects) {
+			return null;
+		}
+		const managedTickets = await getRepository(Ticket)
+			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.manager', 'manager')
+			.leftJoinAndSelect('ticket.submitter', 'submitter')
+			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
+			.where('ticket.managerId = :id', { id: isUser?.id })
+			.getRawMany();
+
+		console.log('data: ', managedTickets);
+		return managedTickets;
 	}
 	//================================================================================
 	//Find Assigned Tickets By Priority Query

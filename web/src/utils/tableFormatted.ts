@@ -1,6 +1,9 @@
-export const tableFormatted = (cellInput: String) => {
+export const tableFormatted = (cellInput: string) => {
 	let value = '';
 	switch (cellInput) {
+		case 'null null':
+			value = '-';
+			break;
 		case 'low':
 			value = 'Low';
 			break;
@@ -35,7 +38,7 @@ export const tableFormatted = (cellInput: String) => {
 			value = 'Other';
 			break;
 		default:
-			value = 'no data';
+			value = `${cellInput}`;
 			break;
 	}
 	return value;

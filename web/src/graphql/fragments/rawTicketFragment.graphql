@@ -5,9 +5,5 @@ fragment rawTicketFragment on RawTicketResponse {
 	ticket_type
 	ticket_priority
 	ticket_status
-	assignedDeveloper_id
-	assignedDeveloper_firstName
-	assignedDeveloper_lastName
-	assignedDeveloper_email
-	assignedDeveloper_role
+	ticket_organizationId
 }

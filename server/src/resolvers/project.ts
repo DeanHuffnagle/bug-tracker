@@ -7,7 +7,7 @@ import {
 	Resolver,
 	UseMiddleware,
 } from 'type-graphql';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { Project } from '../entities/Project';
 import { User } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
@@ -18,7 +18,7 @@ import {
 	CreateProjectInput,
 	UnassignProjectInput,
 } from '../utils/inputTypes';
-import { ProjectResponse } from '../utils/objectTypes';
+import { ProjectResponse, RawProjectResponse } from '../utils/objectTypes';
 
 @Resolver(Project)
 export class ProjectResolver {
@@ -72,6 +72,25 @@ export class ProjectResolver {
 		return Project.findOne(id, {
 			relations: ['organization', 'assignedDevelopers'],
 		});
+	}
+	//================================================================================
+	//Find Raw Assigned Projects Query
+	//================================================================================
+	@Query(() => [RawProjectResponse], { nullable: true })
+	async findRawAssignedProjects(
+		@Ctx() { req }: MyContext
+	): Promise<RawProjectResponse[]> {
+		const isUser = await User.findOne(req.session.UserId);
+
+		const assignedProjects = await getRepository(Project)
+			.createQueryBuilder('project')
+			.leftJoinAndSelect('project.manager', 'manager')
+			.leftJoinAndSelect('project.assignedDevelopers', 'assignedDevelopers')
+			.where('project.id IN (:...assignedProjects)', {
+				assignedProjects: isUser?.assignedProjectIds,
+			})
+			.getRawMany();
+		return assignedProjects;
 	}
 	//================================================================================
 	//Assign Project Mutation

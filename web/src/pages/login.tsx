@@ -19,7 +19,7 @@ import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import NextLink from 'next/link';
 
-const login: React.FC<{}> = ({}) => {
+const Login: React.FC<{}> = ({}) => {
 	const router = useRouter();
 	const [, login] = useLoginMutation();
 	return (
@@ -119,4 +119,4 @@ const login: React.FC<{}> = ({}) => {
 	);
 };
 
-export default withUrqlClient(createUrqlClient)(login);
+export default withUrqlClient(createUrqlClient)(Login);

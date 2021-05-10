@@ -67,7 +67,7 @@ export class Project extends BaseEntity {
 	@Field(() => [User], { nullable: true })
 	@ManyToMany(() => User, (user) => user.assignedProjects, {
 		cascade: ['insert', 'update'],
-		onDelete: 'SET NULL',
+		onDelete: 'CASCADE',
 	})
 	@JoinTable()
 	assignedDevelopers: User[] | null;

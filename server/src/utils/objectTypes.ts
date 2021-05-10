@@ -68,6 +68,8 @@ export class RawTicketResponse {
 	ticket_status: TicketStatusType;
 	@Field()
 	ticket_type: TicketTypeType;
+	@Field()
+	ticket_organizationId: TicketStatusType;
 	@Field(() => Int, { nullable: true })
 	ticket_assignedDeveloperId?: number;
 	@Field(() => Int, { nullable: true })
@@ -76,15 +78,15 @@ export class RawTicketResponse {
 	ticket_projectId?: number;
 	@Field(() => Int, { nullable: true })
 	ticket_submitterId: number;
-	@Field(() => Int)
+	@Field(() => Int, { nullable: true })
 	assignedDeveloper_id: number;
-	@Field()
+	@Field(() => String, { nullable: true })
 	assignedDeveloper_firstName: string;
-	@Field()
+	@Field(() => String, { nullable: true })
 	assignedDeveloper_lastName: string;
-	@Field()
+	@Field(() => String, { nullable: true })
 	assignedDeveloper_email: string;
-	@Field()
+	@Field(() => String, { nullable: true })
 	assignedDeveloper_role: UserRoleType;
 	@Field(() => Int, { nullable: true })
 	assignedDeveloper_organizationId: number;
@@ -92,6 +94,38 @@ export class RawTicketResponse {
 	assignedDeveloper_assignedProjectsId: number;
 	@Field(() => Int, { nullable: true })
 	assignedDeveloper_assignedTicketsId: number;
+	@Field(() => Int, { nullable: true })
+	submitter_id?: number;
+	@Field(() => String, { nullable: true })
+	submitter_firstName?: string;
+	@Field(() => String, { nullable: true })
+	submitter_lastName?: string;
+	@Field(() => String, { nullable: true })
+	submitter_email?: string;
+	@Field(() => String, { nullable: true })
+	submitter_role?: UserRoleType;
+	@Field(() => Int, { nullable: true })
+	submitter_organizationId?: number;
+	@Field(() => Int, { nullable: true })
+	submitter_assignedProjectsId?: number;
+	@Field(() => Int, { nullable: true })
+	submitter_assignedTicketsId?: number;
+	@Field(() => Int, { nullable: true })
+	manager_id?: number;
+	@Field(() => String, { nullable: true })
+	manager_firstName?: string;
+	@Field(() => String, { nullable: true })
+	manager_lastName?: string;
+	@Field(() => String, { nullable: true })
+	manager_email?: string;
+	@Field(() => String, { nullable: true })
+	manager_role?: UserRoleType;
+	@Field(() => Int, { nullable: true })
+	manager_organizationId?: number;
+	@Field(() => Int, { nullable: true })
+	manager_assignedProjectsId?: number;
+	@Field(() => Int, { nullable: true })
+	manager_assignedTicketsId?: number;
 }
 
 @ObjectType()
@@ -116,6 +150,12 @@ export class RawCommentResponse {
 	commenter_email: string;
 	@Field()
 	commenter_role: UserRoleType;
+}
+
+@ObjectType()
+export class RawProjectResponse {
+	@Field(() => Int)
+	project_id: number;
 }
 
 @ObjectType()

@@ -1,7 +1,7 @@
 import { withUrqlClient } from 'next-urql';
 import React from 'react';
 import { Card, Container } from 'react-bootstrap';
-import { TICKET_COLUMNS } from '../components/Columns';
+import { TICKET_COLUMNS } from '../utils/Columns';
 import { CustomTable } from '../components/CustomTable';
 import { NavBar } from '../components/NavBar';
 import {
@@ -12,7 +12,7 @@ import { createUrqlClient } from '../utils/createUrqlClient';
 
 type TestPageProps = {};
 
-const TestPage: React.FC<TestPageProps> = ({}) => {
+const TestPage: React.FC<TestPageProps> = () => {
 	const [{ data: meData }] = useMeQuery();
 	const [{ data: ticketData }] = useFindRawAssignedTicketsQuery();
 	const tableData = ticketData?.findRawAssignedTickets

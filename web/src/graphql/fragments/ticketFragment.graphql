@@ -6,7 +6,6 @@ fragment ticketFragment on Ticket {
 	priority
 	type
 	assignedDeveloperId
-	creatorId
 	projectId
 	createdAt
 	updatedAt

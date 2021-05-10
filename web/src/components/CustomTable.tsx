@@ -19,6 +19,8 @@ type CustomTableProps = {
 	pageSizeInput?: number;
 	dependencyInput?: string[];
 	hiddenColumnsInput?: string[];
+	sortByInput?: string;
+	descending?: Boolean;
 };
 
 export const CustomTable: React.FC<CustomTableProps> = ({
@@ -28,6 +30,8 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 	pageSizeInput,
 	dependencyInput,
 	hiddenColumnsInput,
+	sortByInput,
+	descending,
 }) => {
 	const meData = userInput ? userInput : null;
 	const isData = dataInput ? dataInput : [{}];
@@ -36,6 +40,14 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 	const columns = useMemo<Column<object>[]>(() => columnInput, []);
 
 	const hiddenColumnsList = hiddenColumnsInput ? hiddenColumnsInput : [''];
+	const sortByColumn = sortByInput
+		? [
+				{
+					id: sortByInput,
+					desc: descending,
+				},
+		  ]
+		: [{}];
 
 	const data = dependencyInput
 		? useMemo(() => isData, [isData, dependencyInput])
@@ -64,6 +76,7 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 			initialState: {
 				pageSize: size,
 				hiddenColumns: hiddenColumnsList,
+				sortBy: sortByColumn,
 			},
 		},
 		useGlobalFilter,

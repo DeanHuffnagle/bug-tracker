@@ -20,7 +20,8 @@ export const createUrqlClient = (ssrExchange: any) => {
 			dedupExchange,
 			cacheExchange({
 				keys: {
-					findCommentsByTicket: () => 'comment_id',
+					RawCommentResponse: () => null,
+					RawTicketResponse: () => null,
 				},
 				updates: {
 					Mutation: {
@@ -38,14 +39,13 @@ export const createUrqlClient = (ssrExchange: any) => {
 							});
 						},
 						deleteComment: (result, _args, cache) => {
-							console.log(cache.inspectFields('Query'));
-							console.log('result: ', result);
-							cache.invalidate('Query', 'findCommentsByTicket', {
-								options: {
-									ticketId: result.deleteComment,
-								},
-							});
-							console.log(cache.inspectFields('Query'));
+							if (result.deleteComment !== -1) {
+								cache.invalidate('Query', 'findCommentsByTicket', {
+									options: {
+										ticketId: result.deleteComment,
+									},
+								});
+							}
 						},
 
 						login: (_result, args, cache, info) => {

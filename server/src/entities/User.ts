@@ -9,6 +9,7 @@ import {
 	OneToMany,
 	OneToOne,
 	PrimaryGeneratedColumn,
+	RelationId,
 	UpdateDateColumn,
 } from 'typeorm';
 import { Comment } from './Comment';
@@ -77,10 +78,6 @@ export class User extends BaseEntity {
 
 	@Field(() => [Int], { nullable: true })
 	@Column({ nullable: true })
-	assignedProjectsId: number;
-
-	@Field(() => [Int], { nullable: true })
-	@Column({ nullable: true })
 	assignedTicketsId: number;
 
 	@Field(() => String)
@@ -103,6 +100,10 @@ export class User extends BaseEntity {
 	})
 	assignedProjects: Project[] | null;
 
+	@Field(() => [Int], { nullable: true })
+	@RelationId((user: User) => user.assignedProjects)
+	assignedProjectIds: number[];
+
 	//// user to organization relationship ////
 	// the user will be default not in an organization when creating their account.
 	// they will then have to be invited into an organization by an admin sending an email with a link to join.
@@ -120,6 +121,14 @@ export class User extends BaseEntity {
 		onDelete: 'SET NULL',
 	})
 	managedProjects: Project[] | null;
+
+	//// Project manager to ticket relationship ////
+	@Field(() => [Ticket], { nullable: true })
+	@OneToMany(() => Ticket, (ticket) => ticket.manager, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	managedTickets: Ticket[] | null;
 
 	//// creator relationship with created organization ////
 	@Field(() => Organization)

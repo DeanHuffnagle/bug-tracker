@@ -28,7 +28,7 @@ import { useGetIntId } from '../../utils/useGetIntId';
 import { useGetTicketFromUrl } from '../../utils/useGetTicketFromUrl';
 import NextLink from 'next/link';
 import { CustomTable } from '../../components/CustomTable';
-import { COMMENT_COLUMNS } from '../../components/Columns';
+import { COMMENT_COLUMNS } from '../../utils/Columns';
 
 const ticket = ({}) => {
 	const router = useRouter();
@@ -38,7 +38,6 @@ const ticket = ({}) => {
 	const [{}, deleteComment] = useDeleteCommentMutation();
 	const isTicketId = ticketData?.findTicket?.id;
 	const intId = useGetIntId();
-	// const [loading, setLoading] = useState(false);
 	const [{ data: commentData }] = useFindCommentsByTicketQuery({
 		variables: {
 			options: {
@@ -63,7 +62,6 @@ const ticket = ({}) => {
 	if (fetching) {
 		return (
 			<>
-				<NavBar />
 				<Box>Loading...</Box>;
 			</>
 		);
@@ -158,6 +156,8 @@ const ticket = ({}) => {
 									columnInput={COMMENT_COLUMNS}
 									pageSizeInput={5}
 									hiddenColumnsInput={hiddenColumns}
+									sortByInput={'date'}
+									descending
 								/>
 							</Card>
 							<Card>

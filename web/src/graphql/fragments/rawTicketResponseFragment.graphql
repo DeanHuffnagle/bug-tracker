@@ -1,0 +1,6 @@
+fragment rawTicketResponseFragment on RawTicketResponse {
+	...rawTicketFragment
+	...rawTicketAssignedDeveloperFragment
+	...rawTicketSubmitterFragment
+	...rawTicketManagerFragment
+}

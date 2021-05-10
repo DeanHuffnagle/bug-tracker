@@ -18,7 +18,6 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
 				icon={<DeleteIcon />}
 				size="xs"
 				onClick={() => {
-					console.log('deleted comment', commentIdInput);
 					deleteComment({ commentId: commentIdInput });
 				}}
 			/>

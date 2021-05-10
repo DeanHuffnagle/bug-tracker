@@ -40,6 +40,9 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 					<Navbar.Brand href="/">Bug-Tracker</Navbar.Brand>
 				)}
 				{children}
+				<div>
+					logged in as <strong>{meData?.me?.role}</strong>.
+				</div>
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ml-auto">

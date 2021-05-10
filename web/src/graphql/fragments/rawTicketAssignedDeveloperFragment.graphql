@@ -1,0 +1,8 @@
+fragment rawTicketAssignedDeveloperFragment on RawTicketResponse {
+	assignedDeveloper_organizationId
+	assignedDeveloper_id
+	assignedDeveloper_firstName
+	assignedDeveloper_lastName
+	assignedDeveloper_email
+	assignedDeveloper_role
+}

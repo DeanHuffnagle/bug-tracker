@@ -1,5 +1,5 @@
 query FindRawAssignedTickets {
 	findRawAssignedTickets {
-		...rawTicketFragment
+		...rawTicketResponseFragment
 	}
 }

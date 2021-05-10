@@ -1,21 +1,19 @@
+import { ArrowBackIcon } from '@chakra-ui/icons';
 import {
 	Box,
 	Button,
-	FormControl,
-	FormLabel,
-	Heading,
-	Text,
-	Select,
-	Link,
 	Flex,
+	Heading,
 	IconButton,
+	Link,
+	Text,
 } from '@chakra-ui/react';
-import { Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
-
 import { InputField } from '../../../components/InputField';
 import { NavBar } from '../../../components/NavBar';
 import { SelectField } from '../../../components/SelectField';
@@ -27,8 +25,6 @@ import { createUrqlClient } from '../../../utils/createUrqlClient';
 import { toErrorMap } from '../../../utils/toErrorMap';
 import { useGetIntId } from '../../../utils/useGetIntId';
 import { useGetTicketFromUrl } from '../../../utils/useGetTicketFromUrl';
-import NextLink from 'next/link';
-import { ArrowBackIcon } from '@chakra-ui/icons';
 
 const editTicket = ({}) => {
 	const router = useRouter();
@@ -57,6 +53,7 @@ const editTicket = ({}) => {
 			</>
 		);
 	} else {
+		console.log(ticketData?.findTicket?.assignedDeveloper?.lastName);
 		return (
 			<>
 				<NavBar />

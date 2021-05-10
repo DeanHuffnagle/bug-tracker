@@ -136,6 +136,14 @@ export class AssignTicketInput {
 	@Field(() => Int)
 	userId!: number;
 }
+//// Assign Ticket ////
+@InputType()
+export class AssignTicketManagerInput {
+	@Field(() => Int)
+	ticketId!: number;
+	@Field(() => Int)
+	userId!: number;
+}
 
 //// Find Assigned Tickets By Priority ////
 @InputType()

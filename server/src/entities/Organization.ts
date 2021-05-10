@@ -11,6 +11,7 @@ import {
 	UpdateDateColumn,
 } from 'typeorm';
 import { Project } from './Project';
+import { Ticket } from './Ticket';
 import { User } from './User';
 
 @ObjectType()
@@ -68,4 +69,12 @@ export class Organization extends BaseEntity {
 		onDelete: 'SET NULL',
 	})
 	projects: Project[] | null;
+
+	//// Organization to tickets relationship ////
+	@Field(() => [Ticket], { nullable: true })
+	@OneToMany(() => Ticket, (ticket) => ticket.organization, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	tickets: Ticket[] | null;
 }

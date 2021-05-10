@@ -1,0 +1,8 @@
+fragment rawTicketSubmitterFragment on RawTicketResponse {
+	submitter_organizationId
+	submitter_id
+	submitter_firstName
+	submitter_lastName
+	submitter_email
+	submitter_role
+}

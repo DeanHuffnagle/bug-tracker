@@ -24,6 +24,11 @@ export type AssignTicketInput = {
   userId: Scalars['Int'];
 };
 
+export type AssignTicketManagerInput = {
+  ticketId: Scalars['Int'];
+  userId: Scalars['Int'];
+};
+
 export type ChangeOrganizationNameInput = {
   name: Scalars['String'];
 };
@@ -147,6 +152,7 @@ export type Mutation = {
   unassignProjectManager: ProjectResponse;
   createTicket: TicketResponse;
   assignTicket: TicketResponse;
+  assignTicketManager: TicketResponse;
   updateTicket: TicketResponse;
   changeTicketStatus: TicketResponse;
   changeTicketPriority: TicketResponse;
@@ -224,6 +230,11 @@ export type MutationAssignTicketArgs = {
 };
 
 
+export type MutationAssignTicketManagerArgs = {
+  options: AssignTicketManagerInput;
+};
+
+
 export type MutationUpdateTicketArgs = {
   ticketId: Scalars['Int'];
   options: UpdateTicketInput;
@@ -295,6 +306,7 @@ export type Organization = {
   users?: Maybe<Array<User>>;
   creator: User;
   projects?: Maybe<Array<Project>>;
+  tickets?: Maybe<Array<Ticket>>;
 };
 
 export type OrganizationResponse = {
@@ -336,6 +348,8 @@ export type Query = {
   findTickets: Array<Ticket>;
   findAssignedTickets?: Maybe<Array<Ticket>>;
   findRawAssignedTickets?: Maybe<Array<RawTicketResponse>>;
+  findRawOrganizationTickets?: Maybe<Array<RawTicketResponse>>;
+  findRawManagedTickets?: Maybe<Array<RawTicketResponse>>;
   findAssignedTicketsByPriority?: Maybe<Array<Ticket>>;
   findAssignedTicketsByStatus?: Maybe<Array<Ticket>>;
   findAssignedTicketsByType?: Maybe<Array<Ticket>>;
@@ -416,18 +430,35 @@ export type RawTicketResponse = {
   ticket_priority: Scalars['String'];
   ticket_status: Scalars['String'];
   ticket_type: Scalars['String'];
+  ticket_organizationId: Scalars['String'];
   ticket_assignedDeveloperId?: Maybe<Scalars['Int']>;
   ticket_creatorId?: Maybe<Scalars['Int']>;
   ticket_projectId?: Maybe<Scalars['Int']>;
   ticket_submitterId?: Maybe<Scalars['Int']>;
-  assignedDeveloper_id: Scalars['Int'];
-  assignedDeveloper_firstName: Scalars['String'];
-  assignedDeveloper_lastName: Scalars['String'];
-  assignedDeveloper_email: Scalars['String'];
-  assignedDeveloper_role: Scalars['String'];
+  assignedDeveloper_id?: Maybe<Scalars['Int']>;
+  assignedDeveloper_firstName?: Maybe<Scalars['String']>;
+  assignedDeveloper_lastName?: Maybe<Scalars['String']>;
+  assignedDeveloper_email?: Maybe<Scalars['String']>;
+  assignedDeveloper_role?: Maybe<Scalars['String']>;
   assignedDeveloper_organizationId?: Maybe<Scalars['Int']>;
   assignedDeveloper_assignedProjectsId?: Maybe<Scalars['Int']>;
   assignedDeveloper_assignedTicketsId?: Maybe<Scalars['Int']>;
+  submitter_id?: Maybe<Scalars['Int']>;
+  submitter_firstName?: Maybe<Scalars['String']>;
+  submitter_lastName?: Maybe<Scalars['String']>;
+  submitter_email?: Maybe<Scalars['String']>;
+  submitter_role?: Maybe<Scalars['String']>;
+  submitter_organizationId?: Maybe<Scalars['Int']>;
+  submitter_assignedProjectsId?: Maybe<Scalars['Int']>;
+  submitter_assignedTicketsId?: Maybe<Scalars['Int']>;
+  manager_id?: Maybe<Scalars['Int']>;
+  manager_firstName?: Maybe<Scalars['String']>;
+  manager_lastName?: Maybe<Scalars['String']>;
+  manager_email?: Maybe<Scalars['String']>;
+  manager_role?: Maybe<Scalars['String']>;
+  manager_organizationId?: Maybe<Scalars['Int']>;
+  manager_assignedProjectsId?: Maybe<Scalars['Int']>;
+  manager_assignedTicketsId?: Maybe<Scalars['Int']>;
 };
 
 export type Ticket = {
@@ -439,13 +470,17 @@ export type Ticket = {
   status: Scalars['String'];
   type: Scalars['String'];
   assignedDeveloperId?: Maybe<Scalars['Int']>;
-  creatorId: Scalars['Int'];
   projectId: Scalars['Int'];
+  managerId?: Maybe<Scalars['Int']>;
+  submitterId?: Maybe<Scalars['Int']>;
+  organizationId: Scalars['Int'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   assignedDeveloper?: Maybe<User>;
   submitter: User;
   project: Project;
+  organization: Organization;
+  manager?: Maybe<User>;
   comments?: Maybe<Comment>;
 };
 
@@ -484,6 +519,7 @@ export type User = {
   assignedProjects?: Maybe<Array<Project>>;
   organization?: Maybe<Organization>;
   managedProjects?: Maybe<Array<Project>>;
+  managedTickets?: Maybe<Array<Ticket>>;
   createdOrganization: Organization;
   submittedTickets?: Maybe<Array<Ticket>>;
   comments?: Maybe<Comment>;
@@ -533,14 +569,37 @@ export type RawCommentFragmentFragment = (
   & Pick<RawCommentResponse, 'comment_id' | 'comment_text' | 'comment_ticketId' | 'comment_createdAt' | 'commenter_id' | 'commenter_firstName' | 'commenter_lastName' | 'commenter_email' | 'commenter_role'>
 );
 
+export type RawTicketAssignedDeveloperFragmentFragment = (
+  { __typename?: 'RawTicketResponse' }
+  & Pick<RawTicketResponse, 'assignedDeveloper_organizationId' | 'assignedDeveloper_id' | 'assignedDeveloper_firstName' | 'assignedDeveloper_lastName' | 'assignedDeveloper_email' | 'assignedDeveloper_role'>
+);
+
 export type RawTicketFragmentFragment = (
   { __typename?: 'RawTicketResponse' }
-  & Pick<RawTicketResponse, 'ticket_id' | 'ticket_title' | 'ticket_text' | 'ticket_type' | 'ticket_priority' | 'ticket_status' | 'assignedDeveloper_id' | 'assignedDeveloper_firstName' | 'assignedDeveloper_lastName' | 'assignedDeveloper_email' | 'assignedDeveloper_role'>
+  & Pick<RawTicketResponse, 'ticket_id' | 'ticket_title' | 'ticket_text' | 'ticket_type' | 'ticket_priority' | 'ticket_status' | 'ticket_organizationId'>
+);
+
+export type RawTicketManagerFragmentFragment = (
+  { __typename?: 'RawTicketResponse' }
+  & Pick<RawTicketResponse, 'manager_organizationId' | 'manager_id' | 'manager_firstName' | 'manager_lastName' | 'manager_email' | 'manager_role'>
+);
+
+export type RawTicketResponseFragmentFragment = (
+  { __typename?: 'RawTicketResponse' }
+  & RawTicketFragmentFragment
+  & RawTicketAssignedDeveloperFragmentFragment
+  & RawTicketSubmitterFragmentFragment
+  & RawTicketManagerFragmentFragment
+);
+
+export type RawTicketSubmitterFragmentFragment = (
+  { __typename?: 'RawTicketResponse' }
+  & Pick<RawTicketResponse, 'submitter_organizationId' | 'submitter_id' | 'submitter_firstName' | 'submitter_lastName' | 'submitter_email' | 'submitter_role'>
 );
 
 export type TicketFragmentFragment = (
   { __typename?: 'Ticket' }
-  & Pick<Ticket, 'id' | 'title' | 'text' | 'status' | 'priority' | 'type' | 'assignedDeveloperId' | 'creatorId' | 'projectId' | 'createdAt' | 'updatedAt'>
+  & Pick<Ticket, 'id' | 'title' | 'text' | 'status' | 'priority' | 'type' | 'assignedDeveloperId' | 'projectId' | 'createdAt' | 'updatedAt'>
 );
 
 export type UserFragmentFragment = (
@@ -752,7 +811,29 @@ export type FindRawAssignedTicketsQuery = (
   { __typename?: 'Query' }
   & { findRawAssignedTickets?: Maybe<Array<(
     { __typename?: 'RawTicketResponse' }
-    & RawTicketFragmentFragment
+    & RawTicketResponseFragmentFragment
+  )>> }
+);
+
+export type FindRawManagedTicketsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindRawManagedTicketsQuery = (
+  { __typename?: 'Query' }
+  & { findRawManagedTickets?: Maybe<Array<(
+    { __typename?: 'RawTicketResponse' }
+    & RawTicketResponseFragmentFragment
+  )>> }
+);
+
+export type FindRawOrganizationTicketsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindRawOrganizationTicketsQuery = (
+  { __typename?: 'Query' }
+  & { findRawOrganizationTickets?: Maybe<Array<(
+    { __typename?: 'RawTicketResponse' }
+    & RawTicketResponseFragmentFragment
   )>> }
 );
 
@@ -877,6 +958,12 @@ export const RawTicketFragmentFragmentDoc = gql`
   ticket_type
   ticket_priority
   ticket_status
+  ticket_organizationId
+}
+    `;
+export const RawTicketAssignedDeveloperFragmentFragmentDoc = gql`
+    fragment rawTicketAssignedDeveloperFragment on RawTicketResponse {
+  assignedDeveloper_organizationId
   assignedDeveloper_id
   assignedDeveloper_firstName
   assignedDeveloper_lastName
@@ -884,6 +971,37 @@ export const RawTicketFragmentFragmentDoc = gql`
   assignedDeveloper_role
 }
     `;
+export const RawTicketSubmitterFragmentFragmentDoc = gql`
+    fragment rawTicketSubmitterFragment on RawTicketResponse {
+  submitter_organizationId
+  submitter_id
+  submitter_firstName
+  submitter_lastName
+  submitter_email
+  submitter_role
+}
+    `;
+export const RawTicketManagerFragmentFragmentDoc = gql`
+    fragment rawTicketManagerFragment on RawTicketResponse {
+  manager_organizationId
+  manager_id
+  manager_firstName
+  manager_lastName
+  manager_email
+  manager_role
+}
+    `;
+export const RawTicketResponseFragmentFragmentDoc = gql`
+    fragment rawTicketResponseFragment on RawTicketResponse {
+  ...rawTicketFragment
+  ...rawTicketAssignedDeveloperFragment
+  ...rawTicketSubmitterFragment
+  ...rawTicketManagerFragment
+}
+    ${RawTicketFragmentFragmentDoc}
+${RawTicketAssignedDeveloperFragmentFragmentDoc}
+${RawTicketSubmitterFragmentFragmentDoc}
+${RawTicketManagerFragmentFragmentDoc}`;
 export const TicketFragmentFragmentDoc = gql`
     fragment ticketFragment on Ticket {
   id
@@ -893,7 +1011,6 @@ export const TicketFragmentFragmentDoc = gql`
   priority
   type
   assignedDeveloperId
-  creatorId
   projectId
   createdAt
   updatedAt
@@ -1088,13 +1205,35 @@ export function useFindCommentsByTicketQuery(options: Omit<Urql.UseQueryArgs<Fin
 export const FindRawAssignedTicketsDocument = gql`
     query FindRawAssignedTickets {
   findRawAssignedTickets {
-    ...rawTicketFragment
+    ...rawTicketResponseFragment
   }
 }
-    ${RawTicketFragmentFragmentDoc}`;
+    ${RawTicketResponseFragmentFragmentDoc}`;
 
 export function useFindRawAssignedTicketsQuery(options: Omit<Urql.UseQueryArgs<FindRawAssignedTicketsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindRawAssignedTicketsQuery>({ query: FindRawAssignedTicketsDocument, ...options });
+};
+export const FindRawManagedTicketsDocument = gql`
+    query FindRawManagedTickets {
+  findRawManagedTickets {
+    ...rawTicketResponseFragment
+  }
+}
+    ${RawTicketResponseFragmentFragmentDoc}`;
+
+export function useFindRawManagedTicketsQuery(options: Omit<Urql.UseQueryArgs<FindRawManagedTicketsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindRawManagedTicketsQuery>({ query: FindRawManagedTicketsDocument, ...options });
+};
+export const FindRawOrganizationTicketsDocument = gql`
+    query FindRawOrganizationTickets {
+  findRawOrganizationTickets {
+    ...rawTicketResponseFragment
+  }
+}
+    ${RawTicketResponseFragmentFragmentDoc}`;
+
+export function useFindRawOrganizationTicketsQuery(options: Omit<Urql.UseQueryArgs<FindRawOrganizationTicketsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindRawOrganizationTicketsQuery>({ query: FindRawOrganizationTicketsDocument, ...options });
 };
 export const FindTicketDocument = gql`
     query FindTicket($id: Int!) {

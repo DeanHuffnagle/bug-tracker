@@ -13,9 +13,9 @@ import {
 import { TICKET_COLUMNS } from '../utils/Columns';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
-type TicketsPageProps = {};
+type ProjectsPageProps = {};
 
-const Tickets: React.FC<{}> = () => {
+const Projects: React.FC<{}> = () => {
 	const [{ data: meData, fetching }] = useMeQuery();
 	const [{ data: devData }] = useFindRawAssignedTicketsQuery();
 	const [{ data: adminData }] = useFindRawOrganizationTicketsQuery();
@@ -95,4 +95,4 @@ const Tickets: React.FC<{}> = () => {
 	);
 };
 
-export default withUrqlClient(createUrqlClient)(Tickets);
+export default withUrqlClient(createUrqlClient)(Projects);

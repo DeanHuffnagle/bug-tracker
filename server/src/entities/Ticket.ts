@@ -12,6 +12,7 @@ import { Project } from './Project';
 import { Comment } from './Comment';
 import { User } from './User';
 import { Field, Int, ObjectType } from 'type-graphql';
+import { Organization } from './Organization';
 
 export type TicketPriorityType = 'low' | 'medium' | 'high';
 
@@ -76,11 +77,19 @@ export class Ticket extends BaseEntity {
 
 	@Field(() => Int)
 	@Column()
-	creatorId: number;
+	projectId!: number;
+
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	managerId: number | null;
+
+	@Field(() => Int, { nullable: true })
+	@Column({ nullable: true })
+	submitterId: number | null;
 
 	@Field(() => Int)
 	@Column()
-	projectId!: number;
+	organizationId!: number;
 
 	@Field(() => String)
 	@CreateDateColumn()
@@ -117,6 +126,22 @@ export class Ticket extends BaseEntity {
 		onDelete: 'CASCADE',
 	})
 	project!: Project;
+
+	//// Tickets to organization relationship ////
+	@Field(() => Organization)
+	@ManyToOne(() => Organization, (organization) => organization.tickets, {
+		cascade: ['insert', 'update'],
+		onDelete: 'CASCADE',
+	})
+	organization!: Organization;
+
+	//// Project to project manager relationship ////
+	@Field(() => User, { nullable: true })
+	@ManyToOne(() => User, (user) => user.managedTickets, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	manager: User | null;
 
 	//// Ticket to comments relationship ////
 	@Field(() => Comment, { nullable: true })
