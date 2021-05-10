@@ -1,0 +1,8 @@
+query FindProject($id: Int!) {
+	findProject(id: $id) {
+		...projectFragment
+		manager {
+			...userFragment
+		}
+	}
+}

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import { tableFormatted } from './tableFormatted';
 import { DeleteButton } from '../components/DeleteButton';
+import { tableFormattedLink } from './tableFormattedLink';
 
 //================================================================================
 //Ticket Table Columns
@@ -61,92 +62,46 @@ export const TICKET_COLUMNS = [
 	},
 ];
 //================================================================================
-// Project Manager ticket Table Columns
+//Project Table Columns
 //================================================================================
-// export const PROJECT_MANAGER_TICKET_COLUMNS = [
-// 	{
-// 		Header: 'Ticket Number',
-// 		id: 'ticket number',
-// 		accessor: 'ticket_id',
-// 		Cell: (e) => (
-// 			<Link href="ticket/[id]" as={`ticket/${e.value}`}>
-// 				<span id="clickable-text">{e.value}</span>
-// 			</Link>
-// 		),
-// 	},
-// 	{
-// 		Header: 'Title',
-// 		id: 'title',
-// 		accessor: 'ticket_title',
-// 	},
-// 	{
-// 		Header: 'Type',
-// 		id: 'type',
-// 		accessor: 'ticket_type',
-// 		Cell: (props) => tableFormatted(props.value),
-// 	},
-// 	{
-// 		Header: 'Status',
-// 		id: 'status',
-// 		accessor: 'ticket_status',
-// 		Cell: (props) => tableFormatted(props.value),
-// 	},
-// 	{
-// 		Header: 'Priority',
-// 		id: 'priority',
-// 		accessor: 'ticket_priority',
-// 		Cell: (props) => tableFormatted(props.value),
-// 	},
-// 	{
-// 		Header: 'Assigned Developer',
-// 		id: 'assigned developer',
-// 		accessor: (d) =>
-// 			`${d.assignedDeveloper_firstName} ${d.assignedDeveloper_lastName}`,
-// 		Cell: (props) => tableFormatted(props.value),
-// 	},
-// ];
-// //================================================================================
-// //Developer Ticket Table Columns
-// //================================================================================
-// export const DEV_TICKET_COLUMNS = [
-// 	{
-// 		Header: 'Ticket Number',
-// 		id: 'ticket number',
-// 		accessor: 'ticket_id',
-// 		Cell: (e) => (
-// 			<Link href="ticket/[id]" as={`ticket/${e.value}`}>
-// 				<span id="clickable-text">{e.value}</span>
-// 			</Link>
-// 		),
-// 	},
-// 	{
-// 		Header: 'Title',
-// 		id: 'title',
-// 		accessor: 'ticket_title',
-// 	},
-// 	{
-// 		Header: 'Type',
-// 		id: 'type',
-// 		accessor: 'ticket_type',
-// 		Cell: (props) => tableFormatted(props.value),
-// 	},
-// 	{
-// 		Header: 'Status',
-// 		id: 'status',
-// 		accessor: 'ticket_status',
-// 		Cell: (props) => tableFormatted(props.value),
-// 	},
-// 	{
-// 		Header: 'Priority',
-// 		id: 'priority',
-// 		accessor: 'ticket_priority',
-// 		Cell: (props) => tableFormatted(props.value),
-// 	},
-// ];
+export const PROJECT_COLUMNS = [
+	{
+		Header: 'Project Id',
+		id: 'project id',
+		accessor: 'project_id',
+		Cell: (e) => (
+			<Link href="project/[id]" as={`project/${e.value}`}>
+				<span id="clickable-text">{e.value}</span>
+			</Link>
+		),
+	},
+	{
+		Header: 'Name',
+		id: 'name',
+		accessor: 'project_name',
+	},
+	{
+		Header: 'Description',
+		id: 'description',
+		accessor: 'project_description',
+	},
+	{
+		Header: 'Project Manager',
+		id: 'project manager',
+		accessor: (d) => `${d.manager_firstName} ${d.manager_lastName}`,
+		Cell: (props) => tableFormatted(props.value),
+	},
+	{
+		Header: 'RepositoryLink',
+		id: 'repository link',
+		accessor: 'project_repositoryLink',
+		Cell: (e) => tableFormattedLink(e.value),
+	},
+];
+
 //================================================================================
 //Comment Table Columns
 //================================================================================
-
 export const COMMENT_COLUMNS = [
 	{
 		Header: 'Comment',
@@ -174,14 +129,6 @@ export const COMMENT_COLUMNS = [
 			return (
 				<span>
 					<DeleteButton commentIdInput={props.value} />
-					{/* <IconButton
-						aria-label="delete comment"
-						icon={<DeleteIcon />}
-						size="xs"
-						onClick={() => {
-							console.log('deleted comment', props.value);
-						}}
-					/> */}
 				</span>
 			);
 		},

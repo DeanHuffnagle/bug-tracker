@@ -14,6 +14,7 @@ import { isAdmin } from '../middleware/isAdmin';
 import { isProjectManager } from '../middleware/isProjectManager';
 import { MyContext } from '../types';
 import {
+	AddRepositoryLinkInput,
 	AssignProjectInput,
 	CreateProjectInput,
 	UnassignProjectInput,
@@ -70,7 +71,7 @@ export class ProjectResolver {
 	@Query(() => Project, { nullable: true })
 	findProject(@Arg('id', () => Int) id: number): Promise<Project | undefined> {
 		return Project.findOne(id, {
-			relations: ['organization', 'assignedDevelopers'],
+			relations: ['organization', 'assignedDevelopers', 'manager'],
 		});
 	}
 	//================================================================================
@@ -85,12 +86,47 @@ export class ProjectResolver {
 		const assignedProjects = await getRepository(Project)
 			.createQueryBuilder('project')
 			.leftJoinAndSelect('project.manager', 'manager')
-			.leftJoinAndSelect('project.assignedDevelopers', 'assignedDevelopers')
 			.where('project.id IN (:...assignedProjects)', {
 				assignedProjects: isUser?.assignedProjectIds,
 			})
 			.getRawMany();
 		return assignedProjects;
+	}
+	//================================================================================
+	//Find Raw Managed Projects Query
+	//================================================================================
+	@Query(() => [RawProjectResponse], { nullable: true })
+	async findRawManagedProjects(
+		@Ctx() { req }: MyContext
+	): Promise<RawProjectResponse[]> {
+		const isUser = await User.findOne(req.session.UserId);
+
+		const managedProjects = await getRepository(Project)
+			.createQueryBuilder('project')
+			.leftJoinAndSelect('project.manager', 'manager')
+			.where('project.id IN (:...managedProjects)', {
+				managedProjects: isUser?.managedProjectIds,
+			})
+			.getRawMany();
+		return managedProjects;
+	}
+	//================================================================================
+	//Find Raw Organization Projects Query
+	//================================================================================
+	@Query(() => [RawProjectResponse], { nullable: true })
+	async findRawOrganizationProjects(
+		@Ctx() { req }: MyContext
+	): Promise<RawProjectResponse[]> {
+		const isUser = await User.findOne(req.session.UserId);
+
+		const organizationProjects = await getRepository(Project)
+			.createQueryBuilder('project')
+			.leftJoinAndSelect('project.manager', 'manager')
+			.where('project.organizationId = :id ', {
+				id: isUser?.organizationId,
+			})
+			.getRawMany();
+		return organizationProjects;
 	}
 	//================================================================================
 	//Assign Project Mutation
@@ -250,6 +286,33 @@ export class ProjectResolver {
 		const project = await Project.findOne(options.projectId, {
 			relations: ['manager'],
 		});
+		return { project };
+	}
+	//================================================================================
+	//Add Repository Link Mutation
+	//================================================================================
+	@Mutation(() => ProjectResponse)
+	@UseMiddleware(isProjectManager)
+	async addRepositoryLink(
+		@Arg('options') options: AddRepositoryLinkInput
+	): Promise<ProjectResponse> {
+		const isProject = await Project.findOne(options.projectId);
+		if (!isProject) {
+			return {
+				errors: [
+					{
+						field: 'project',
+						message: 'no project found.',
+					},
+				],
+			};
+		}
+		await Project.update(
+			{ id: options.projectId },
+			{ repositoryLink: options.repositoryLink }
+		);
+
+		const project = await Project.findOne(options.projectId);
 		return { project };
 	}
 }

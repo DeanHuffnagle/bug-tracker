@@ -14,6 +14,11 @@ export type Scalars = {
   Float: number;
 };
 
+export type AddRepositoryLinkInput = {
+  projectId: Scalars['Int'];
+  repositoryLink: Scalars['String'];
+};
+
 export type AssignProjectInput = {
   projectId: Scalars['Int'];
   userId: Scalars['Int'];
@@ -150,6 +155,7 @@ export type Mutation = {
   unassignProject: ProjectResponse;
   assignProjectManager: ProjectResponse;
   unassignProjectManager: ProjectResponse;
+  addRepositoryLink: ProjectResponse;
   createTicket: TicketResponse;
   assignTicket: TicketResponse;
   assignTicketManager: TicketResponse;
@@ -217,6 +223,11 @@ export type MutationAssignProjectManagerArgs = {
 
 export type MutationUnassignProjectManagerArgs = {
   options: UnassignProjectInput;
+};
+
+
+export type MutationAddRepositoryLinkArgs = {
+  options: AddRepositoryLinkInput;
 };
 
 
@@ -321,6 +332,7 @@ export type Project = {
   name: Scalars['String'];
   description: Scalars['String'];
   organizationId: Scalars['Int'];
+  repositoryLink?: Maybe<Scalars['String']>;
   managerId?: Maybe<Scalars['Int']>;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
@@ -344,6 +356,9 @@ export type Query = {
   findCommentsByTicket: Array<RawCommentResponse>;
   findOrganization?: Maybe<Organization>;
   findProject?: Maybe<Project>;
+  findRawAssignedProjects?: Maybe<Array<RawProjectResponse>>;
+  findRawManagedProjects?: Maybe<Array<RawProjectResponse>>;
+  findRawOrganizationProjects?: Maybe<Array<RawProjectResponse>>;
   findTicket?: Maybe<Ticket>;
   findTickets: Array<Ticket>;
   findAssignedTickets?: Maybe<Array<Ticket>>;
@@ -420,6 +435,26 @@ export type RawCommentResponse = {
   commenter_lastName: Scalars['String'];
   commenter_email: Scalars['String'];
   commenter_role: Scalars['String'];
+};
+
+export type RawProjectResponse = {
+  __typename?: 'RawProjectResponse';
+  project_id: Scalars['Int'];
+  project_name: Scalars['String'];
+  project_description: Scalars['String'];
+  project_organizationId: Scalars['Int'];
+  project_managerId: Scalars['Int'];
+  project_createdAt: Scalars['String'];
+  project_repositoryLink: Scalars['String'];
+  project_updatedAt: Scalars['String'];
+  manager_id: Scalars['Int'];
+  manager_firstName: Scalars['String'];
+  manager_lastName: Scalars['String'];
+  manager_email: Scalars['String'];
+  manager_role: Scalars['String'];
+  manager_organizationId: Scalars['Int'];
+  manager_createdAt: Scalars['String'];
+  manager_updatedAt: Scalars['String'];
 };
 
 export type RawTicketResponse = {
@@ -512,13 +547,14 @@ export type User = {
   email: Scalars['String'];
   role: Scalars['String'];
   organizationId?: Maybe<Scalars['Int']>;
-  assignedProjectsId?: Maybe<Array<Scalars['Int']>>;
   assignedTicketsId?: Maybe<Array<Scalars['Int']>>;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   assignedProjects?: Maybe<Array<Project>>;
+  assignedProjectIds?: Maybe<Array<Scalars['Int']>>;
   organization?: Maybe<Organization>;
   managedProjects?: Maybe<Array<Project>>;
+  managedProjectIds?: Maybe<Array<Scalars['Int']>>;
   managedTickets?: Maybe<Array<Ticket>>;
   createdOrganization: Organization;
   submittedTickets?: Maybe<Array<Ticket>>;
@@ -561,12 +597,28 @@ export type OrganizationFragmentFragment = (
 
 export type ProjectFragmentFragment = (
   { __typename?: 'Project' }
-  & Pick<Project, 'id' | 'name' | 'description' | 'managerId' | 'organizationId' | 'createdAt' | 'updatedAt'>
+  & Pick<Project, 'id' | 'name' | 'description' | 'managerId' | 'assignedDeveloperIds' | 'organizationId' | 'repositoryLink' | 'createdAt' | 'updatedAt'>
 );
 
 export type RawCommentFragmentFragment = (
   { __typename?: 'RawCommentResponse' }
   & Pick<RawCommentResponse, 'comment_id' | 'comment_text' | 'comment_ticketId' | 'comment_createdAt' | 'commenter_id' | 'commenter_firstName' | 'commenter_lastName' | 'commenter_email' | 'commenter_role'>
+);
+
+export type RawProjectFragmentFragment = (
+  { __typename?: 'RawProjectResponse' }
+  & Pick<RawProjectResponse, 'project_id' | 'project_name' | 'project_description' | 'project_organizationId' | 'project_managerId' | 'project_createdAt' | 'project_updatedAt' | 'project_repositoryLink'>
+);
+
+export type RawProjectManagerFragmentFragment = (
+  { __typename?: 'RawProjectResponse' }
+  & Pick<RawProjectResponse, 'manager_id' | 'manager_firstName' | 'manager_lastName' | 'manager_email' | 'manager_role' | 'manager_organizationId' | 'manager_createdAt' | 'manager_updatedAt'>
+);
+
+export type RawProjectResponseFragmentFragment = (
+  { __typename?: 'RawProjectResponse' }
+  & RawProjectFragmentFragment
+  & RawProjectManagerFragmentFragment
 );
 
 export type RawTicketAssignedDeveloperFragmentFragment = (
@@ -804,6 +856,34 @@ export type FindCommentsByTicketQuery = (
   )> }
 );
 
+export type FindProjectQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FindProjectQuery = (
+  { __typename?: 'Query' }
+  & { findProject?: Maybe<(
+    { __typename?: 'Project' }
+    & { manager?: Maybe<(
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+    & ProjectFragmentFragment
+  )> }
+);
+
+export type FindRawAssignedProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindRawAssignedProjectsQuery = (
+  { __typename?: 'Query' }
+  & { findRawAssignedProjects?: Maybe<Array<(
+    { __typename?: 'RawProjectResponse' }
+    & RawProjectResponseFragmentFragment
+  )>> }
+);
+
 export type FindRawAssignedTicketsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -815,6 +895,17 @@ export type FindRawAssignedTicketsQuery = (
   )>> }
 );
 
+export type FindRawManagedProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindRawManagedProjectsQuery = (
+  { __typename?: 'Query' }
+  & { findRawManagedProjects?: Maybe<Array<(
+    { __typename?: 'RawProjectResponse' }
+    & RawProjectResponseFragmentFragment
+  )>> }
+);
+
 export type FindRawManagedTicketsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -823,6 +914,17 @@ export type FindRawManagedTicketsQuery = (
   & { findRawManagedTickets?: Maybe<Array<(
     { __typename?: 'RawTicketResponse' }
     & RawTicketResponseFragmentFragment
+  )>> }
+);
+
+export type FindRawOrganizationProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindRawOrganizationProjectsQuery = (
+  { __typename?: 'Query' }
+  & { findRawOrganizationProjects?: Maybe<Array<(
+    { __typename?: 'RawProjectResponse' }
+    & RawProjectResponseFragmentFragment
   )>> }
 );
 
@@ -932,7 +1034,9 @@ export const ProjectFragmentFragmentDoc = gql`
   name
   description
   managerId
+  assignedDeveloperIds
   organizationId
+  repositoryLink
   createdAt
   updatedAt
 }
@@ -950,6 +1054,37 @@ export const RawCommentFragmentFragmentDoc = gql`
   commenter_role
 }
     `;
+export const RawProjectFragmentFragmentDoc = gql`
+    fragment rawProjectFragment on RawProjectResponse {
+  project_id
+  project_name
+  project_description
+  project_organizationId
+  project_managerId
+  project_createdAt
+  project_updatedAt
+  project_repositoryLink
+}
+    `;
+export const RawProjectManagerFragmentFragmentDoc = gql`
+    fragment rawProjectManagerFragment on RawProjectResponse {
+  manager_id
+  manager_firstName
+  manager_lastName
+  manager_email
+  manager_role
+  manager_organizationId
+  manager_createdAt
+  manager_updatedAt
+}
+    `;
+export const RawProjectResponseFragmentFragmentDoc = gql`
+    fragment rawProjectResponseFragment on RawProjectResponse {
+  ...rawProjectFragment
+  ...rawProjectManagerFragment
+}
+    ${RawProjectFragmentFragmentDoc}
+${RawProjectManagerFragmentFragmentDoc}`;
 export const RawTicketFragmentFragmentDoc = gql`
     fragment rawTicketFragment on RawTicketResponse {
   ticket_id
@@ -1202,6 +1337,32 @@ export const FindCommentsByTicketDocument = gql`
 export function useFindCommentsByTicketQuery(options: Omit<Urql.UseQueryArgs<FindCommentsByTicketQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindCommentsByTicketQuery>({ query: FindCommentsByTicketDocument, ...options });
 };
+export const FindProjectDocument = gql`
+    query FindProject($id: Int!) {
+  findProject(id: $id) {
+    ...projectFragment
+    manager {
+      ...userFragment
+    }
+  }
+}
+    ${ProjectFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useFindProjectQuery(options: Omit<Urql.UseQueryArgs<FindProjectQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindProjectQuery>({ query: FindProjectDocument, ...options });
+};
+export const FindRawAssignedProjectsDocument = gql`
+    query FindRawAssignedProjects {
+  findRawAssignedProjects {
+    ...rawProjectResponseFragment
+  }
+}
+    ${RawProjectResponseFragmentFragmentDoc}`;
+
+export function useFindRawAssignedProjectsQuery(options: Omit<Urql.UseQueryArgs<FindRawAssignedProjectsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindRawAssignedProjectsQuery>({ query: FindRawAssignedProjectsDocument, ...options });
+};
 export const FindRawAssignedTicketsDocument = gql`
     query FindRawAssignedTickets {
   findRawAssignedTickets {
@@ -1213,6 +1374,17 @@ export const FindRawAssignedTicketsDocument = gql`
 export function useFindRawAssignedTicketsQuery(options: Omit<Urql.UseQueryArgs<FindRawAssignedTicketsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindRawAssignedTicketsQuery>({ query: FindRawAssignedTicketsDocument, ...options });
 };
+export const FindRawManagedProjectsDocument = gql`
+    query FindRawManagedProjects {
+  findRawManagedProjects {
+    ...rawProjectResponseFragment
+  }
+}
+    ${RawProjectResponseFragmentFragmentDoc}`;
+
+export function useFindRawManagedProjectsQuery(options: Omit<Urql.UseQueryArgs<FindRawManagedProjectsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindRawManagedProjectsQuery>({ query: FindRawManagedProjectsDocument, ...options });
+};
 export const FindRawManagedTicketsDocument = gql`
     query FindRawManagedTickets {
   findRawManagedTickets {
@@ -1223,6 +1395,17 @@ export const FindRawManagedTicketsDocument = gql`
 
 export function useFindRawManagedTicketsQuery(options: Omit<Urql.UseQueryArgs<FindRawManagedTicketsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindRawManagedTicketsQuery>({ query: FindRawManagedTicketsDocument, ...options });
+};
+export const FindRawOrganizationProjectsDocument = gql`
+    query FindRawOrganizationProjects {
+  findRawOrganizationProjects {
+    ...rawProjectResponseFragment
+  }
+}
+    ${RawProjectResponseFragmentFragmentDoc}`;
+
+export function useFindRawOrganizationProjectsQuery(options: Omit<Urql.UseQueryArgs<FindRawOrganizationProjectsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindRawOrganizationProjectsQuery>({ query: FindRawOrganizationProjectsDocument, ...options });
 };
 export const FindRawOrganizationTicketsDocument = gql`
     query FindRawOrganizationTickets {

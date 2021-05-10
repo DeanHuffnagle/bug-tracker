@@ -130,6 +130,7 @@ export class RawTicketResponse {
 
 @ObjectType()
 export class RawCommentResponse {
+	//comment
 	@Field(() => Int)
 	comment_id: number;
 	@Field()
@@ -140,6 +141,7 @@ export class RawCommentResponse {
 	comment_ticketId: number;
 	@Field()
 	comment_createdAt: string;
+	//commenter
 	@Field(() => Int)
 	commenter_id: number;
 	@Field()
@@ -154,8 +156,40 @@ export class RawCommentResponse {
 
 @ObjectType()
 export class RawProjectResponse {
+	//project
 	@Field(() => Int)
 	project_id: number;
+	@Field()
+	project_name: string;
+	@Field()
+	project_description: string;
+	@Field(() => Int)
+	project_organizationId: number;
+	@Field(() => Int)
+	project_managerId: number;
+	@Field()
+	project_createdAt: string;
+	@Field()
+	project_repositoryLink: string;
+	@Field()
+	project_updatedAt: string;
+	//manager
+	@Field(() => Int)
+	manager_id: number;
+	@Field()
+	manager_firstName: string;
+	@Field()
+	manager_lastName: string;
+	@Field()
+	manager_email: string;
+	@Field()
+	manager_role: string;
+	@Field(() => Int)
+	manager_organizationId: number;
+	@Field()
+	manager_createdAt: string;
+	@Field()
+	manager_updatedAt: string;
 }
 
 @ObjectType()

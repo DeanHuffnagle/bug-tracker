@@ -39,6 +39,10 @@ export class Project extends BaseEntity {
 	@Column()
 	organizationId!: number;
 
+	@Field({ nullable: true })
+	@Column({ nullable: true })
+	repositoryLink!: string;
+
 	@Field(() => Int, { nullable: true })
 	@Column({ nullable: true })
 	managerId: number | null;

@@ -122,6 +122,10 @@ export class User extends BaseEntity {
 	})
 	managedProjects: Project[] | null;
 
+	@Field(() => [Int], { nullable: true })
+	@RelationId((user: User) => user.managedProjects)
+	managedProjectIds: number[];
+
 	//// Project manager to ticket relationship ////
 	@Field(() => [Ticket], { nullable: true })
 	@OneToMany(() => Ticket, (ticket) => ticket.manager, {

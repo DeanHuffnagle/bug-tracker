@@ -1,0 +1,10 @@
+fragment rawProjectManagerFragment on RawProjectResponse {
+	manager_id
+	manager_firstName
+	manager_lastName
+	manager_email
+	manager_role
+	manager_organizationId
+	manager_createdAt
+	manager_updatedAt
+}

@@ -1,0 +1,4 @@
+fragment rawProjectResponseFragment on RawProjectResponse {
+	...rawProjectFragment
+	...rawProjectManagerFragment
+}

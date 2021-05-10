@@ -3,7 +3,9 @@ fragment projectFragment on Project {
 	name
 	description
 	managerId
+	assignedDeveloperIds
 	organizationId
+	repositoryLink
 	createdAt
 	updatedAt
 }

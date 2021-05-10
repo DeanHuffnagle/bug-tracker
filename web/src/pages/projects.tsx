@@ -5,30 +5,33 @@ import { Card, Container } from 'react-bootstrap';
 import { CustomTable } from '../components/CustomTable';
 import { NavBar } from '../components/NavBar';
 import {
+	useFindRawAssignedProjectsQuery,
 	useFindRawAssignedTicketsQuery,
+	useFindRawManagedProjectsQuery,
 	useFindRawManagedTicketsQuery,
+	useFindRawOrganizationProjectsQuery,
 	useFindRawOrganizationTicketsQuery,
 	useMeQuery,
 } from '../generated/graphql';
-import { TICKET_COLUMNS } from '../utils/Columns';
+import { PROJECT_COLUMNS, TICKET_COLUMNS } from '../utils/Columns';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
 type ProjectsPageProps = {};
 
 const Projects: React.FC<{}> = () => {
 	const [{ data: meData, fetching }] = useMeQuery();
-	const [{ data: devData }] = useFindRawAssignedTicketsQuery();
-	const [{ data: adminData }] = useFindRawOrganizationTicketsQuery();
-	const [{ data: projectManagerData }] = useFindRawManagedTicketsQuery();
+	const [{ data: adminData }] = useFindRawOrganizationProjectsQuery();
+	const [{ data: projectManagerData }] = useFindRawManagedProjectsQuery();
+	const [{ data: devData }] = useFindRawAssignedProjectsQuery();
 	const isUserRole = meData?.me ? meData?.me?.role : 'developer';
-	const adminTableData = adminData?.findRawOrganizationTickets
-		? adminData.findRawOrganizationTickets
+	const adminTableData = adminData?.findRawOrganizationProjects
+		? adminData.findRawOrganizationProjects
 		: [{}];
-	const projectManagerTableData = projectManagerData?.findRawManagedTickets
-		? projectManagerData.findRawManagedTickets
+	const projectManagerTableData = projectManagerData?.findRawManagedProjects
+		? projectManagerData.findRawManagedProjects
 		: [{}];
-	const devTableData = devData?.findRawAssignedTickets
-		? devData.findRawAssignedTickets
+	const devTableData = devData?.findRawAssignedProjects
+		? devData.findRawAssignedProjects
 		: [{}];
 
 	let tableData;
@@ -45,32 +48,21 @@ const Projects: React.FC<{}> = () => {
 
 	switch (isUserRole) {
 		case 'admin':
-			console.log(isUserRole);
-			console.log('1');
 			tableData = adminTableData;
-			hiddenColumns = ['id'];
-			brand = 'Organization Tickets';
+			brand = 'Organization Projects';
 			break;
 		case 'projectManager':
-			console.log(isUserRole);
-			console.log('2');
 			tableData = projectManagerTableData;
-			hiddenColumns = ['submitted by', 'manager'];
-			brand = 'Managed Tickets';
+			hiddenColumns = ['project manager'];
+			brand = 'Managed Projects';
 			break;
 		case 'submitter':
-			console.log(isUserRole);
-			console.log('3');
 			tableData = devTableData;
-			hiddenColumns = ['assigned developer', 'submitted by', 'manager'];
-			brand = 'Assigned Tickets';
+			brand = 'Assigned Projects';
 			break;
 		case 'developer':
-			console.log(isUserRole);
-			console.log('3');
 			tableData = devTableData;
-			hiddenColumns = ['assigned developer', 'submitted by', 'manager'];
-			brand = 'Assigned Tickets';
+			brand = 'Assigned Projects';
 			break;
 	}
 	console.log(isUserRole);
@@ -84,9 +76,9 @@ const Projects: React.FC<{}> = () => {
 				<Card>
 					<CustomTable
 						dataInput={tableData}
-						columnInput={TICKET_COLUMNS}
+						columnInput={PROJECT_COLUMNS}
 						userInput={meData?.me}
-						sortByInput={'ticket number'}
+						sortByInput={'project number'}
 						hiddenColumnsInput={hiddenColumns}
 					/>
 				</Card>

@@ -89,8 +89,8 @@ const ticket = ({}) => {
 									</Box>
 									<Box mr="auto" mt={1}>
 										<NextLink
-											href="/ticket/edit/[id]"
-											as={`/ticket/edit/${isTicketId}`}
+											href="/ticket/edit-ticket/[id]"
+											as={`/ticket/edit-ticket/${isTicketId}`}
 										>
 											<IconButton
 												as={Link}

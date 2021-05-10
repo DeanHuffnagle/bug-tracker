@@ -70,6 +70,15 @@ export class UnassignProjectInput {
 	userId!: number;
 }
 
+//// Unassign Project ////
+@InputType()
+export class AddRepositoryLinkInput {
+	@Field(() => Int)
+	projectId!: number;
+	@Field()
+	repositoryLink!: string;
+}
+
 //================================================================================
 //Ticket Input Types
 //================================================================================
