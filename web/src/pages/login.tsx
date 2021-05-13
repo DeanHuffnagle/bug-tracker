@@ -18,6 +18,7 @@ import { useRouter } from 'next/router';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import NextLink from 'next/link';
+import { APP_NAME } from '../constants';
 
 const Login: React.FC<{}> = ({}) => {
 	const router = useRouter();

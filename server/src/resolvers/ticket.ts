@@ -358,6 +358,23 @@ export class TicketResolver {
 		return organizationTickets;
 	}
 	//================================================================================
+	//Find Raw Tickets By Project Query
+	//================================================================================
+	@Query(() => [RawTicketResponse], { nullable: true })
+	async findRawTicketsByProject(
+		@Arg('projectId', () => Int) projectId: number
+	): Promise<RawTicketResponse[]> {
+		const projectTickets = await getRepository(Ticket)
+			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.manager', 'manager')
+			.leftJoinAndSelect('ticket.submitter', 'submitter')
+			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
+			.where('ticket.projectId = :id', { id: projectId })
+			.getRawMany();
+		console.log('data: ', projectTickets);
+		return projectTickets;
+	}
+	//================================================================================
 	//Find Raw Managed Tickets Query
 	//================================================================================
 	@Query(() => [RawTicketResponse], { nullable: true })

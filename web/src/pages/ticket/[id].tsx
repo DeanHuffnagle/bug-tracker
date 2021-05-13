@@ -2,42 +2,37 @@ import { EditIcon } from '@chakra-ui/icons';
 import {
 	Box,
 	Button,
+	Flex,
 	Heading,
 	IconButton,
 	Link,
 	Text,
-	Flex,
 } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
-import { Router, useRouter } from 'next/router';
-import React, { useState } from 'react';
-import { Card, Col, Container, Row, Table } from 'react-bootstrap';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import React from 'react';
+import { Card, Col, Container, Row } from 'react-bootstrap';
+import { CustomTable } from '../../components/CustomTable';
 import { InputField } from '../../components/InputField';
 import { NavBar } from '../../components/NavBar';
 import {
-	FindCommentsByTicketDocument,
 	useCreateCommentMutation,
-	useDeleteCommentMutation,
 	useFindCommentsByTicketQuery,
 	useMeQuery,
 } from '../../generated/graphql';
+import { COMMENT_COLUMNS } from '../../utils/Columns';
 import { createUrqlClient } from '../../utils/createUrqlClient';
 import { toErrorMap } from '../../utils/toErrorMap';
-import { useGetIntId } from '../../utils/useGetIntId';
 import { useGetTicketFromUrl } from '../../utils/useGetTicketFromUrl';
-import NextLink from 'next/link';
-import { CustomTable } from '../../components/CustomTable';
-import { COMMENT_COLUMNS } from '../../utils/Columns';
 
 const ticket = ({}) => {
 	const router = useRouter();
 	const [{ data: ticketData, error, fetching }] = useGetTicketFromUrl();
 	const [{ data: meData }] = useMeQuery();
 	const [{}, createComment] = useCreateCommentMutation();
-	const [{}, deleteComment] = useDeleteCommentMutation();
 	const isTicketId = ticketData?.findTicket?.id;
-	const intId = useGetIntId();
 	const [{ data: commentData }] = useFindCommentsByTicketQuery({
 		variables: {
 			options: {

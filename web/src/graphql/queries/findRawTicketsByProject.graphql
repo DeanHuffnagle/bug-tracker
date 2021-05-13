@@ -1,0 +1,5 @@
+query FindRawTicketsByProject($projectId: Int!) {
+	findRawTicketsByProject(projectId: $projectId) {
+		...rawTicketResponseFragment
+	}
+}

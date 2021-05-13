@@ -20,10 +20,10 @@ import { NavBar } from '../../components/NavBar';
 import {
 	useCreateCommentMutation,
 	useDeleteCommentMutation,
-	useFindCommentsByTicketQuery,
+	useFindRawTicketsByProjectQuery,
 	useMeQuery,
 } from '../../generated/graphql';
-import { COMMENT_COLUMNS } from '../../utils/Columns';
+import { COMMENT_COLUMNS, TICKET_COLUMNS } from '../../utils/Columns';
 import { createUrqlClient } from '../../utils/createUrqlClient';
 import { toErrorMap } from '../../utils/toErrorMap';
 import { useGetIntId } from '../../utils/useGetIntId';
@@ -33,9 +33,15 @@ const ticket = ({}) => {
 	const router = useRouter();
 	const [{ data: projectData, fetching }] = useGetProjectFromUrl();
 	const [{ data: meData }] = useMeQuery();
-
 	const isProjectId = projectData?.findProject?.id;
-	const intId = useGetIntId();
+	const [{ data: ticketData }] = useFindRawTicketsByProjectQuery({
+		variables: { projectId: isProjectId as number },
+	});
+
+	const tableData = ticketData?.findRawTicketsByProject
+		? ticketData.findRawTicketsByProject
+		: [{}];
+	let hiddenColumns: string[] = [''];
 
 	if (fetching) {
 		return (
@@ -62,7 +68,6 @@ const ticket = ({}) => {
 								<Flex width="full">
 									<Box width="full">
 										<Heading ml={2} mt={1}>
-											{isProjectId}
 											{projectData?.findProject?.name}
 										</Heading>
 									</Box>
@@ -85,14 +90,22 @@ const ticket = ({}) => {
 									Description: {projectData?.findProject?.description}
 								</Text>
 								<Text ml={2} mb={2}>
-									Assigned Developer:{' '}
-									{projectData?.findTicket?.manager?.firstName}{' '}
-									{projectData?.findTicket?.manager?.lastName}
+									Project Manager:{' '}
+									{projectData?.findProject?.manager?.firstName}{' '}
+									{projectData?.findProject?.manager?.lastName}
 								</Text>
 							</Card>
 						</Col>
 						<Col md={12} lg={6} className="mt-1">
-							<Card>===== add table with tickets by project later =====</Card>
+							<Card>
+								<CustomTable
+									dataInput={tableData}
+									columnInput={TICKET_COLUMNS}
+									pageSizeInput={5}
+									hiddenColumnsInput={hiddenColumns}
+									sortByInput={'ticket number'}
+								/>
+							</Card>
 						</Col>
 					</Row>
 				</Container>

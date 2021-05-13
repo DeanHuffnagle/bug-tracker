@@ -33,7 +33,6 @@ const Tickets: React.FC<{}> = () => {
 
 	let tableData;
 	let hiddenColumns: string[] = [''];
-	let brand;
 
 	if (fetching) {
 		return (
@@ -49,28 +48,24 @@ const Tickets: React.FC<{}> = () => {
 			console.log('1');
 			tableData = adminTableData;
 			hiddenColumns = ['id'];
-			brand = 'Organization Tickets';
 			break;
 		case 'projectManager':
 			console.log(isUserRole);
 			console.log('2');
 			tableData = projectManagerTableData;
 			hiddenColumns = ['submitted by', 'manager'];
-			brand = 'Managed Tickets';
 			break;
 		case 'submitter':
 			console.log(isUserRole);
 			console.log('3');
 			tableData = devTableData;
 			hiddenColumns = ['assigned developer', 'submitted by', 'manager'];
-			brand = 'Assigned Tickets';
 			break;
 		case 'developer':
 			console.log(isUserRole);
 			console.log('3');
 			tableData = devTableData;
 			hiddenColumns = ['assigned developer', 'submitted by', 'manager'];
-			brand = 'Assigned Tickets';
 			break;
 	}
 	console.log(isUserRole);
@@ -79,7 +74,7 @@ const Tickets: React.FC<{}> = () => {
 
 	return (
 		<>
-			<NavBar brand={brand} />
+			<NavBar />
 			<Container>
 				<Card>
 					<CustomTable

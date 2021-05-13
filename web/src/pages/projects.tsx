@@ -36,7 +36,6 @@ const Projects: React.FC<{}> = () => {
 
 	let tableData;
 	let hiddenColumns: string[] = [''];
-	let brand;
 
 	if (fetching) {
 		return (
@@ -49,29 +48,22 @@ const Projects: React.FC<{}> = () => {
 	switch (isUserRole) {
 		case 'admin':
 			tableData = adminTableData;
-			brand = 'Organization Projects';
 			break;
 		case 'projectManager':
 			tableData = projectManagerTableData;
 			hiddenColumns = ['project manager'];
-			brand = 'Managed Projects';
 			break;
 		case 'submitter':
 			tableData = devTableData;
-			brand = 'Assigned Projects';
 			break;
 		case 'developer':
 			tableData = devTableData;
-			brand = 'Assigned Projects';
 			break;
 	}
-	console.log(isUserRole);
-	console.log(tableData);
-	console.log(' hidden columns: ', hiddenColumns);
 
 	return (
 		<>
-			<NavBar brand={brand} />
+			<NavBar />
 			<Container>
 				<Card>
 					<CustomTable

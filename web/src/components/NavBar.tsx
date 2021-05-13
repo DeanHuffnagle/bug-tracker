@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Dropdown, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { APP_NAME } from '../constants';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 
 type NavBarProps = {
@@ -34,12 +35,10 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 	return (
 		<div>
 			<Navbar bg="light" variant="light" expand="lg">
-				{brand ? (
-					<Navbar.Brand href="/">{brand}</Navbar.Brand>
-				) : (
-					<Navbar.Brand href="/">Bug-Tracker</Navbar.Brand>
-				)}
-				{children}
+				<Navbar.Brand href="/">
+					<strong>{APP_NAME}</strong>
+				</Navbar.Brand>
+
 				<div>
 					logged in as <strong>{meData?.me?.role}</strong>.
 				</div>

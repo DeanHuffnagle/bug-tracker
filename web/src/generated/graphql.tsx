@@ -364,6 +364,7 @@ export type Query = {
   findAssignedTickets?: Maybe<Array<Ticket>>;
   findRawAssignedTickets?: Maybe<Array<RawTicketResponse>>;
   findRawOrganizationTickets?: Maybe<Array<RawTicketResponse>>;
+  findRawTicketsByProject?: Maybe<Array<RawTicketResponse>>;
   findRawManagedTickets?: Maybe<Array<RawTicketResponse>>;
   findAssignedTicketsByPriority?: Maybe<Array<Ticket>>;
   findAssignedTicketsByStatus?: Maybe<Array<Ticket>>;
@@ -396,6 +397,11 @@ export type QueryFindProjectArgs = {
 
 export type QueryFindTicketArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryFindRawTicketsByProjectArgs = {
+  projectId: Scalars['Int'];
 };
 
 
@@ -939,6 +945,19 @@ export type FindRawOrganizationTicketsQuery = (
   )>> }
 );
 
+export type FindRawTicketsByProjectQueryVariables = Exact<{
+  projectId: Scalars['Int'];
+}>;
+
+
+export type FindRawTicketsByProjectQuery = (
+  { __typename?: 'Query' }
+  & { findRawTicketsByProject?: Maybe<Array<(
+    { __typename?: 'RawTicketResponse' }
+    & RawTicketResponseFragmentFragment
+  )>> }
+);
+
 export type FindTicketQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -1417,6 +1436,17 @@ export const FindRawOrganizationTicketsDocument = gql`
 
 export function useFindRawOrganizationTicketsQuery(options: Omit<Urql.UseQueryArgs<FindRawOrganizationTicketsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindRawOrganizationTicketsQuery>({ query: FindRawOrganizationTicketsDocument, ...options });
+};
+export const FindRawTicketsByProjectDocument = gql`
+    query FindRawTicketsByProject($projectId: Int!) {
+  findRawTicketsByProject(projectId: $projectId) {
+    ...rawTicketResponseFragment
+  }
+}
+    ${RawTicketResponseFragmentFragmentDoc}`;
+
+export function useFindRawTicketsByProjectQuery(options: Omit<Urql.UseQueryArgs<FindRawTicketsByProjectQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindRawTicketsByProjectQuery>({ query: FindRawTicketsByProjectDocument, ...options });
 };
 export const FindTicketDocument = gql`
     query FindTicket($id: Int!) {

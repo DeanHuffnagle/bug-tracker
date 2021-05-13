@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import { tableFormatted } from './tableFormatted';
 import { DeleteButton } from '../components/DeleteButton';
-import { tableFormattedLink } from './tableFormattedLink';
+import { tableFormattedExternalLink } from './tableFormattedExternalLink';
 
 //================================================================================
 //Ticket Table Columns
@@ -13,7 +13,7 @@ export const TICKET_COLUMNS = [
 		id: 'ticket number',
 		accessor: 'ticket_id',
 		Cell: (e) => (
-			<Link href="ticket/[id]" as={`ticket/${e.value}`}>
+			<Link href="/ticket/[id]" as={`/ticket/${e.value}`}>
 				<span id="clickable-text">{e.value}</span>
 			</Link>
 		),
@@ -70,7 +70,7 @@ export const PROJECT_COLUMNS = [
 		id: 'project id',
 		accessor: 'project_id',
 		Cell: (e) => (
-			<Link href="project/[id]" as={`project/${e.value}`}>
+			<Link href="/project/[id]" as={`/project/${e.value}`}>
 				<span id="clickable-text">{e.value}</span>
 			</Link>
 		),
@@ -92,10 +92,10 @@ export const PROJECT_COLUMNS = [
 		Cell: (props) => tableFormatted(props.value),
 	},
 	{
-		Header: 'RepositoryLink',
+		Header: 'Repository Link',
 		id: 'repository link',
 		accessor: 'project_repositoryLink',
-		Cell: (e) => tableFormattedLink(e.value),
+		Cell: (e) => tableFormattedExternalLink(e.value),
 	},
 ];
 

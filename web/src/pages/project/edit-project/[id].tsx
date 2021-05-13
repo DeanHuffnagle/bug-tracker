@@ -84,7 +84,7 @@ const editTicket = ({}) => {
 									Description: {projectData?.findProject?.description}
 								</Text>
 								<Text ml={2} mb={2}>
-									Assigned Developer:{' '}
+									Project Manager:{' '}
 									{projectData?.findProject?.manager?.firstName}{' '}
 									{projectData?.findProject?.manager?.lastName}
 								</Text>

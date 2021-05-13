@@ -1,16 +1,16 @@
 import Link from 'next/link';
 import React from 'react';
 
-export const tableFormattedLink = (cellInput: string) => {
+export const tableFormattedExternalLink = (cellInput: string) => {
 	switch (cellInput) {
 		case '':
 			return <span>-</span>;
 
 		default:
 			return (
-				<Link href={`${cellInput}`}>
+				<a target="_blank" href={`${cellInput}`} rel="noopener noreferrer">
 					<span id="clickable-text">{cellInput}</span>
-				</Link>
+				</a>
 			);
 	}
 };
