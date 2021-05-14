@@ -1,6 +1,14 @@
+import { Box } from '@chakra-ui/react';
 import React from 'react';
-import { Button, Dropdown, Nav, Navbar, NavDropdown } from 'react-bootstrap';
-import { APP_NAME } from '../constants';
+import {
+	Button,
+	Dropdown,
+	Image,
+	Nav,
+	Navbar,
+	NavDropdown,
+} from 'react-bootstrap';
+import { APP_LOGO } from '../constants';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 
 type NavBarProps = {
@@ -36,7 +44,11 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 		<div>
 			<Navbar bg="light" variant="light" expand="lg">
 				<Navbar.Brand href="/">
-					<strong>{APP_NAME}</strong>
+					<Image
+						src="http://localhost:3000/workflo.png"
+						alt="website logo"
+						width={125}
+					/>
 				</Navbar.Brand>
 
 				<div>

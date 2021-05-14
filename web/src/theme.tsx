@@ -1,5 +1,6 @@
 import { extendTheme } from '@chakra-ui/react';
 import { createBreakpoints } from '@chakra-ui/theme-tools';
+import { GOLD, GREEN, LIGHT_BLUE, NAVY, ORANGE } from './constants';
 
 const fonts = { mono: `'Menlo', monospace` };
 
@@ -13,6 +14,18 @@ const breakpoints = createBreakpoints({
 const theme = extendTheme({
 	colors: {
 		black: '#16161D',
+		navy: `${NAVY}`,
+		lightBlue: `${LIGHT_BLUE}`,
+		gold: `${GOLD}`,
+		orange: `${ORANGE}`,
+		green: `${GREEN}`,
+		brand: {
+			500: `${NAVY}`,
+			600: `${LIGHT_BLUE}`,
+			200: `${GOLD}`,
+			300: `${ORANGE}`,
+			400: `${GREEN}`,
+		},
 	},
 	fonts,
 	breakpoints,

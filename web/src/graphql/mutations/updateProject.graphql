@@ -1,0 +1,10 @@
+mutation UpdateProject($options: UpdateProjectInput!, $projectId: Int!) {
+	updateProject(options: $options, projectId: $projectId) {
+		errors {
+			...errorFragment
+		}
+		project {
+			...projectFragment
+		}
+	}
+}

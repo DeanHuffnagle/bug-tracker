@@ -11,6 +11,7 @@ import { getConnection, getRepository } from 'typeorm';
 import { Project } from '../entities/Project';
 import { User } from '../entities/User';
 import { isAdmin } from '../middleware/isAdmin';
+import { isAuth } from '../middleware/isAuth';
 import { isProjectManager } from '../middleware/isProjectManager';
 import { MyContext } from '../types';
 import {
@@ -18,6 +19,7 @@ import {
 	AssignProjectInput,
 	CreateProjectInput,
 	UnassignProjectInput,
+	UpdateProjectInput,
 } from '../utils/inputTypes';
 import { ProjectResponse, RawProjectResponse } from '../utils/objectTypes';
 
@@ -313,6 +315,66 @@ export class ProjectResolver {
 		);
 
 		const project = await Project.findOne(options.projectId);
+		return { project };
+	}
+	//================================================================================
+	//Update Project Mutation
+	//================================================================================
+	@Mutation(() => ProjectResponse)
+	@UseMiddleware(isAuth)
+	async updateProject(
+		@Arg('options') options: UpdateProjectInput,
+		@Arg('projectId', () => Int) projectId: number
+	): Promise<ProjectResponse> {
+		const isUser = await User.findOne({ where: { email: options.userEmail });
+
+		if (!options.description) {
+			return {
+				errors: [
+					{
+						field: 'projectDescription',
+						message: 'cannot be blank.',
+					},
+				],
+			};
+		}
+		if (!options.name) {
+			return {
+				errors: [
+					{
+						field: 'projectName',
+						message: 'cannot be blank.',
+					},
+				],
+			};
+		}
+		if (!isUser) {
+			await getConnection()
+				.createQueryBuilder()
+				.update(Project)
+				.set({
+					name: options.name,
+					description: options.description,
+					repositoryLink: options.repositoryLink,
+				})
+				.where('id = :id', { id: projectId })
+				.execute();
+		}
+		if (isUser) {
+			await getConnection()
+				.createQueryBuilder()
+				.update(Project)
+				.set({
+					name: options.name,
+					description: options.description,
+					repositoryLink: options.repositoryLink,
+					managerId: isUser.id,
+				})
+				.where('id = :id', { id: projectId })
+				.execute();
+		}
+
+		const project = await Project.findOne(projectId);
 		return { project };
 	}
 }

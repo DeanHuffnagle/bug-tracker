@@ -44,33 +44,22 @@ const Tickets: React.FC<{}> = () => {
 
 	switch (isUserRole) {
 		case 'admin':
-			console.log(isUserRole);
-			console.log('1');
 			tableData = adminTableData;
 			hiddenColumns = ['id'];
 			break;
 		case 'projectManager':
-			console.log(isUserRole);
-			console.log('2');
 			tableData = projectManagerTableData;
 			hiddenColumns = ['submitted by', 'manager'];
 			break;
 		case 'submitter':
-			console.log(isUserRole);
-			console.log('3');
 			tableData = devTableData;
 			hiddenColumns = ['assigned developer', 'submitted by', 'manager'];
 			break;
 		case 'developer':
-			console.log(isUserRole);
-			console.log('3');
 			tableData = devTableData;
 			hiddenColumns = ['assigned developer', 'submitted by', 'manager'];
 			break;
 	}
-	console.log(isUserRole);
-	console.log(tableData);
-	console.log(' hidden columns: ', hiddenColumns);
 
 	return (
 		<>

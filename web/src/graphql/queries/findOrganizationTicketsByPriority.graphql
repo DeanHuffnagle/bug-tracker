@@ -1,0 +1,5 @@
+query FindOrganizationTicketsByPriority($options: FindTicketsByPriorityInput!) {
+	findOrganizationTicketsByPriority(options: $options) {
+		...ticketFragment
+	}
+}

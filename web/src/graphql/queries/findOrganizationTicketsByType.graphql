@@ -1,0 +1,5 @@
+query FindOrganizationTicketsByType($options: FindTicketsByTypeInput!) {
+	findOrganizationTicketsByType(options: $options) {
+		...ticketFragment
+	}
+}

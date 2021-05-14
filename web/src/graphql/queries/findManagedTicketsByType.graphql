@@ -1,0 +1,5 @@
+query FindManagedTicketsByType($options: FindTicketsByTypeInput!) {
+	findManagedTicketsByType(options: $options) {
+		...ticketFragment
+	}
+}

@@ -1,0 +1,5 @@
+query FindManagedTicketsByPriority($options: FindTicketsByPriorityInput!) {
+	findManagedTicketsByPriority(options: $options) {
+		...ticketFragment
+	}
+}

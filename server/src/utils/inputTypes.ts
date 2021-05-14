@@ -52,6 +52,19 @@ export class CreateProjectInput {
 	description!: string;
 }
 
+//// Update Project ////
+@InputType()
+export class UpdateProjectInput {
+	@Field()
+	name!: string;
+	@Field()
+	description!: string;
+	@Field()
+	repositoryLink!: string;
+	@Field(() => String, { nullable: true })
+	userEmail: string | undefined;
+}
+
 //// Assign Project ////
 @InputType()
 export class AssignProjectInput {
@@ -67,7 +80,7 @@ export class UnassignProjectInput {
 	@Field(() => Int)
 	projectId!: number;
 	@Field(() => Int)
-	userId!: number;
+	userId: number;
 }
 
 //// Unassign Project ////
@@ -145,7 +158,7 @@ export class AssignTicketInput {
 	@Field(() => Int)
 	userId!: number;
 }
-//// Assign Ticket ////
+//// Assign Ticket Manager ////
 @InputType()
 export class AssignTicketManagerInput {
 	@Field(() => Int)
@@ -154,23 +167,23 @@ export class AssignTicketManagerInput {
 	userId!: number;
 }
 
-//// Find Assigned Tickets By Priority ////
+//// Find Tickets By Priority ////
 @InputType()
-export class FindAssignedTicketsByPriorityInput {
+export class FindTicketsByPriorityInput {
 	@Field(() => String)
 	priority: TicketPriorityType;
 }
 
-//// Find Assigned Tickets By Status ////
+//// Find Tickets By Status ////
 @InputType()
-export class FindAssignedTicketsByStatusInput {
+export class FindTicketsByStatusInput {
 	@Field(() => String)
 	status: TicketStatusType;
 }
 
-//// Find Assigned Tickets By Type ////
+//// Find Tickets By Type ////
 @InputType()
-export class FindAssignedTicketsByTypeInput {
+export class FindTicketsByTypeInput {
 	@Field(() => String)
 	type: TicketTypeType;
 }

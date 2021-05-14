@@ -1,5 +1,6 @@
 import React, { PureComponent, useState } from 'react';
 import { PieChart, Pie, Sector, ResponsiveContainer, Cell } from 'recharts';
+import { GOLD, GREEN, LIGHT_BLUE, ORANGE } from '../constants';
 import {
 	useFindAssignedTicketsByTypeQuery,
 	useMeQuery,
@@ -111,7 +112,7 @@ export default function DevTypePieChart() {
 			},
 		}
 	);
-	const ticketTypeColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+	const ticketTypeColors = [GREEN, LIGHT_BLUE, ORANGE, GOLD];
 	const ticketTypeData = [
 		{
 			name: 'Bug/Errors',

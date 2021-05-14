@@ -1,0 +1,5 @@
+query FindManagedTicketsByStatus($options: FindTicketsByStatusInput!) {
+	findManagedTicketsByStatus(options: $options) {
+		...ticketFragment
+	}
+}

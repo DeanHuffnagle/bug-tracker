@@ -41,6 +41,18 @@ const ticket = ({}) => {
 	const tableData = ticketData?.findRawTicketsByProject
 		? ticketData.findRawTicketsByProject
 		: [{}];
+
+	const link = projectData?.findProject?.repositoryLink ? (
+		<a
+			target="_blank"
+			href={`${projectData?.findProject?.repositoryLink}`}
+			rel="noopener noreferrer"
+		>
+			{projectData?.findProject?.repositoryLink}
+		</a>
+	) : (
+		'no repository'
+	);
 	let hiddenColumns: string[] = [''];
 
 	if (fetching) {
@@ -87,10 +99,15 @@ const ticket = ({}) => {
 									</Box>
 								</Flex>
 								<Text ml={2} my={2}>
-									Description: {projectData?.findProject?.description}
+									<strong>Description: </strong>
+									{projectData?.findProject?.description}
 								</Text>
 								<Text ml={2} mb={2}>
-									Project Manager:{' '}
+									<strong>Repository: </strong> {link}
+								</Text>
+
+								<Text ml={2} mb={2}>
+									<strong>Project Manager: </strong>{' '}
 									{projectData?.findProject?.manager?.firstName}{' '}
 									{projectData?.findProject?.manager?.lastName}
 								</Text>

@@ -1,4 +1,4 @@
-query FindAssignedTicketsByType($options: FindAssignedTicketsByTypeInput!) {
+query FindAssignedTicketsByType($options: FindTicketsByTypeInput!) {
 	findAssignedTicketsByType(options: $options) {
 		...ticketFragment
 	}

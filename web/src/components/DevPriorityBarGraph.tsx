@@ -10,6 +10,7 @@ import {
 	Cell,
 	Tooltip,
 } from 'recharts';
+import { GOLD, GREEN, ORANGE } from '../constants';
 import {
 	useFindAssignedTicketsByPriorityQuery,
 	useFindAssignedTicketsQuery,
@@ -40,7 +41,7 @@ export default function DevPriorityBarGraph() {
 		},
 	});
 
-	const ticketPriorityColors = ['#264653', '#2a9d8f', '#e76f51'];
+	const ticketPriorityColors = [GREEN, GOLD, ORANGE];
 	const ticketPriorityData = [
 		{
 			name: 'Low',

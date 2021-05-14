@@ -53,7 +53,6 @@ const editTicket = ({}) => {
 			</>
 		);
 	} else {
-		console.log(ticketData?.findTicket?.assignedDeveloper?.lastName);
 		return (
 			<>
 				<NavBar />

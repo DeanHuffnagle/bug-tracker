@@ -25,6 +25,9 @@ import {
 	FindAssignedTicketsByPriorityInput,
 	FindAssignedTicketsByStatusInput,
 	FindAssignedTicketsByTypeInput,
+	FindTicketsByPriorityInput,
+	FindTicketsByStatusInput,
+	FindTicketsByTypeInput,
 	UpdateTicketInput,
 } from '../utils/inputTypes';
 import { RawTicketResponse, TicketResponse } from '../utils/objectTypes';
@@ -318,8 +321,6 @@ export class TicketResolver {
 			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
 			.where('ticket.assignedDeveloperId = :id', { id: isUser?.id })
 			.getMany();
-
-		console.log('data: ', JSON.stringify(assignedTickets));
 		return assignedTickets;
 	}
 	//================================================================================
@@ -354,7 +355,6 @@ export class TicketResolver {
 			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
 			.where('ticket.organizationId = :id', { id: isUser?.organizationId })
 			.getRawMany();
-		console.log('data: ', organizationTickets);
 		return organizationTickets;
 	}
 	//================================================================================
@@ -371,7 +371,6 @@ export class TicketResolver {
 			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
 			.where('ticket.projectId = :id', { id: projectId })
 			.getRawMany();
-		console.log('data: ', projectTickets);
 		return projectTickets;
 	}
 	//================================================================================
@@ -395,8 +394,6 @@ export class TicketResolver {
 			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
 			.where('ticket.managerId = :id', { id: isUser?.id })
 			.getRawMany();
-
-		console.log('data: ', managedTickets);
 		return managedTickets;
 	}
 	//================================================================================
@@ -404,7 +401,7 @@ export class TicketResolver {
 	//================================================================================
 	@Query(() => [Ticket], { nullable: true })
 	async findAssignedTicketsByPriority(
-		@Arg('options') options: FindAssignedTicketsByPriorityInput,
+		@Arg('options') options: FindTicketsByPriorityInput,
 		@Ctx() { req }: MyContext
 	): Promise<Ticket[]> {
 		const isUser = await User.findOne(req.session.UserId);
@@ -417,11 +414,45 @@ export class TicketResolver {
 		return ticketsByPriority;
 	}
 	//================================================================================
+	//Find Managed Tickets By Priority Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findManagedTicketsByPriority(
+		@Arg('options') options: FindTicketsByPriorityInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByPriority = await getRepository(Ticket)
+			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
+			.where('ticket.priority = :priority', { priority: options.priority })
+			.andWhere('ticket.managerId = :id', { id: isUser?.id })
+			.getMany();
+		return ticketsByPriority;
+	}
+	//================================================================================
+	//Find Organization Tickets By Priority Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findOrganizationTicketsByPriority(
+		@Arg('options') options: FindTicketsByPriorityInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByPriority = await getRepository(Ticket)
+			.createQueryBuilder('ticket')
+			.leftJoinAndSelect('ticket.assignedDeveloper', 'assignedDeveloper')
+			.where('ticket.priority = :priority', { priority: options.priority })
+			.andWhere('ticket.organizationId = :id', { id: isUser?.organizationId })
+			.getMany();
+		return ticketsByPriority;
+	}
+	//================================================================================
 	//Find Assigned Tickets By Status Query
 	//================================================================================
 	@Query(() => [Ticket], { nullable: true })
 	async findAssignedTicketsByStatus(
-		@Arg('options') options: FindAssignedTicketsByStatusInput,
+		@Arg('options') options: FindTicketsByStatusInput,
 		@Ctx() { req }: MyContext
 	): Promise<Ticket[]> {
 		const isUser = await User.findOne(req.session.UserId);
@@ -435,11 +466,47 @@ export class TicketResolver {
 		return ticketsByStatus;
 	}
 	//================================================================================
+	//Find Managed Tickets By Status Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findManagedTicketsByStatus(
+		@Arg('options') options: FindTicketsByStatusInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByStatus = await getConnection()
+			.createQueryBuilder()
+			.select('ticket')
+			.from(Ticket, 'ticket')
+			.where('ticket.status = :status', { status: options.status })
+			.andWhere('ticket.managerId = :id', { id: isUser?.id })
+			.getMany();
+		return ticketsByStatus;
+	}
+	//================================================================================
+	//Find Organization Tickets By Status Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findOrganizationTicketsByStatus(
+		@Arg('options') options: FindTicketsByStatusInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByStatus = await getConnection()
+			.createQueryBuilder()
+			.select('ticket')
+			.from(Ticket, 'ticket')
+			.where('ticket.status = :status', { status: options.status })
+			.andWhere('ticket.organizationId = :id', { id: isUser?.organizationId })
+			.getMany();
+		return ticketsByStatus;
+	}
+	//================================================================================
 	//Find Assigned Tickets By Type Query
 	//================================================================================
 	@Query(() => [Ticket], { nullable: true })
 	async findAssignedTicketsByType(
-		@Arg('options') options: FindAssignedTicketsByTypeInput,
+		@Arg('options') options: FindTicketsByTypeInput,
 		@Ctx() { req }: MyContext
 	): Promise<Ticket[]> {
 		const isUser = await User.findOne(req.session.UserId);
@@ -449,6 +516,42 @@ export class TicketResolver {
 			.from(Ticket, 'ticket')
 			.where('ticket.type = :type', { type: options.type })
 			.andWhere('ticket.assignedDeveloperId = :id', { id: isUser?.id })
+			.getMany();
+		return ticketsByType;
+	}
+	//================================================================================
+	//Find Managed Tickets By Type Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findManagedTicketsByType(
+		@Arg('options') options: FindTicketsByTypeInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByType = await getConnection()
+			.createQueryBuilder()
+			.select('ticket')
+			.from(Ticket, 'ticket')
+			.where('ticket.type = :type', { type: options.type })
+			.andWhere('ticket.managerId = :id', { id: isUser?.organizationId })
+			.getMany();
+		return ticketsByType;
+	}
+	//================================================================================
+	//Find Organization Tickets By Type Query
+	//================================================================================
+	@Query(() => [Ticket], { nullable: true })
+	async findOrganizationTicketsByType(
+		@Arg('options') options: FindTicketsByTypeInput,
+		@Ctx() { req }: MyContext
+	): Promise<Ticket[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const ticketsByType = await getConnection()
+			.createQueryBuilder()
+			.select('ticket')
+			.from(Ticket, 'ticket')
+			.where('ticket.type = :type', { type: options.type })
+			.andWhere('ticket.organizationId = :id', { id: isUser?.organizationId })
 			.getMany();
 		return ticketsByType;
 	}

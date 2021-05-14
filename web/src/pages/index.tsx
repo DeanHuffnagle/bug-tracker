@@ -38,14 +38,7 @@ const Index = () => {
 				<Container>
 					<Row>
 						<Col className="mt-1">
-							<Card
-								className="chart-card"
-								style={{
-									width: '100%',
-									height: '100%',
-									background: 'rgb(225, 225, 225)',
-								}}
-							>
+							<Card id="chart-card">
 								<div className="text-center" id="dashboard-card-titles">
 									Stats and Stuff
 								</div>
@@ -57,11 +50,7 @@ const Index = () => {
 						</Col>
 
 						<Col className="mt-1">
-							<Card
-								style={{
-									background: 'rgb(225, 225, 225)',
-								}}
-							>
+							<Card id="chart-card">
 								<div className="text-center" id="dashboard-card-titles">
 									Tickets by Type
 								</div>
@@ -72,11 +61,7 @@ const Index = () => {
 
 					<Row>
 						<Col className="mt-1">
-							<Card
-								style={{
-									background: 'rgb(225, 225, 225)',
-								}}
-							>
+							<Card id="chart-card">
 								<div className="text-center" id="dashboard-card-titles">
 									Tickets by Priority
 								</div>
@@ -85,11 +70,7 @@ const Index = () => {
 						</Col>
 
 						<Col className="mt-1">
-							<Card
-								style={{
-									background: 'rgb(225, 225, 225)',
-								}}
-							>
+							<Card id="chart-card">
 								<div className="text-center" id="dashboard-card-titles">
 									Tickets by Status
 								</div>

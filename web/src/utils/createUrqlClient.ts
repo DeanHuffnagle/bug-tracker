@@ -22,13 +22,24 @@ export const createUrqlClient = (ssrExchange: any) => {
 				keys: {
 					RawCommentResponse: () => null,
 					RawTicketResponse: () => null,
+					RawProjectResponse: () => null,
 				},
 				updates: {
 					Mutation: {
-						updateTicket: (result, args, cache, info) => {
-							cache.invalidate('Query', 'findTicket', {
-								id: 4,
+						updateProject: (result, args, cache, info) => {
+							// console.log(cache.inspectFields('Query'));
+							cache.invalidate('Query', 'findProject', {
+								id: args.projectId,
 							});
+							// console.log(cache.inspectFields('Query'));
+						},
+
+						updateTicket: (result, args, cache, info) => {
+							// console.log(cache.inspectFields('Query'));
+							cache.invalidate('Query', 'findTicket', {
+								id: args.ticketId,
+							});
+							// console.log(cache.inspectFields('Query'));
 						},
 
 						createComment: (result, _args, cache) => {
@@ -38,6 +49,7 @@ export const createUrqlClient = (ssrExchange: any) => {
 								},
 							});
 						},
+
 						deleteComment: (result, _args, cache) => {
 							if (result.deleteComment !== -1) {
 								cache.invalidate('Query', 'findCommentsByTicket', {

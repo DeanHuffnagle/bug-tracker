@@ -9,6 +9,7 @@ import {
 	XAxis,
 	YAxis,
 } from 'recharts';
+import { GOLD, GREEN, LIGHT_BLUE, ORANGE } from '../constants';
 import { useFindAssignedTicketsByStatusQuery } from '../generated/graphql';
 
 export default function DevStatusBarGraph() {
@@ -28,15 +29,14 @@ export default function DevStatusBarGraph() {
 		},
 	});
 
-	const [
-		{ data: awaitingConfirmationData },
-	] = useFindAssignedTicketsByStatusQuery({
-		variables: {
-			options: {
-				status: 'awaitingConfirmation',
+	const [{ data: awaitingConfirmationData }] =
+		useFindAssignedTicketsByStatusQuery({
+			variables: {
+				options: {
+					status: 'awaitingConfirmation',
+				},
 			},
-		},
-	});
+		});
 
 	const [{ data: resolvedData }] = useFindAssignedTicketsByStatusQuery({
 		variables: {
@@ -46,7 +46,7 @@ export default function DevStatusBarGraph() {
 		},
 	});
 
-	const ticketStatusColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+	const ticketStatusColors = [GOLD, LIGHT_BLUE, ORANGE, GREEN];
 	const ticketStatusData = [
 		{
 			name: 'Unassigned',

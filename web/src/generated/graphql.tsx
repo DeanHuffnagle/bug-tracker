@@ -102,24 +102,24 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
-export type FindAssignedTicketsByPriorityInput = {
-  priority: Scalars['String'];
-};
-
-export type FindAssignedTicketsByStatusInput = {
-  status: Scalars['String'];
-};
-
-export type FindAssignedTicketsByTypeInput = {
-  type: Scalars['String'];
-};
-
 export type FindCommentInput = {
   commentId: Scalars['Int'];
 };
 
 export type FindCommentsByTicketInput = {
   ticketId: Scalars['Int'];
+};
+
+export type FindTicketsByPriorityInput = {
+  priority: Scalars['String'];
+};
+
+export type FindTicketsByStatusInput = {
+  status: Scalars['String'];
+};
+
+export type FindTicketsByTypeInput = {
+  type: Scalars['String'];
 };
 
 export type FindUsersByOrganizationInput = {
@@ -156,6 +156,7 @@ export type Mutation = {
   assignProjectManager: ProjectResponse;
   unassignProjectManager: ProjectResponse;
   addRepositoryLink: ProjectResponse;
+  updateProject: ProjectResponse;
   createTicket: TicketResponse;
   assignTicket: TicketResponse;
   assignTicketManager: TicketResponse;
@@ -228,6 +229,12 @@ export type MutationUnassignProjectManagerArgs = {
 
 export type MutationAddRepositoryLinkArgs = {
   options: AddRepositoryLinkInput;
+};
+
+
+export type MutationUpdateProjectArgs = {
+  projectId: Scalars['Int'];
+  options: UpdateProjectInput;
 };
 
 
@@ -367,8 +374,14 @@ export type Query = {
   findRawTicketsByProject?: Maybe<Array<RawTicketResponse>>;
   findRawManagedTickets?: Maybe<Array<RawTicketResponse>>;
   findAssignedTicketsByPriority?: Maybe<Array<Ticket>>;
+  findManagedTicketsByPriority?: Maybe<Array<Ticket>>;
+  findOrganizationTicketsByPriority?: Maybe<Array<Ticket>>;
   findAssignedTicketsByStatus?: Maybe<Array<Ticket>>;
+  findManagedTicketsByStatus?: Maybe<Array<Ticket>>;
+  findOrganizationTicketsByStatus?: Maybe<Array<Ticket>>;
   findAssignedTicketsByType?: Maybe<Array<Ticket>>;
+  findManagedTicketsByType?: Maybe<Array<Ticket>>;
+  findOrganizationTicketsByType?: Maybe<Array<Ticket>>;
   me?: Maybe<User>;
   findUsersByOrganization?: Maybe<Array<User>>;
   findUsersByProject?: Maybe<Array<User>>;
@@ -406,17 +419,47 @@ export type QueryFindRawTicketsByProjectArgs = {
 
 
 export type QueryFindAssignedTicketsByPriorityArgs = {
-  options: FindAssignedTicketsByPriorityInput;
+  options: FindTicketsByPriorityInput;
+};
+
+
+export type QueryFindManagedTicketsByPriorityArgs = {
+  options: FindTicketsByPriorityInput;
+};
+
+
+export type QueryFindOrganizationTicketsByPriorityArgs = {
+  options: FindTicketsByPriorityInput;
 };
 
 
 export type QueryFindAssignedTicketsByStatusArgs = {
-  options: FindAssignedTicketsByStatusInput;
+  options: FindTicketsByStatusInput;
+};
+
+
+export type QueryFindManagedTicketsByStatusArgs = {
+  options: FindTicketsByStatusInput;
+};
+
+
+export type QueryFindOrganizationTicketsByStatusArgs = {
+  options: FindTicketsByStatusInput;
 };
 
 
 export type QueryFindAssignedTicketsByTypeArgs = {
-  options: FindAssignedTicketsByTypeInput;
+  options: FindTicketsByTypeInput;
+};
+
+
+export type QueryFindManagedTicketsByTypeArgs = {
+  options: FindTicketsByTypeInput;
+};
+
+
+export type QueryFindOrganizationTicketsByTypeArgs = {
+  options: FindTicketsByTypeInput;
 };
 
 
@@ -534,6 +577,13 @@ export type TicketResponse = {
 export type UnassignProjectInput = {
   projectId: Scalars['Int'];
   userId: Scalars['Int'];
+};
+
+export type UpdateProjectInput = {
+  name: Scalars['String'];
+  description: Scalars['String'];
+  repositoryLink: Scalars['String'];
+  userEmail?: Maybe<Scalars['String']>;
 };
 
 export type UpdateTicketInput = {
@@ -775,6 +825,26 @@ export type RegisterMutation = (
   ) }
 );
 
+export type UpdateProjectMutationVariables = Exact<{
+  options: UpdateProjectInput;
+  projectId: Scalars['Int'];
+}>;
+
+
+export type UpdateProjectMutation = (
+  { __typename?: 'Mutation' }
+  & { updateProject: (
+    { __typename?: 'ProjectResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, project?: Maybe<(
+      { __typename?: 'Project' }
+      & ProjectFragmentFragment
+    )> }
+  ) }
+);
+
 export type UpdateTicketMutationVariables = Exact<{
   options: UpdateTicketInput;
   ticketId: Scalars['Int'];
@@ -811,7 +881,7 @@ export type FindAssignedTicketsQuery = (
 );
 
 export type FindAssignedTicketsByPriorityQueryVariables = Exact<{
-  options: FindAssignedTicketsByPriorityInput;
+  options: FindTicketsByPriorityInput;
 }>;
 
 
@@ -824,7 +894,7 @@ export type FindAssignedTicketsByPriorityQuery = (
 );
 
 export type FindAssignedTicketsByStatusQueryVariables = Exact<{
-  options: FindAssignedTicketsByStatusInput;
+  options: FindTicketsByStatusInput;
 }>;
 
 
@@ -837,7 +907,7 @@ export type FindAssignedTicketsByStatusQuery = (
 );
 
 export type FindAssignedTicketsByTypeQueryVariables = Exact<{
-  options: FindAssignedTicketsByTypeInput;
+  options: FindTicketsByTypeInput;
 }>;
 
 
@@ -860,6 +930,84 @@ export type FindCommentsByTicketQuery = (
     { __typename?: 'RawCommentResponse' }
     & RawCommentFragmentFragment
   )> }
+);
+
+export type FindManagedTicketsByPriorityQueryVariables = Exact<{
+  options: FindTicketsByPriorityInput;
+}>;
+
+
+export type FindManagedTicketsByPriorityQuery = (
+  { __typename?: 'Query' }
+  & { findManagedTicketsByPriority?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & TicketFragmentFragment
+  )>> }
+);
+
+export type FindManagedTicketsByStatusQueryVariables = Exact<{
+  options: FindTicketsByStatusInput;
+}>;
+
+
+export type FindManagedTicketsByStatusQuery = (
+  { __typename?: 'Query' }
+  & { findManagedTicketsByStatus?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & TicketFragmentFragment
+  )>> }
+);
+
+export type FindManagedTicketsByTypeQueryVariables = Exact<{
+  options: FindTicketsByTypeInput;
+}>;
+
+
+export type FindManagedTicketsByTypeQuery = (
+  { __typename?: 'Query' }
+  & { findManagedTicketsByType?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & TicketFragmentFragment
+  )>> }
+);
+
+export type FindOrganizationTicketsByPriorityQueryVariables = Exact<{
+  options: FindTicketsByPriorityInput;
+}>;
+
+
+export type FindOrganizationTicketsByPriorityQuery = (
+  { __typename?: 'Query' }
+  & { findOrganizationTicketsByPriority?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & TicketFragmentFragment
+  )>> }
+);
+
+export type FindOrganizationTicketsByStatusQueryVariables = Exact<{
+  options: FindTicketsByStatusInput;
+}>;
+
+
+export type FindOrganizationTicketsByStatusQuery = (
+  { __typename?: 'Query' }
+  & { findOrganizationTicketsByStatus?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & TicketFragmentFragment
+  )>> }
+);
+
+export type FindOrganizationTicketsByTypeQueryVariables = Exact<{
+  options: FindTicketsByTypeInput;
+}>;
+
+
+export type FindOrganizationTicketsByTypeQuery = (
+  { __typename?: 'Query' }
+  & { findOrganizationTicketsByType?: Maybe<Array<(
+    { __typename?: 'Ticket' }
+    & TicketFragmentFragment
+  )>> }
 );
 
 export type FindProjectQueryVariables = Exact<{
@@ -1280,6 +1428,23 @@ ${UserFragmentFragmentDoc}`;
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
+export const UpdateProjectDocument = gql`
+    mutation UpdateProject($options: UpdateProjectInput!, $projectId: Int!) {
+  updateProject(options: $options, projectId: $projectId) {
+    errors {
+      ...errorFragment
+    }
+    project {
+      ...projectFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${ProjectFragmentFragmentDoc}`;
+
+export function useUpdateProjectMutation() {
+  return Urql.useMutation<UpdateProjectMutation, UpdateProjectMutationVariables>(UpdateProjectDocument);
+};
 export const UpdateTicketDocument = gql`
     mutation UpdateTicket($options: UpdateTicketInput!, $ticketId: Int!) {
   updateTicket(options: $options, ticketId: $ticketId) {
@@ -1313,7 +1478,7 @@ export function useFindAssignedTicketsQuery(options: Omit<Urql.UseQueryArgs<Find
   return Urql.useQuery<FindAssignedTicketsQuery>({ query: FindAssignedTicketsDocument, ...options });
 };
 export const FindAssignedTicketsByPriorityDocument = gql`
-    query FindAssignedTicketsByPriority($options: FindAssignedTicketsByPriorityInput!) {
+    query FindAssignedTicketsByPriority($options: FindTicketsByPriorityInput!) {
   findAssignedTicketsByPriority(options: $options) {
     ...ticketFragment
   }
@@ -1324,7 +1489,7 @@ export function useFindAssignedTicketsByPriorityQuery(options: Omit<Urql.UseQuer
   return Urql.useQuery<FindAssignedTicketsByPriorityQuery>({ query: FindAssignedTicketsByPriorityDocument, ...options });
 };
 export const FindAssignedTicketsByStatusDocument = gql`
-    query FindAssignedTicketsByStatus($options: FindAssignedTicketsByStatusInput!) {
+    query FindAssignedTicketsByStatus($options: FindTicketsByStatusInput!) {
   findAssignedTicketsByStatus(options: $options) {
     ...ticketFragment
   }
@@ -1335,7 +1500,7 @@ export function useFindAssignedTicketsByStatusQuery(options: Omit<Urql.UseQueryA
   return Urql.useQuery<FindAssignedTicketsByStatusQuery>({ query: FindAssignedTicketsByStatusDocument, ...options });
 };
 export const FindAssignedTicketsByTypeDocument = gql`
-    query FindAssignedTicketsByType($options: FindAssignedTicketsByTypeInput!) {
+    query FindAssignedTicketsByType($options: FindTicketsByTypeInput!) {
   findAssignedTicketsByType(options: $options) {
     ...ticketFragment
   }
@@ -1355,6 +1520,72 @@ export const FindCommentsByTicketDocument = gql`
 
 export function useFindCommentsByTicketQuery(options: Omit<Urql.UseQueryArgs<FindCommentsByTicketQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindCommentsByTicketQuery>({ query: FindCommentsByTicketDocument, ...options });
+};
+export const FindManagedTicketsByPriorityDocument = gql`
+    query FindManagedTicketsByPriority($options: FindTicketsByPriorityInput!) {
+  findManagedTicketsByPriority(options: $options) {
+    ...ticketFragment
+  }
+}
+    ${TicketFragmentFragmentDoc}`;
+
+export function useFindManagedTicketsByPriorityQuery(options: Omit<Urql.UseQueryArgs<FindManagedTicketsByPriorityQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindManagedTicketsByPriorityQuery>({ query: FindManagedTicketsByPriorityDocument, ...options });
+};
+export const FindManagedTicketsByStatusDocument = gql`
+    query FindManagedTicketsByStatus($options: FindTicketsByStatusInput!) {
+  findManagedTicketsByStatus(options: $options) {
+    ...ticketFragment
+  }
+}
+    ${TicketFragmentFragmentDoc}`;
+
+export function useFindManagedTicketsByStatusQuery(options: Omit<Urql.UseQueryArgs<FindManagedTicketsByStatusQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindManagedTicketsByStatusQuery>({ query: FindManagedTicketsByStatusDocument, ...options });
+};
+export const FindManagedTicketsByTypeDocument = gql`
+    query FindManagedTicketsByType($options: FindTicketsByTypeInput!) {
+  findManagedTicketsByType(options: $options) {
+    ...ticketFragment
+  }
+}
+    ${TicketFragmentFragmentDoc}`;
+
+export function useFindManagedTicketsByTypeQuery(options: Omit<Urql.UseQueryArgs<FindManagedTicketsByTypeQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindManagedTicketsByTypeQuery>({ query: FindManagedTicketsByTypeDocument, ...options });
+};
+export const FindOrganizationTicketsByPriorityDocument = gql`
+    query FindOrganizationTicketsByPriority($options: FindTicketsByPriorityInput!) {
+  findOrganizationTicketsByPriority(options: $options) {
+    ...ticketFragment
+  }
+}
+    ${TicketFragmentFragmentDoc}`;
+
+export function useFindOrganizationTicketsByPriorityQuery(options: Omit<Urql.UseQueryArgs<FindOrganizationTicketsByPriorityQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindOrganizationTicketsByPriorityQuery>({ query: FindOrganizationTicketsByPriorityDocument, ...options });
+};
+export const FindOrganizationTicketsByStatusDocument = gql`
+    query FindOrganizationTicketsByStatus($options: FindTicketsByStatusInput!) {
+  findOrganizationTicketsByStatus(options: $options) {
+    ...ticketFragment
+  }
+}
+    ${TicketFragmentFragmentDoc}`;
+
+export function useFindOrganizationTicketsByStatusQuery(options: Omit<Urql.UseQueryArgs<FindOrganizationTicketsByStatusQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindOrganizationTicketsByStatusQuery>({ query: FindOrganizationTicketsByStatusDocument, ...options });
+};
+export const FindOrganizationTicketsByTypeDocument = gql`
+    query FindOrganizationTicketsByType($options: FindTicketsByTypeInput!) {
+  findOrganizationTicketsByType(options: $options) {
+    ...ticketFragment
+  }
+}
+    ${TicketFragmentFragmentDoc}`;
+
+export function useFindOrganizationTicketsByTypeQuery(options: Omit<Urql.UseQueryArgs<FindOrganizationTicketsByTypeQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindOrganizationTicketsByTypeQuery>({ query: FindOrganizationTicketsByTypeDocument, ...options });
 };
 export const FindProjectDocument = gql`
     query FindProject($id: Int!) {

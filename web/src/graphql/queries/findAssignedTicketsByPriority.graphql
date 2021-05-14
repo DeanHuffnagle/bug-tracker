@@ -1,6 +1,4 @@
-query FindAssignedTicketsByPriority(
-	$options: FindAssignedTicketsByPriorityInput!
-) {
+query FindAssignedTicketsByPriority($options: FindTicketsByPriorityInput!) {
 	findAssignedTicketsByPriority(options: $options) {
 		...ticketFragment
 	}

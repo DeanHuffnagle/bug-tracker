@@ -18,7 +18,9 @@ import { InputField } from '../../../components/InputField';
 import { NavBar } from '../../../components/NavBar';
 import { SelectField } from '../../../components/SelectField';
 import {
+	useFindUsersByOrganizationQuery,
 	useFindUsersByProjectQuery,
+	useUpdateProjectMutation,
 	useUpdateTicketMutation,
 } from '../../../generated/graphql';
 import { createUrqlClient } from '../../../utils/createUrqlClient';
@@ -30,11 +32,23 @@ const editTicket = ({}) => {
 	const router = useRouter();
 	const [{ data: projectData, fetching }] = useGetProjectFromUrl();
 	const isProjectId = projectData?.findProject?.id;
+	const isOrganizationId = projectData?.findProject?.organizationId;
 	const intId = useGetIntId();
-	const [, updateTicket] = useUpdateTicketMutation();
-	const [{ data }] = useFindUsersByProjectQuery({
-		variables: { options: { projectId: isProjectId as number } },
+	const [, updateProject] = useUpdateProjectMutation();
+	const [{ data }] = useFindUsersByOrganizationQuery({
+		variables: { options: { organizationId: isOrganizationId as number } },
 	});
+	const link = projectData?.findProject?.repositoryLink ? (
+		<a
+			target="_blank"
+			href={`${projectData?.findProject?.repositoryLink}`}
+			rel="noopener noreferrer"
+		>
+			{projectData?.findProject?.repositoryLink}
+		</a>
+	) : (
+		'no repository'
+	);
 
 	if (fetching) {
 		return (
@@ -81,38 +95,48 @@ const editTicket = ({}) => {
 									</Box>
 								</Flex>
 								<Text ml={2} my={2}>
-									Description: {projectData?.findProject?.description}
+									<strong>Description: </strong>{' '}
+									{projectData?.findProject?.description}
 								</Text>
 								<Text ml={2} mb={2}>
-									Project Manager:{' '}
+									<strong>Repository: </strong>
+									{link}
+								</Text>
+								<Text ml={2} mb={2}>
+									<strong>Project Manager: </strong>{' '}
 									{projectData?.findProject?.manager?.firstName}{' '}
 									{projectData?.findProject?.manager?.lastName}
 								</Text>
-								===== add more project info later =====
 							</Card>
 						</Col>
 						<Col md={12} lg={6} className="mt-1">
 							<Card className="m-auto">
-								===== add edit form later =====
-								{/* <Formik
+								<Formik
 									initialValues={{
-										projectName: projectData?.findProject?.name
+										name: projectData?.findProject?.name
 											? projectData.findProject.name
 											: '',
-										projectDescription: projectData?.findProject?.description
+										description: projectData?.findProject?.description
 											? projectData.findProject.description
+											: '',
+										repositoryLink: projectData?.findProject?.repositoryLink
+											? projectData.findProject.repositoryLink
+											: '',
+										userEmail: projectData?.findProject?.manager?.email
+											? projectData.findProject.manager.email
 											: '',
 									}}
 									onSubmit={async (values, { setErrors }) => {
-										const response = await updateTicket({
-											ticketId: isTicketId,
+										const response = await updateProject({
+											projectId: isProjectId,
 											options: values,
 										});
-										if (response.data?.updateTicket.errors) {
+										if (response.data?.updateProject.errors) {
 											setErrors(
-												toErrorMap(response?.data?.updateTicket.errors)
+												toErrorMap(response?.data?.updateProject.errors)
 											);
 										} else {
+											console.log('values: ', values);
 											// router.push(`/ticket/${isTicketId}`);
 										}
 									}}
@@ -121,67 +145,46 @@ const editTicket = ({}) => {
 										<Form>
 											<Box mt={1}>
 												<InputField
-													name="projectName"
+													name="name"
 													placeholder="name"
-													label="name:"
+													label="Name:"
 												/>
 											</Box>
 											<Box mt={1}>
 												<InputField
 													textarea
-													name="projectDescription"
-													placeholder="text"
-													label="Text:"
+													name="description"
+													placeholder="description"
+													label="Description:"
+												/>
+											</Box>
+											<Box mt={1}>
+												<InputField
+													name="repositoryLink"
+													placeholder="repository link"
+													label="Repository link:"
 												/>
 											</Box>
 											<Flex>
 												<Box mt={1} width="full">
-													<SelectField label="manager:" name="userEmail">
-														{data?.findUsersByProject?.map((u) =>
+													<SelectField
+														label="Project manager:"
+														name="userEmail"
+													>
+														{data?.findUsersByOrganization?.map((u) =>
 															!u ? null : (
-																<option key={u.id} value={u.id}>
+																<option key={u.id} value={u.email}>
 																	{u.firstName} {u.lastName}
 																</option>
 															)
 														)}
 													</SelectField>
 												</Box>
-												<Box mt={1} width="full">
-													<SelectField label="Priority:" name="ticketPriority">
-														<option value="low">Low</option>
-														<option value="medium">Medium</option>
-														<option value="high">High</option>
-													</SelectField>
-												</Box>
-											</Flex>
-											<Flex>
-												<Box mt={1} width="full">
-													<SelectField label="Status:" name="ticketStatus">
-														<option value="unassigned">Unassigned</option>
-														<option value="inProgress">In Progress</option>
-														<option value="awaitingConfirmation">
-															Awaiting Confirmation
-														</option>
-														<option value="resolved">Resolved</option>
-													</SelectField>
-												</Box>
-												<Box mt={1} width="full">
-													<SelectField label="Type:" name="ticketType">
-														<option value="bugOrError">Bug/Error</option>
-														<option value="featureRequest">
-															Feature Request
-														</option>
-														<option value="trainingRequest">
-															Training Request
-														</option>
-														<option value="other">Other</option>
-													</SelectField>
-												</Box>
 											</Flex>
 
 											<Button
 												width="full"
-												colorScheme="teal"
+												colorScheme="brand"
 												mt={5}
 												type="submit"
 												isLoading={isSubmitting}
@@ -190,7 +193,7 @@ const editTicket = ({}) => {
 											</Button>
 										</Form>
 									)}
-								</Formik> */}
+								</Formik>
 							</Card>
 						</Col>
 					</Row>
