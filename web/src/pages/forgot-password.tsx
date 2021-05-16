@@ -22,8 +22,8 @@ const ForgotPassword: React.FC<{}> = ({}) => {
 			bg="black"
 			alignItems="center"
 			style={{
-				backgroundImage: `url("http://localhost:3000/background.png")`,
-				backgroundSize: '100%',
+				backgroundImage: `url("http://localhost:3000/workflo_background.png")`,
+				backgroundSize: 2450,
 			}}
 		>
 			<Box ml="auto" mr="auto" bg="white" borderRadius={8}>
@@ -64,7 +64,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
 
 											<Button
 												width="full"
-												colorScheme="teal"
+												colorScheme="brand"
 												mt={10}
 												type="submit"
 												isLoading={isSubmitting}

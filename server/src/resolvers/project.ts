@@ -326,7 +326,7 @@ export class ProjectResolver {
 		@Arg('options') options: UpdateProjectInput,
 		@Arg('projectId', () => Int) projectId: number
 	): Promise<ProjectResponse> {
-		const isUser = await User.findOne({ where: { email: options.userEmail });
+		const isUser = await User.findOne({ where: { email: options.userEmail } });
 
 		if (!options.description) {
 			return {

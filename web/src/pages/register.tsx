@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import NextLink from 'next/link';
+import { NAVY } from '../constants';
 
 interface registerProps {}
 
@@ -21,8 +22,8 @@ const Register: React.FC<registerProps> = ({}) => {
 			alignItems="center"
 			bg="black"
 			style={{
-				backgroundImage: `url("http://localhost:3000/background.png")`,
-				backgroundSize: '100%',
+				backgroundImage: `url("http://localhost:3000/workflo_background.png")`,
+				backgroundSize: 2450,
 			}}
 		>
 			<Box ml="auto" mr="auto">
@@ -91,7 +92,7 @@ const Register: React.FC<registerProps> = ({}) => {
 
 										<Button
 											width="full"
-											colorScheme="teal"
+											colorScheme="brand"
 											mt={10}
 											type="submit"
 											isLoading={isSubmitting}
@@ -101,7 +102,7 @@ const Register: React.FC<registerProps> = ({}) => {
 										<Box textAlign="center" mt={2}>
 											{'Already have an account? '}
 											<NextLink href="/login">
-												<Link ml="auto" color="blue" fontWeight="semibold">
+												<Link ml="auto" color={NAVY} fontWeight="semibold">
 													Sign in.
 												</Link>
 											</NextLink>
