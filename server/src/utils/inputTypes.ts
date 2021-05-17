@@ -50,6 +50,8 @@ export class CreateProjectInput {
 	name!: string;
 	@Field()
 	description!: string;
+	@Field(() => String, { nullable: true })
+	repositoryLink?: string | undefined;
 }
 
 //// Update Project ////
@@ -104,6 +106,10 @@ export class CreateTicketInput {
 	title!: string;
 	@Field()
 	text!: string;
+	@Field()
+	ticketPriority!: TicketPriorityType;
+	@Field()
+	ticketType!: TicketTypeType;
 }
 
 //// Update Ticket ////

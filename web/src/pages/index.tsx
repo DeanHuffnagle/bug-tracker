@@ -13,7 +13,7 @@ import { createUrqlClient } from '../utils/createUrqlClient';
 //================================================================================
 //Index Page
 //================================================================================
-const Index = () => {
+const Index: React.FC<{}> = () => {
 	const router = useRouter();
 	const [{ data: meData, fetching }] = useMeQuery();
 	const [{ data: assignedTicketsData }] = useFindAssignedTicketsQuery();

@@ -8,7 +8,6 @@ import {
 	Navbar,
 	NavDropdown,
 } from 'react-bootstrap';
-import { APP_LOGO } from '../constants';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 
 type NavBarProps = {
@@ -27,10 +26,9 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 	if (meData?.me) {
 		dropdown = (
 			<NavDropdown title={meData?.me?.firstName} id="basic-nav-dropdown">
-				<NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-				<NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-				<NavDropdown.Item href="/create-organization">
-					Create Organization
+				<NavDropdown.Item href="/create-ticket">Create Ticket</NavDropdown.Item>
+				<NavDropdown.Item href="/create-project">
+					Create Project
 				</NavDropdown.Item>
 				<NavDropdown.Divider />
 				<NavDropdown.Item as="button" onClick={() => logout()}>

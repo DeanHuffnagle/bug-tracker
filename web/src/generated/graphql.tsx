@@ -88,12 +88,15 @@ export type CreateOrganizationInput = {
 export type CreateProjectInput = {
   name: Scalars['String'];
   description: Scalars['String'];
+  repositoryLink?: Maybe<Scalars['String']>;
 };
 
 export type CreateTicketInput = {
   projectId: Scalars['Int'];
   title: Scalars['String'];
   text: Scalars['String'];
+  ticketPriority: Scalars['String'];
+  ticketType: Scalars['String'];
 };
 
 export type FieldError = {
@@ -755,6 +758,44 @@ export type CreateCommentMutation = (
   ) }
 );
 
+export type CreateProjectMutationVariables = Exact<{
+  options: CreateProjectInput;
+}>;
+
+
+export type CreateProjectMutation = (
+  { __typename?: 'Mutation' }
+  & { createProject: (
+    { __typename?: 'ProjectResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, project?: Maybe<(
+      { __typename?: 'Project' }
+      & ProjectFragmentFragment
+    )> }
+  ) }
+);
+
+export type CreateTicketMutationVariables = Exact<{
+  options: CreateTicketInput;
+}>;
+
+
+export type CreateTicketMutation = (
+  { __typename?: 'Mutation' }
+  & { createTicket: (
+    { __typename?: 'TicketResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, ticket?: Maybe<(
+      { __typename?: 'Ticket' }
+      & TicketFragmentFragment
+    )> }
+  ) }
+);
+
 export type DeleteCommentMutationVariables = Exact<{
   commentId: Scalars['Int'];
 }>;
@@ -1362,6 +1403,40 @@ ${CommentFragmentFragmentDoc}`;
 
 export function useCreateCommentMutation() {
   return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
+};
+export const CreateProjectDocument = gql`
+    mutation CreateProject($options: CreateProjectInput!) {
+  createProject(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    project {
+      ...projectFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${ProjectFragmentFragmentDoc}`;
+
+export function useCreateProjectMutation() {
+  return Urql.useMutation<CreateProjectMutation, CreateProjectMutationVariables>(CreateProjectDocument);
+};
+export const CreateTicketDocument = gql`
+    mutation CreateTicket($options: CreateTicketInput!) {
+  createTicket(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    ticket {
+      ...ticketFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${TicketFragmentFragmentDoc}`;
+
+export function useCreateTicketMutation() {
+  return Urql.useMutation<CreateTicketMutation, CreateTicketMutationVariables>(CreateTicketDocument);
 };
 export const DeleteCommentDocument = gql`
     mutation DeleteComment($commentId: Int!) {

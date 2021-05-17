@@ -184,6 +184,11 @@ const editTicket = ({}) => {
 													<SelectField
 														label="Assigned Developer:"
 														name="userEmail"
+														placeholder={
+															ticketData?.findTicket?.assignedDeveloper?.email
+																? `${ticketData?.findTicket?.assignedDeveloper?.firstName} ${ticketData?.findTicket?.assignedDeveloper?.lastName}`
+																: 'Select developer'
+														}
 													>
 														{data?.findUsersByProject?.map((u) =>
 															!u ? null : (

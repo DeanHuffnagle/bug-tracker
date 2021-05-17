@@ -29,7 +29,7 @@ export class ProjectResolver {
 	//Create Project
 	//================================================================================
 	@Mutation(() => ProjectResponse)
-	@UseMiddleware(isAdmin)
+	@UseMiddleware(isProjectManager)
 	async createProject(
 		@Arg('options') options: CreateProjectInput,
 		@Ctx() { req }: MyContext
@@ -56,7 +56,9 @@ export class ProjectResolver {
 				.values({
 					name: options.name,
 					description: options.description,
+					repositoryLink: options.repositoryLink,
 					organizationId: isUser.organizationId,
+					managerId: isUser.id,
 				})
 				.returning('*')
 				.execute();

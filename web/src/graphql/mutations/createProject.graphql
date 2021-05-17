@@ -1,0 +1,10 @@
+mutation CreateProject($options: CreateProjectInput!) {
+	createProject(options: $options) {
+		errors {
+			...errorFragment
+		}
+		project {
+			...projectFragment
+		}
+	}
+}

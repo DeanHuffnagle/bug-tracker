@@ -64,11 +64,12 @@ export class TicketResolver {
 				.values({
 					title: options.title,
 					text: options.text,
+					priority: options.ticketPriority,
+					type: options.ticketType,
 					submitterId: isUser?.id,
 					managerId: isProject.managerId,
 					projectId: isProject?.id,
 					organizationId: isUser?.organizationId,
-					assignedDeveloperId: isUser?.id,
 				})
 				.returning('*')
 				.execute();

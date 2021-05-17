@@ -1,0 +1,10 @@
+mutation CreateTicket($options: CreateTicketInput!) {
+	createTicket(options: $options) {
+		errors {
+			...errorFragment
+		}
+		ticket {
+			...ticketFragment
+		}
+	}
+}
