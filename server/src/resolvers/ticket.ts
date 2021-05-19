@@ -40,15 +40,17 @@ export class TicketResolver {
 		@Arg('options') options: CreateTicketInput,
 		@Ctx() { req }: MyContext
 	): Promise<TicketResponse> {
+		console.log('thingy: ', options.projectId);
 		const isUser = await User.findOne(req.session.UserId, {
 			relations: ['assignedProjects', 'managedProjects'],
 		});
-		const isProject = await Project.findOne(options.projectId);
+		const intProjectId = parseInt(options.projectId);
+		const isProject = await Project.findOne(intProjectId);
 		if (!isProject) {
 			return {
 				errors: [
 					{
-						field: 'project',
+						field: 'projectId',
 						message: 'failed to find a project with that id.',
 					},
 				],

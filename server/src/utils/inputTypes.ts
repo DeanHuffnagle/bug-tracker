@@ -100,8 +100,8 @@ export class AddRepositoryLinkInput {
 //// Create Ticket ////
 @InputType()
 export class CreateTicketInput {
-	@Field(() => Int)
-	projectId!: number;
+	@Field(() => String)
+	projectId!: string;
 	@Field()
 	title!: string;
 	@Field()

@@ -1,0 +1,8 @@
+query FindProjectsByOrganization {
+	findProjectsByOrganization {
+		...projectFragment
+		organization {
+			...organizationFragment
+		}
+	}
+}

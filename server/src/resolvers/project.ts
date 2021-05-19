@@ -79,6 +79,27 @@ export class ProjectResolver {
 		});
 	}
 	//================================================================================
+	//Find Projects By Organization Query
+	//================================================================================
+	@Query(() => [Project], { nullable: true })
+	async findProjectsByOrganization(
+		@Ctx() { req }: MyContext
+	): Promise<Project[]> {
+		const isUser = await User.findOne(req.session.UserId);
+		const projectsByOrganization = Project.find({
+			where: { organizationId: isUser?.organizationId },
+			relations: ['organization'],
+		});
+		// await getRepository(Project)
+		// 	.createQueryBuilder('project')
+		// 	.where('project.organizationId = :id', {
+		// 		id: isUser?.organizationId,
+		// 	})
+		// 	.getMany();
+
+		return projectsByOrganization;
+	}
+	//================================================================================
 	//Find Raw Assigned Projects Query
 	//================================================================================
 	@Query(() => [RawProjectResponse], { nullable: true })

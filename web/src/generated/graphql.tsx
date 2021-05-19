@@ -92,7 +92,7 @@ export type CreateProjectInput = {
 };
 
 export type CreateTicketInput = {
-  projectId: Scalars['Int'];
+  projectId: Scalars['String'];
   title: Scalars['String'];
   text: Scalars['String'];
   ticketPriority: Scalars['String'];
@@ -366,6 +366,7 @@ export type Query = {
   findCommentsByTicket: Array<RawCommentResponse>;
   findOrganization?: Maybe<Organization>;
   findProject?: Maybe<Project>;
+  findProjectsByOrganization?: Maybe<Array<Project>>;
   findRawAssignedProjects?: Maybe<Array<RawProjectResponse>>;
   findRawManagedProjects?: Maybe<Array<RawProjectResponse>>;
   findRawOrganizationProjects?: Maybe<Array<RawProjectResponse>>;
@@ -1068,6 +1069,21 @@ export type FindProjectQuery = (
   )> }
 );
 
+export type FindProjectsByOrganizationQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindProjectsByOrganizationQuery = (
+  { __typename?: 'Query' }
+  & { findProjectsByOrganization?: Maybe<Array<(
+    { __typename?: 'Project' }
+    & { organization: (
+      { __typename?: 'Organization' }
+      & OrganizationFragmentFragment
+    ) }
+    & ProjectFragmentFragment
+  )>> }
+);
+
 export type FindRawAssignedProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1676,6 +1692,21 @@ ${UserFragmentFragmentDoc}`;
 
 export function useFindProjectQuery(options: Omit<Urql.UseQueryArgs<FindProjectQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindProjectQuery>({ query: FindProjectDocument, ...options });
+};
+export const FindProjectsByOrganizationDocument = gql`
+    query FindProjectsByOrganization {
+  findProjectsByOrganization {
+    ...projectFragment
+    organization {
+      ...organizationFragment
+    }
+  }
+}
+    ${ProjectFragmentFragmentDoc}
+${OrganizationFragmentFragmentDoc}`;
+
+export function useFindProjectsByOrganizationQuery(options: Omit<Urql.UseQueryArgs<FindProjectsByOrganizationQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindProjectsByOrganizationQuery>({ query: FindProjectsByOrganizationDocument, ...options });
 };
 export const FindRawAssignedProjectsDocument = gql`
     query FindRawAssignedProjects {
