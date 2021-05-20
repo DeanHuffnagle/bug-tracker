@@ -169,8 +169,8 @@ export class RawProjectResponse {
 	project_managerId: number;
 	@Field()
 	project_createdAt: string;
-	@Field()
-	project_repositoryLink: string;
+	@Field(() => String, { nullable: true })
+	project_repositoryLink: string | undefined;
 	@Field()
 	project_updatedAt: string;
 	//manager

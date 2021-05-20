@@ -170,6 +170,7 @@ const editTicket = ({}) => {
 													<SelectField
 														label="Project manager:"
 														name="userEmail"
+														placeholder="-Select-"
 													>
 														{data?.findUsersByOrganization?.map((u) =>
 															!u ? null : (

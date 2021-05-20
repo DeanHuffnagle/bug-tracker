@@ -180,15 +180,12 @@ const editTicket = ({}) => {
 												/>
 											</Box>
 											<Flex>
+												P
 												<Box mt={1} width="full">
 													<SelectField
 														label="Assigned Developer:"
 														name="userEmail"
-														placeholder={
-															ticketData?.findTicket?.assignedDeveloper?.email
-																? `${ticketData?.findTicket?.assignedDeveloper?.firstName} ${ticketData?.findTicket?.assignedDeveloper?.lastName}`
-																: 'Select developer'
-														}
+														placeholder="-Select-"
 													>
 														{data?.findUsersByProject?.map((u) =>
 															!u ? null : (
@@ -200,7 +197,11 @@ const editTicket = ({}) => {
 													</SelectField>
 												</Box>
 												<Box mt={1} width="full">
-													<SelectField label="Priority:" name="ticketPriority">
+													<SelectField
+														label="Priority:"
+														name="ticketPriority"
+														placeholder="-Select-"
+													>
 														<option value="low">Low</option>
 														<option value="medium">Medium</option>
 														<option value="high">High</option>
@@ -209,7 +210,11 @@ const editTicket = ({}) => {
 											</Flex>
 											<Flex>
 												<Box mt={1} width="full">
-													<SelectField label="Status:" name="ticketStatus">
+													<SelectField
+														label="Status:"
+														name="ticketStatus"
+														placeholder="-Select-"
+													>
 														<option value="unassigned">Unassigned</option>
 														<option value="inProgress">In Progress</option>
 														<option value="awaitingConfirmation">
@@ -219,7 +224,11 @@ const editTicket = ({}) => {
 													</SelectField>
 												</Box>
 												<Box mt={1} width="full">
-													<SelectField label="Type:" name="ticketType">
+													<SelectField
+														label="Type:"
+														name="ticketType"
+														placeholder="-Select-"
+													>
 														<option value="bugOrError">Bug/Error</option>
 														<option value="featureRequest">
 															Feature Request

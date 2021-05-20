@@ -48,8 +48,22 @@ export class ProjectResolver {
 				],
 			};
 		}
-		try {
-			const result = await getConnection()
+		let result;
+		if (!options.repositoryLink) {
+			result = await getConnection()
+				.createQueryBuilder()
+				.insert()
+				.into(Project)
+				.values({
+					name: options.name,
+					description: options.description,
+					organizationId: isUser.organizationId,
+					managerId: isUser.id,
+				})
+				.returning('*')
+				.execute();
+		} else {
+			result = await getConnection()
 				.createQueryBuilder()
 				.insert()
 				.into(Project)
@@ -62,11 +76,8 @@ export class ProjectResolver {
 				})
 				.returning('*')
 				.execute();
-
-			project = result.raw[0];
-		} catch (err) {
-			console.log('err: ', err);
 		}
+		project = result.raw[0];
 		return { project };
 	}
 	//================================================================================
