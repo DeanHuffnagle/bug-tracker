@@ -3,7 +3,32 @@ import React from 'react';
 import { tableFormatted } from './tableFormatted';
 import { DeleteButton } from '../components/DeleteButton';
 import { tableFormattedExternalLink } from './tableFormattedExternalLink';
-
+//================================================================================
+// Organizations Table Columns
+//================================================================================
+export const ORGANIZATIONS_COLUMNS = [
+	{
+		Header: 'Id',
+		id: 'id',
+		accessor: 'id',
+		Cell: (e) => (
+			<Link href="/organization/[id]" as={`/organization/${e.value}`}>
+				<span id="clickable-text">{e.value}</span>
+			</Link>
+		),
+	},
+	{
+		Header: 'Name',
+		id: 'name',
+		accessor: 'name',
+	},
+	{
+		Header: 'Link',
+		id: 'link',
+		accessor: 'link',
+		Cell: (e) => tableFormattedExternalLink(e.value),
+	},
+];
 //================================================================================
 //Ticket Table Columns
 //================================================================================

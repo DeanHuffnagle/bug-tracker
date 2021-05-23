@@ -2,6 +2,7 @@ fragment organizationFragment on Organization {
 	id
 	name
 	creatorId
+	link
 	createdAt
 	updatedAt
 }

@@ -322,6 +322,7 @@ export type Organization = {
   id: Scalars['Int'];
   name: Scalars['String'];
   creatorId?: Maybe<Scalars['Int']>;
+  link?: Maybe<Scalars['String']>;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   users?: Maybe<Array<User>>;
@@ -365,6 +366,7 @@ export type Query = {
   findComments: Array<Comment>;
   findCommentsByTicket: Array<RawCommentResponse>;
   findOrganization?: Maybe<Organization>;
+  findOrganizations?: Maybe<Array<Organization>>;
   findProject?: Maybe<Project>;
   findProjectsByOrganization?: Maybe<Array<Project>>;
   findRawAssignedProjects?: Maybe<Array<RawProjectResponse>>;
@@ -498,7 +500,7 @@ export type RawProjectResponse = {
   project_organizationId: Scalars['Int'];
   project_managerId: Scalars['Int'];
   project_createdAt: Scalars['String'];
-  project_repositoryLink: Scalars['String'];
+  project_repositoryLink?: Maybe<Scalars['String']>;
   project_updatedAt: Scalars['String'];
   manager_id: Scalars['Int'];
   manager_firstName: Scalars['String'];
@@ -652,7 +654,7 @@ export type ErrorFragmentFragment = (
 
 export type OrganizationFragmentFragment = (
   { __typename?: 'Organization' }
-  & Pick<Organization, 'id' | 'name' | 'creatorId' | 'createdAt' | 'updatedAt'>
+  & Pick<Organization, 'id' | 'name' | 'creatorId' | 'link' | 'createdAt' | 'updatedAt'>
 );
 
 export type ProjectFragmentFragment = (
@@ -716,7 +718,7 @@ export type TicketFragmentFragment = (
 
 export type UserFragmentFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'createdAt' | 'updatedAt'>
+  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'organizationId' | 'createdAt' | 'updatedAt'>
 );
 
 export type ChangePasswordMutationVariables = Exact<{
@@ -1013,6 +1015,19 @@ export type FindManagedTicketsByTypeQuery = (
   )>> }
 );
 
+export type FindOrganizationQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FindOrganizationQuery = (
+  { __typename?: 'Query' }
+  & { findOrganization?: Maybe<(
+    { __typename?: 'Organization' }
+    & OrganizationFragmentFragment
+  )> }
+);
+
 export type FindOrganizationTicketsByPriorityQueryVariables = Exact<{
   options: FindTicketsByPriorityInput;
 }>;
@@ -1049,6 +1064,17 @@ export type FindOrganizationTicketsByTypeQuery = (
   & { findOrganizationTicketsByType?: Maybe<Array<(
     { __typename?: 'Ticket' }
     & TicketFragmentFragment
+  )>> }
+);
+
+export type FindOrganizationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindOrganizationsQuery = (
+  { __typename?: 'Query' }
+  & { findOrganizations?: Maybe<Array<(
+    { __typename?: 'Organization' }
+    & OrganizationFragmentFragment
   )>> }
 );
 
@@ -1248,6 +1274,7 @@ export const OrganizationFragmentFragmentDoc = gql`
   id
   name
   creatorId
+  link
   createdAt
   updatedAt
 }
@@ -1382,6 +1409,7 @@ export const UserFragmentFragmentDoc = gql`
   lastName
   email
   role
+  organizationId
   createdAt
   updatedAt
 }
@@ -1645,6 +1673,17 @@ export const FindManagedTicketsByTypeDocument = gql`
 export function useFindManagedTicketsByTypeQuery(options: Omit<Urql.UseQueryArgs<FindManagedTicketsByTypeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindManagedTicketsByTypeQuery>({ query: FindManagedTicketsByTypeDocument, ...options });
 };
+export const FindOrganizationDocument = gql`
+    query FindOrganization($id: Int!) {
+  findOrganization(id: $id) {
+    ...organizationFragment
+  }
+}
+    ${OrganizationFragmentFragmentDoc}`;
+
+export function useFindOrganizationQuery(options: Omit<Urql.UseQueryArgs<FindOrganizationQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindOrganizationQuery>({ query: FindOrganizationDocument, ...options });
+};
 export const FindOrganizationTicketsByPriorityDocument = gql`
     query FindOrganizationTicketsByPriority($options: FindTicketsByPriorityInput!) {
   findOrganizationTicketsByPriority(options: $options) {
@@ -1677,6 +1716,17 @@ export const FindOrganizationTicketsByTypeDocument = gql`
 
 export function useFindOrganizationTicketsByTypeQuery(options: Omit<Urql.UseQueryArgs<FindOrganizationTicketsByTypeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindOrganizationTicketsByTypeQuery>({ query: FindOrganizationTicketsByTypeDocument, ...options });
+};
+export const FindOrganizationsDocument = gql`
+    query FindOrganizations {
+  findOrganizations {
+    ...organizationFragment
+  }
+}
+    ${OrganizationFragmentFragmentDoc}`;
+
+export function useFindOrganizationsQuery(options: Omit<Urql.UseQueryArgs<FindOrganizationsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindOrganizationsQuery>({ query: FindOrganizationsDocument, ...options });
 };
 export const FindProjectDocument = gql`
     query FindProject($id: Int!) {

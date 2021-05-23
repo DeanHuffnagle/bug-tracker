@@ -112,4 +112,11 @@ export class OrganizationResolver {
 	): Promise<Organization | undefined> {
 		return Organization.findOne(id, { relations: ['creator'] });
 	}
+	//================================================================================
+	//Find Organizations Query
+	//================================================================================
+	@Query(() => [Organization], { nullable: true })
+	findOrganizations(): Promise<Organization[] | undefined> {
+		return Organization.find();
+	}
 }

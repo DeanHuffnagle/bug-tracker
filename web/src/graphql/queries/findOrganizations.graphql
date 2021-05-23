@@ -1,0 +1,5 @@
+query FindOrganizations {
+	findOrganizations {
+		...organizationFragment
+	}
+}

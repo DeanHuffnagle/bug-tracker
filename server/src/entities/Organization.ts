@@ -33,6 +33,10 @@ export class Organization extends BaseEntity {
 	@Column({ nullable: true })
 	creatorId: number;
 
+	@Field(() => String, { nullable: true })
+	@Column({ nullable: true })
+	link: string;
+
 	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;
