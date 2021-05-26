@@ -1,4 +1,4 @@
-import { Box, Heading } from '@chakra-ui/react';
+import { Box, Heading, Text } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -85,6 +85,9 @@ const organization: React.FC<{}> = ({}) => {
 							<Card id="chart-card">
 								<Heading>{organizationData?.findOrganization?.name}</Heading>
 								{link}
+								<Text>
+									Projects:{projectData?.findRawOrganizationProjects?.length}
+								</Text>
 							</Card>
 						</Col>
 
