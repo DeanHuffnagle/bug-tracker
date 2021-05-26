@@ -200,3 +200,20 @@ export class UserResponse {
 	@Field(() => User, { nullable: true })
 	user?: User;
 }
+@ObjectType()
+export class RawUserResponse {
+	@Field(() => Int)
+	user_id: number;
+	@Field()
+	user_firstName: string;
+	@Field()
+	user_lastName: string;
+	@Field()
+	user_email: string;
+	@Field()
+	user_role: string;
+	@Field()
+	user_createdAt: string;
+	@Field()
+	user_updatedAt: string;
+}

@@ -4,6 +4,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinColumn,
 	ManyToMany,
 	ManyToOne,
 	OneToMany,
@@ -126,7 +127,7 @@ export class User extends BaseEntity {
 	@RelationId((user: User) => user.managedProjects)
 	managedProjectIds: number[];
 
-	//// Project manager to ticket relationship ////
+	//// Ticket manager to ticket relationship ////
 	@Field(() => [Ticket], { nullable: true })
 	@OneToMany(() => Ticket, (ticket) => ticket.manager, {
 		cascade: ['insert', 'update'],
@@ -134,13 +135,21 @@ export class User extends BaseEntity {
 	})
 	managedTickets: Ticket[] | null;
 
-	//// creator relationship with created organization ////
-	@Field(() => Organization)
-	@OneToOne(() => Organization, (organization) => organization.creator, {
+	@Field(() => [Int], { nullable: true })
+	@RelationId((user: User) => user.managedTickets)
+	managedTicketIds: number[];
+
+	//// owner relationship with created organization ////
+	@Field(() => Organization, { nullable: true })
+	@OneToOne(() => Organization, (organization) => organization.owner, {
 		cascade: ['insert', 'update'],
 		onDelete: 'SET NULL',
 	})
-	createdOrganization: Organization | null;
+	ownedOrganization: Organization | null;
+
+	@Field(() => Int, { nullable: true })
+	@RelationId((user: User) => user.ownedOrganization)
+	ownedOrganizationId: number;
 
 	//// User to submitted tickets relationship  ////
 	@Field(() => [Ticket], { nullable: true })

@@ -30,6 +30,31 @@ export const ORGANIZATIONS_COLUMNS = [
 	},
 ];
 //================================================================================
+// Organizations Table Columns
+//================================================================================
+export const USER_COLUMNS = [
+	{
+		Header: 'First Name',
+		id: 'first name',
+		accessor: 'user_firstName',
+	},
+	{
+		Header: 'Last Name',
+		id: 'last name',
+		accessor: 'user_lastName',
+	},
+	{
+		Header: 'Email',
+		id: 'email',
+		accessor: 'user_email',
+	},
+	{
+		Header: 'Role',
+		id: 'role',
+		accessor: 'user_role',
+	},
+];
+//================================================================================
 //Ticket Table Columns
 //================================================================================
 export const TICKET_COLUMNS = [

@@ -1,0 +1,9 @@
+fragment rawUserFragment on RawUserResponse {
+	user_id
+	user_firstName
+	user_lastName
+	user_email
+	user_role
+	user_createdAt
+	user_updatedAt
+}

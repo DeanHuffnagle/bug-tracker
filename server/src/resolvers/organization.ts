@@ -30,23 +30,26 @@ export class OrganizationResolver {
 		@Arg('options') options: CreateOrganizationInput,
 		@Ctx() { req }: MyContext
 	) {
+		const isUser = await User.findOne(req.session.UserId);
 		let organization;
-		try {
-			console.log('req.session.userID: ', req.session.UserId);
-			const result = await getConnection()
-				.createQueryBuilder()
-				.insert()
-				.into(Organization)
-				.values({
-					name: options.name,
-					creatorId: req.session.UserId,
-				})
-				.returning('*')
-				.execute();
-			organization = result.raw[0];
-		} catch (err) {
-			console.log('error: ', err);
-		}
+
+		console.log('req.session.userID: ', req.session.UserId);
+		const result = await getConnection()
+			.createQueryBuilder()
+			.insert()
+			.into(Organization)
+			.values({
+				name: options.name,
+				ownerId: isUser?.id,
+			})
+			.returning('*')
+			.execute();
+		organization = result.raw[0];
+
+		console.log('user: ', isUser?.ownedOrganizationId);
+
+		await User.update({ id: isUser?.id }, { organizationId: organization.id });
+
 		return { organization };
 	}
 
@@ -63,7 +66,7 @@ export class OrganizationResolver {
 		if (!organization) {
 			return false;
 		}
-		if (organization.creatorId !== req.session.UserId) {
+		if (organization.ownerId !== req.session.UserId) {
 			return false;
 		}
 
@@ -110,7 +113,7 @@ export class OrganizationResolver {
 	findOrganization(
 		@Arg('id', () => Int) id: number
 	): Promise<Organization | undefined> {
-		return Organization.findOne(id, { relations: ['creator'] });
+		return Organization.findOne(id, { relations: ['owner'] });
 	}
 	//================================================================================
 	//Find Organizations Query

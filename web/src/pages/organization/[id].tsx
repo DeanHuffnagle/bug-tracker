@@ -1,23 +1,43 @@
-import { EditIcon } from '@chakra-ui/icons';
-import { Box, Flex, Heading, IconButton, Link, Text } from '@chakra-ui/react';
+import { Box, Heading } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
 import { CustomTable } from '../../components/CustomTable';
 import { NavBar } from '../../components/NavBar';
-import { useFindOrganizationQuery, useMeQuery } from '../../generated/graphql';
-import { TICKET_COLUMNS } from '../../utils/Columns';
+import {
+	useFindRawOrganizationProjectsQuery,
+	useFindRawOrganizationTicketsQuery,
+	useFindRawOrganizationUsersQuery,
+	useMeQuery,
+} from '../../generated/graphql';
+import {
+	PROJECT_COLUMNS,
+	TICKET_COLUMNS,
+	USER_COLUMNS,
+} from '../../utils/Columns';
 import { createUrqlClient } from '../../utils/createUrqlClient';
-
 import { useGetOrganizationFromUrl } from '../../utils/useGetOrganizationFromUrl';
 
-const organization = ({}) => {
+const organization: React.FC<{}> = ({}) => {
 	const router = useRouter();
-	const [{ data: organizationData, fetching }] = useGetOrganizationFromUrl();
+
 	const [{ data: meData }] = useMeQuery();
+	const [{ data: organizationData, fetching }] = useGetOrganizationFromUrl();
 	const isOrganizationId = organizationData?.findOrganization?.id;
+	const [{ data: ticketData }] = useFindRawOrganizationTicketsQuery();
+	const [{ data: userData }] = useFindRawOrganizationUsersQuery();
+	const [{ data: projectData }] = useFindRawOrganizationProjectsQuery();
+
+	const ticketTableData = ticketData?.findRawOrganizationTickets
+		? ticketData.findRawOrganizationTickets
+		: [{}];
+	const projectTableData = projectData?.findRawOrganizationProjects
+		? projectData.findRawOrganizationProjects
+		: [{}];
+	const userTableData = userData?.findRawOrganizationUsers
+		? userData.findRawOrganizationUsers
+		: [{}];
 
 	const link = organizationData?.findOrganization?.link ? (
 		<a
@@ -28,24 +48,9 @@ const organization = ({}) => {
 			{organizationData.findOrganization.link}
 		</a>
 	) : (
-		'no link'
+		''
 	);
-	let hiddenColumns: string[] = [''];
-	let body;
-	if (!meData?.me?.organizationId) {
-		body = <div>request to join organization</div>;
-	}
-	if (meData?.me?.organizationId === isOrganizationId) {
-  body = (<><CustomTable
-  dataInput={}
-  columnInput={}
-  /></>
-  
-  </>);
-}
-	if (meData?.me?.organizationId !== isOrganizationId) {
-		body = <div>less organization data</div>;
-	}
+
 	if (fetching) {
 		return (
 			<>
@@ -53,6 +58,16 @@ const organization = ({}) => {
 			</>
 		);
 	}
+	// useEffect(() => {
+	// 	if (organizationData) {
+	// 		if (meData) {
+	// 			if (!(meData?.me?.organizationId === isOrganizationId || fetching)) {
+	// 				console.log('not in org');
+	// 				router.push(`/organization/join/${isOrganizationId}`);
+	// 			}
+	// 		}
+	// 	}
+	// });
 	if (!isOrganizationId) {
 		return (
 			<>
@@ -66,36 +81,44 @@ const organization = ({}) => {
 				<NavBar />
 				<Container>
 					<Row>
-						<Col md={12} lg={6} className="mt-1">
-							<Card>
-								<Flex width="full">
-									<Box width="full">
-										<Heading ml={2} mt={1}>
-											{organizationData?.findOrganization?.name}
-										</Heading>
-									</Box>
-									<Box mr="auto" mt={1}>
-										<NextLink
-											href="/project/edit-organization/[id]"
-											as={`/project/edit-organization/${isOrganizationId}`}
-										>
-											<IconButton
-												as={Link}
-												aria-label="edit organization"
-												icon={<EditIcon />}
-												size="xs"
-												mr={1}
-											/>
-										</NextLink>
-									</Box>
-								</Flex>
-								<Text ml={2} mb={2}>
-									<strong>Link: </strong> {link}
-								</Text>
+						<Col className="mt-1">
+							<Card id="chart-card">
+								<Heading>{organizationData?.findOrganization?.name}</Heading>
+								{link}
 							</Card>
 						</Col>
-						<Col md={12} lg={6} className="mt-1">
-							<Card>{body}</Card>
+
+						<Col className="mt-1">
+							<Card id="chart-card">
+								<CustomTable
+									columnInput={USER_COLUMNS}
+									dataInput={userTableData}
+									userInput={meData?.me}
+								/>
+							</Card>
+						</Col>
+					</Row>
+
+					<Row>
+						<Col className="mt-1">
+							<Card id="chart-card">
+								<CustomTable
+									columnInput={PROJECT_COLUMNS}
+									dataInput={projectTableData}
+									userInput={meData?.me}
+								/>
+							</Card>
+						</Col>
+					</Row>
+					<Row>
+						<Col className="mt-1">
+							<Card id="chart-card">
+								<CustomTable
+									columnInput={TICKET_COLUMNS}
+									dataInput={ticketTableData}
+									userInput={meData?.me}
+								/>
+							</Card>
 						</Col>
 					</Row>
 				</Container>
@@ -103,5 +126,4 @@ const organization = ({}) => {
 		);
 	}
 };
-
 export default withUrqlClient(createUrqlClient)(organization);

@@ -2,6 +2,7 @@ import argon2 from 'argon2';
 import {
 	Arg,
 	Ctx,
+	Int,
 	Mutation,
 	Query,
 	Resolver,
@@ -27,7 +28,7 @@ import {
 	UserLoginInput,
 	UserRegisterInput,
 } from '../utils/inputTypes';
-import { UserResponse } from '../utils/objectTypes';
+import { RawUserResponse, UserResponse } from '../utils/objectTypes';
 import { sendEmail } from '../utils/sendEmail';
 
 @Resolver(User)
@@ -267,7 +268,12 @@ export class UserResolver {
 			return null;
 		}
 		return User.findOne(req.session.UserId, {
-			relations: ['organization', 'assignedProjects', 'managedProjects'],
+			relations: [
+				'organization',
+				'assignedProjects',
+				'managedProjects',
+				'ownedOrganization',
+			],
 		});
 	}
 	//================================================================================
@@ -411,6 +417,7 @@ export class UserResolver {
 		@Arg('options') options: LeaveOrganizationInput
 	): Promise<UserResponse> {
 		const isUser = await User.findOne(options.userId);
+		const isOrganization = await Organization.findOne();
 		if (!isUser) {
 			return {
 				errors: [
@@ -421,6 +428,14 @@ export class UserResolver {
 				],
 			};
 		}
+		if (isUser.id === isOrganization?.ownerId) {
+			await getConnection()
+				.createQueryBuilder()
+				.relation(User, 'ownedOrganization')
+				.of(isUser)
+				.set(null);
+		}
+
 		await getConnection()
 			.createQueryBuilder()
 			.relation(User, 'organization')
@@ -431,5 +446,35 @@ export class UserResolver {
 			relations: ['organization'],
 		});
 		return { user };
+	}
+	//================================================================================
+	//Delete User Mutation
+	//================================================================================
+	@Mutation(() => Boolean)
+	async deleteUser(@Arg('userId', () => Int) userId: number): Promise<Boolean> {
+		const isUser = await User.findOne(userId);
+		if (!isUser) {
+			return false;
+		} else {
+			await User.delete(isUser.id);
+			return true;
+		}
+	}
+	//================================================================================
+	//Find Raw Organization Users Query
+	//================================================================================
+	@Query(() => [RawUserResponse], { nullable: true })
+	async findRawOrganizationUsers(
+		@Ctx() { req }: MyContext
+	): Promise<RawUserResponse[]> {
+		const isUser = await User.findOne(req.session.UserId);
+
+		const organizationUsers = await getRepository(User)
+			.createQueryBuilder('user')
+			.where('user.organizationId = :id ', {
+				id: isUser?.organizationId,
+			})
+			.getRawMany();
+		return organizationUsers;
 	}
 }
