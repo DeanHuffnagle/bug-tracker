@@ -14,6 +14,11 @@ export type Scalars = {
   Float: number;
 };
 
+export type AcceptOrDeclineRequestInput = {
+  organizationId: Scalars['Float'];
+  userId: Scalars['Float'];
+};
+
 export type AddRepositoryLinkInput = {
   projectId: Scalars['Int'];
   repositoryLink: Scalars['String'];
@@ -83,6 +88,7 @@ export type CommentResponse = {
 
 export type CreateOrganizationInput = {
   name: Scalars['String'];
+  link?: Maybe<Scalars['String']>;
 };
 
 export type CreateProjectInput = {
@@ -125,6 +131,10 @@ export type FindTicketsByTypeInput = {
   type: Scalars['String'];
 };
 
+export type FindUsersByJoinRequestInput = {
+  organizationId: Scalars['Int'];
+};
+
 export type FindUsersByOrganizationInput = {
   organizationId: Scalars['Int'];
 };
@@ -134,6 +144,11 @@ export type FindUsersByProjectInput = {
 };
 
 export type JoinOrganizationInput = {
+  organizationId: Scalars['Float'];
+  userId: Scalars['Float'];
+};
+
+export type JoinRequestInput = {
   organizationId: Scalars['Float'];
   userId: Scalars['Float'];
 };
@@ -153,6 +168,7 @@ export type Mutation = {
   createOrganization: OrganizationResponse;
   deleteOrganization: Scalars['Boolean'];
   changeOrganizationName: OrganizationResponse;
+  updateOrganization: OrganizationResponse;
   createProject: ProjectResponse;
   assignProject: ProjectResponse;
   unassignProject: ProjectResponse;
@@ -171,11 +187,14 @@ export type Mutation = {
   login: UserResponse;
   forgotPassword: Scalars['Boolean'];
   changePassword: UserResponse;
+  acceptJoinRequest: UserResponse;
+  declineJoinRequest: UserResponse;
   logout: Scalars['Boolean'];
   makeAdmin: UserResponse;
   changeUserRole: UserResponse;
-  joinOrganizationMutation: UserResponse;
-  leaveOrganizationMutation: UserResponse;
+  joinRequest: UserResponse;
+  joinOrganization: UserResponse;
+  leaveOrganization: UserResponse;
   deleteUser: Scalars['Boolean'];
 };
 
@@ -203,6 +222,12 @@ export type MutationDeleteOrganizationArgs = {
 
 export type MutationChangeOrganizationNameArgs = {
   options: ChangeOrganizationNameInput;
+};
+
+
+export type MutationUpdateOrganizationArgs = {
+  organizationId: Scalars['Int'];
+  options: UpdateOrganizationInput;
 };
 
 
@@ -299,6 +324,16 @@ export type MutationChangePasswordArgs = {
 };
 
 
+export type MutationAcceptJoinRequestArgs = {
+  options: AcceptOrDeclineRequestInput;
+};
+
+
+export type MutationDeclineJoinRequestArgs = {
+  options: AcceptOrDeclineRequestInput;
+};
+
+
 export type MutationMakeAdminArgs = {
   options: MakeAdminInput;
 };
@@ -309,12 +344,17 @@ export type MutationChangeUserRoleArgs = {
 };
 
 
-export type MutationJoinOrganizationMutationArgs = {
+export type MutationJoinRequestArgs = {
+  options: JoinRequestInput;
+};
+
+
+export type MutationJoinOrganizationArgs = {
   options: JoinOrganizationInput;
 };
 
 
-export type MutationLeaveOrganizationMutationArgs = {
+export type MutationLeaveOrganizationArgs = {
   options: LeaveOrganizationInput;
 };
 
@@ -332,6 +372,8 @@ export type Organization = {
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   users?: Maybe<Array<User>>;
+  joinRequests?: Maybe<Array<User>>;
+  joinRequestIds?: Maybe<Array<Scalars['Int']>>;
   owner: User;
   projects?: Maybe<Array<Project>>;
   tickets?: Maybe<Array<Ticket>>;
@@ -396,6 +438,7 @@ export type Query = {
   findOrganizationTicketsByType?: Maybe<Array<Ticket>>;
   me?: Maybe<User>;
   findUsersByOrganization?: Maybe<Array<User>>;
+  findUsersByJoinRequest?: Maybe<Array<User>>;
   findUsersByProject?: Maybe<Array<User>>;
   findRawOrganizationUsers?: Maybe<Array<RawUserResponse>>;
 };
@@ -478,6 +521,11 @@ export type QueryFindOrganizationTicketsByTypeArgs = {
 
 export type QueryFindUsersByOrganizationArgs = {
   options: FindUsersByOrganizationInput;
+};
+
+
+export type QueryFindUsersByJoinRequestArgs = {
+  options: FindUsersByJoinRequestInput;
 };
 
 
@@ -603,6 +651,11 @@ export type UnassignProjectInput = {
   userId: Scalars['Int'];
 };
 
+export type UpdateOrganizationInput = {
+  name: Scalars['String'];
+  link: Scalars['String'];
+};
+
 export type UpdateProjectInput = {
   name: Scalars['String'];
   description: Scalars['String'];
@@ -633,6 +686,8 @@ export type User = {
   assignedProjects?: Maybe<Array<Project>>;
   assignedProjectIds?: Maybe<Array<Scalars['Int']>>;
   organization?: Maybe<Organization>;
+  joinRequest?: Maybe<Organization>;
+  joinRequestId?: Maybe<Scalars['Int']>;
   managedProjects?: Maybe<Array<Project>>;
   managedProjectIds?: Maybe<Array<Scalars['Int']>>;
   managedTickets?: Maybe<Array<Ticket>>;
@@ -743,7 +798,26 @@ export type TicketFragmentFragment = (
 
 export type UserFragmentFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'organizationId' | 'createdAt' | 'updatedAt'>
+  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'organizationId' | 'joinRequestId' | 'createdAt' | 'updatedAt'>
+);
+
+export type AcceptJoinRequestMutationVariables = Exact<{
+  options: AcceptOrDeclineRequestInput;
+}>;
+
+
+export type AcceptJoinRequestMutation = (
+  { __typename?: 'Mutation' }
+  & { acceptJoinRequest: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+  ) }
 );
 
 export type ChangePasswordMutationVariables = Exact<{
@@ -786,6 +860,25 @@ export type CreateCommentMutation = (
   ) }
 );
 
+export type CreateOrganizationMutationVariables = Exact<{
+  options: CreateOrganizationInput;
+}>;
+
+
+export type CreateOrganizationMutation = (
+  { __typename?: 'Mutation' }
+  & { createOrganization: (
+    { __typename?: 'OrganizationResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, organization?: Maybe<(
+      { __typename?: 'Organization' }
+      & OrganizationFragmentFragment
+    )> }
+  ) }
+);
+
 export type CreateProjectMutationVariables = Exact<{
   options: CreateProjectInput;
 }>;
@@ -824,6 +917,25 @@ export type CreateTicketMutation = (
   ) }
 );
 
+export type DeclineJoinRequestMutationVariables = Exact<{
+  options: AcceptOrDeclineRequestInput;
+}>;
+
+
+export type DeclineJoinRequestMutation = (
+  { __typename?: 'Mutation' }
+  & { declineJoinRequest: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+  ) }
+);
+
 export type DeleteCommentMutationVariables = Exact<{
   commentId: Scalars['Int'];
 }>;
@@ -842,6 +954,25 @@ export type ForgotPasswordMutationVariables = Exact<{
 export type ForgotPasswordMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'forgotPassword'>
+);
+
+export type JoinRequestMutationVariables = Exact<{
+  options: JoinRequestInput;
+}>;
+
+
+export type JoinRequestMutation = (
+  { __typename?: 'Mutation' }
+  & { joinRequest: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+  ) }
 );
 
 export type LoginMutationVariables = Exact<{
@@ -890,6 +1021,26 @@ export type RegisterMutation = (
     )>>, user?: Maybe<(
       { __typename?: 'User' }
       & UserFragmentFragment
+    )> }
+  ) }
+);
+
+export type UpdateOrganizationMutationVariables = Exact<{
+  organizationId: Scalars['Int'];
+  options: UpdateOrganizationInput;
+}>;
+
+
+export type UpdateOrganizationMutation = (
+  { __typename?: 'Mutation' }
+  & { updateOrganization: (
+    { __typename?: 'OrganizationResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, organization?: Maybe<(
+      { __typename?: 'Organization' }
+      & OrganizationFragmentFragment
     )> }
   ) }
 );
@@ -1242,6 +1393,19 @@ export type FindTicketQuery = (
   )> }
 );
 
+export type FindUsersByJoinRequestQueryVariables = Exact<{
+  options: FindUsersByJoinRequestInput;
+}>;
+
+
+export type FindUsersByJoinRequestQuery = (
+  { __typename?: 'Query' }
+  & { findUsersByJoinRequest?: Maybe<Array<(
+    { __typename?: 'User' }
+    & UserFragmentFragment
+  )>> }
+);
+
 export type FindUsersByOrganizationQueryVariables = Exact<{
   options: FindUsersByOrganizationInput;
 }>;
@@ -1457,10 +1621,28 @@ export const UserFragmentFragmentDoc = gql`
   email
   role
   organizationId
+  joinRequestId
   createdAt
   updatedAt
 }
     `;
+export const AcceptJoinRequestDocument = gql`
+    mutation AcceptJoinRequest($options: AcceptOrDeclineRequestInput!) {
+  acceptJoinRequest(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    user {
+      ...userFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useAcceptJoinRequestMutation() {
+  return Urql.useMutation<AcceptJoinRequestMutation, AcceptJoinRequestMutationVariables>(AcceptJoinRequestDocument);
+};
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($options: ChangePasswordInput!, $token: String!) {
   changePassword(options: $options, token: $token) {
@@ -1494,6 +1676,23 @@ ${CommentFragmentFragmentDoc}`;
 
 export function useCreateCommentMutation() {
   return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
+};
+export const CreateOrganizationDocument = gql`
+    mutation CreateOrganization($options: CreateOrganizationInput!) {
+  createOrganization(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    organization {
+      ...organizationFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${OrganizationFragmentFragmentDoc}`;
+
+export function useCreateOrganizationMutation() {
+  return Urql.useMutation<CreateOrganizationMutation, CreateOrganizationMutationVariables>(CreateOrganizationDocument);
 };
 export const CreateProjectDocument = gql`
     mutation CreateProject($options: CreateProjectInput!) {
@@ -1529,6 +1728,23 @@ ${TicketFragmentFragmentDoc}`;
 export function useCreateTicketMutation() {
   return Urql.useMutation<CreateTicketMutation, CreateTicketMutationVariables>(CreateTicketDocument);
 };
+export const DeclineJoinRequestDocument = gql`
+    mutation DeclineJoinRequest($options: AcceptOrDeclineRequestInput!) {
+  declineJoinRequest(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    user {
+      ...userFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useDeclineJoinRequestMutation() {
+  return Urql.useMutation<DeclineJoinRequestMutation, DeclineJoinRequestMutationVariables>(DeclineJoinRequestDocument);
+};
 export const DeleteCommentDocument = gql`
     mutation DeleteComment($commentId: Int!) {
   deleteComment(commentId: $commentId)
@@ -1546,6 +1762,23 @@ export const ForgotPasswordDocument = gql`
 
 export function useForgotPasswordMutation() {
   return Urql.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument);
+};
+export const JoinRequestDocument = gql`
+    mutation JoinRequest($options: JoinRequestInput!) {
+  joinRequest(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    user {
+      ...userFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useJoinRequestMutation() {
+  return Urql.useMutation<JoinRequestMutation, JoinRequestMutationVariables>(JoinRequestDocument);
 };
 export const LoginDocument = gql`
     mutation Login($options: UserLoginInput!) {
@@ -1593,6 +1826,23 @@ ${UserFragmentFragmentDoc}`;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const UpdateOrganizationDocument = gql`
+    mutation UpdateOrganization($organizationId: Int!, $options: UpdateOrganizationInput!) {
+  updateOrganization(organizationId: $organizationId, options: $options) {
+    errors {
+      ...errorFragment
+    }
+    organization {
+      ...organizationFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${OrganizationFragmentFragmentDoc}`;
+
+export function useUpdateOrganizationMutation() {
+  return Urql.useMutation<UpdateOrganizationMutation, UpdateOrganizationMutationVariables>(UpdateOrganizationDocument);
 };
 export const UpdateProjectDocument = gql`
     mutation UpdateProject($options: UpdateProjectInput!, $projectId: Int!) {
@@ -1907,6 +2157,17 @@ ${UserFragmentFragmentDoc}`;
 
 export function useFindTicketQuery(options: Omit<Urql.UseQueryArgs<FindTicketQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindTicketQuery>({ query: FindTicketDocument, ...options });
+};
+export const FindUsersByJoinRequestDocument = gql`
+    query FindUsersByJoinRequest($options: FindUsersByJoinRequestInput!) {
+  findUsersByJoinRequest(options: $options) {
+    ...userFragment
+  }
+}
+    ${UserFragmentFragmentDoc}`;
+
+export function useFindUsersByJoinRequestQuery(options: Omit<Urql.UseQueryArgs<FindUsersByJoinRequestQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<FindUsersByJoinRequestQuery>({ query: FindUsersByJoinRequestDocument, ...options });
 };
 export const FindUsersByOrganizationDocument = gql`
     query FindUsersByOrganization($options: FindUsersByOrganizationInput!) {

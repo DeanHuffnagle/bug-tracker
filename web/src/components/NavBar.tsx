@@ -1,3 +1,4 @@
+import { BellIcon } from '@chakra-ui/icons';
 import { Box } from '@chakra-ui/react';
 import React from 'react';
 import {
@@ -8,7 +9,11 @@ import {
 	Navbar,
 	NavDropdown,
 } from 'react-bootstrap';
-import { useLogoutMutation, useMeQuery } from '../generated/graphql';
+import {
+	useFindUsersByJoinRequestQuery,
+	useLogoutMutation,
+	useMeQuery,
+} from '../generated/graphql';
 
 type NavBarProps = {
 	brand?: string;
@@ -16,9 +21,14 @@ type NavBarProps = {
 
 export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 	const [{ data: meData }] = useMeQuery();
+	const isOrganizationId = meData?.me?.organizationId;
 	const [, logout] = useLogoutMutation();
+	const [{ data: joinRequestData }] = useFindUsersByJoinRequestQuery({
+		variables: { options: { organizationId: isOrganizationId } },
+	});
 
 	let dropdown = null;
+	let notification = null;
 
 	if (!meData?.me) {
 		dropdown = <Nav.Link href="/login">Login</Nav.Link>;
@@ -37,7 +47,21 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 			</NavDropdown>
 		);
 	}
-
+	if (meData?.me?.role === 'admin') {
+		if (joinRequestData?.findUsersByJoinRequest?.length === 0) {
+			notification = (
+				<Nav.Link href="/join-requests">
+					<BellIcon />
+				</Nav.Link>
+			);
+		} else {
+			notification = (
+				<Nav.Link href="/join-requests">
+					<BellIcon color="red" />
+				</Nav.Link>
+			);
+		}
+	}
 	return (
 		<div>
 			<Navbar bg="light" variant="light" expand="lg">
@@ -55,6 +79,7 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ml-auto">
+						{notification}
 						{dropdown}
 						<Nav.Link href="/tickets">My Tickets</Nav.Link>
 						<Nav.Link href="/projects">Projects</Nav.Link>

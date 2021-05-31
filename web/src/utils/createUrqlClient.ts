@@ -26,6 +26,25 @@ export const createUrqlClient = (ssrExchange: any) => {
 				},
 				updates: {
 					Mutation: {
+						acceptJoinRequest: (result, args, cache, info) => {
+							// console.log(cache.inspectFields('Query'));
+							cache.invalidate('Query', 'findUsersByJoinRequest', {
+								options: {
+									organizationId: args.options.organizationId,
+								},
+							});
+							// console.log(cache.inspectFields('Query'));
+						},
+						declineJoinRequest: (result, args, cache, info) => {
+							// console.log(cache.inspectFields('Query'));
+							cache.invalidate('Query', 'findUsersByJoinRequest', {
+								options: {
+									organizationId: args.options.organizationId,
+								},
+							});
+							// console.log(cache.inspectFields('Query'));
+						},
+
 						updateProject: (result, args, cache, info) => {
 							// console.log(cache.inspectFields('Query'));
 							cache.invalidate('Query', 'findProject', {

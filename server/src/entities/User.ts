@@ -4,7 +4,6 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinColumn,
 	ManyToMany,
 	ManyToOne,
 	OneToMany,
@@ -114,6 +113,18 @@ export class User extends BaseEntity {
 		onDelete: 'SET NULL',
 	})
 	organization: Organization | null;
+
+	//// Join Request ////
+	@Field(() => Organization, { nullable: true })
+	@ManyToOne(() => Organization, (organization) => organization.joinRequests, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	joinRequest: Organization | null;
+
+	@Field(() => Int, { nullable: true })
+	@RelationId((user: User) => user.joinRequest)
+	joinRequestId: number;
 
 	//// Project manager to project relationship ////
 	@Field(() => [Project], { nullable: true })

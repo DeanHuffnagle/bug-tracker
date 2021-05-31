@@ -1,0 +1,5 @@
+query FindUsersByJoinRequest($options: FindUsersByJoinRequestInput!) {
+	findUsersByJoinRequest(options: $options) {
+		...userFragment
+	}
+}

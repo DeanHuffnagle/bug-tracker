@@ -9,6 +9,7 @@ import {
 	JoinColumn,
 	CreateDateColumn,
 	UpdateDateColumn,
+	RelationId,
 } from 'typeorm';
 import { Project } from './Project';
 import { Ticket } from './Ticket';
@@ -56,6 +57,18 @@ export class Organization extends BaseEntity {
 		onDelete: 'SET NULL',
 	})
 	users: User[];
+
+	//// Join Requests ////
+	@Field(() => [User], { nullable: true })
+	@OneToMany(() => User, (user) => user.joinRequest, {
+		cascade: ['insert', 'update'],
+		onDelete: 'SET NULL',
+	})
+	joinRequests: User[] | null;
+
+	@Field(() => [Int], { nullable: true })
+	@RelationId((organization: Organization) => organization.joinRequests)
+	joinRequestIds: number[];
 
 	//// organization to owner relationship ////
 	@Field(() => User)

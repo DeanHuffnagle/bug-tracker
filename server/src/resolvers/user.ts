@@ -18,11 +18,14 @@ import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
 import { MyContext } from '../types';
 import {
+	AcceptOrDeclineRequestInput,
 	ChangePasswordInput,
 	ChangeRoleInput,
+	FindUsersByJoinRequestInput,
 	FindUsersByOrganizationInput,
 	FindUsersByProjectInput,
 	JoinOrganizationInput,
+	JoinRequestInput,
 	LeaveOrganizationInput,
 	MakeAdminInput,
 	UserLoginInput,
@@ -292,6 +295,188 @@ export class UserResolver {
 		return usersByOrganization;
 	}
 	//================================================================================
+	//Find Users By Join Request Query
+	//================================================================================
+	@Query(() => [User], { nullable: true })
+	async findUsersByJoinRequest(
+		@Arg('options') options: FindUsersByJoinRequestInput
+	): Promise<User[]> {
+		const usersByJoinRequest = await getRepository(User)
+			.createQueryBuilder('user')
+			.where('user.joinRequestId = :organizationId', {
+				organizationId: options.organizationId,
+			})
+			.getMany();
+		return usersByJoinRequest;
+	}
+	//================================================================================
+	//Accept Join Request
+	//================================================================================
+	@Mutation(() => UserResponse)
+	@UseMiddleware(isAdmin)
+	async acceptJoinRequest(
+		@Arg('options') options: AcceptOrDeclineRequestInput,
+		@Ctx() { req }: MyContext
+	): Promise<UserResponse> {
+		const isUser = await User.findOne(options.userId);
+		const me = await User.findOne(req.session.UserId);
+		if (!isUser?.joinRequestId) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'user does not have any active requests.',
+					},
+				],
+			};
+		}
+		if (isUser.joinRequestId !== me?.organizationId) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: "user didn't request to join your organization.",
+					},
+				],
+			};
+		}
+		const isOrganization = await Organization.findOne(options.organizationId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isOrganization) {
+			return {
+				errors: [
+					{
+						field: 'organization',
+						message: 'no organization found.',
+					},
+				],
+			};
+		}
+		if (isUser.organizationId === isOrganization.id) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'user already in this organization.',
+					},
+				],
+			};
+		}
+		if (isUser.organizationId) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message:
+							'user must leave their current organization to join another.',
+					},
+				],
+			};
+		}
+		await User.update({ id: isUser.id }, { organizationId: isOrganization.id });
+		await getConnection()
+			.createQueryBuilder()
+			.relation(User, 'joinRequest')
+			.of(isUser)
+			.set(null);
+
+		const user = await User.findOne(isUser.id);
+
+		return { user };
+	}
+	//================================================================================
+	//Decline Join Request
+	//================================================================================
+	@Mutation(() => UserResponse)
+	@UseMiddleware(isAdmin)
+	async declineJoinRequest(
+		@Arg('options') options: AcceptOrDeclineRequestInput,
+		@Ctx() { req }: MyContext
+	): Promise<UserResponse> {
+		const isUser = await User.findOne(options.userId);
+		const me = await User.findOne(req.session.UserId);
+		if (!isUser?.joinRequestId) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'user does not have any active requests.',
+					},
+				],
+			};
+		}
+		if (isUser.joinRequestId !== me?.organizationId) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: "user didn't request to join your organization.",
+					},
+				],
+			};
+		}
+		const isOrganization = await Organization.findOne(options.organizationId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isOrganization) {
+			return {
+				errors: [
+					{
+						field: 'organization',
+						message: 'no organization found.',
+					},
+				],
+			};
+		}
+		if (isUser.organizationId === isOrganization.id) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'user already in this organization.',
+					},
+				],
+			};
+		}
+		if (isUser.organizationId) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message:
+							'user must leave their current organization to join another.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(User, 'joinRequest')
+			.of(isUser)
+			.set(null);
+
+		const user = await User.findOne(isUser.id);
+
+		return { user };
+	}
+	//================================================================================
 	//Find Users By Project Query
 	//================================================================================
 	@Query(() => [User], { nullable: true })
@@ -368,11 +553,74 @@ export class UserResolver {
 	}
 
 	//================================================================================
+	//Join Request Mutation
+	//================================================================================
+	@Mutation(() => UserResponse)
+	async joinRequest(
+		@Arg('options') options: JoinRequestInput
+	): Promise<UserResponse> {
+		const isUser = await User.findOne(options.userId);
+		const isOrganization = await Organization.findOne(options.organizationId);
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'no user found.',
+					},
+				],
+			};
+		}
+		if (!isOrganization) {
+			return {
+				errors: [
+					{
+						field: 'organization',
+						message: 'no organization found.',
+					},
+				],
+			};
+		}
+		if (isUser.organizationId === isOrganization.id) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: 'you are already in this organization.',
+					},
+				],
+			};
+		}
+		if (isUser.organizationId) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message:
+							'you must leave your current organization to join another.',
+					},
+				],
+			};
+		}
+		await getConnection()
+			.createQueryBuilder()
+			.relation(User, 'joinRequest')
+			.of(isUser)
+			.set(isOrganization);
+
+		const user = await User.findOne(options.userId, {
+			relations: ['joinRequest'],
+		});
+
+		return { user };
+	}
+
+	//================================================================================
 	//Join Organization Mutation
 	//================================================================================
 	@Mutation(() => UserResponse)
 	@UseMiddleware(isAuth)
-	async joinOrganizationMutation(
+	async joinOrganization(
 		@Arg('options') options: JoinOrganizationInput
 	): Promise<UserResponse> {
 		const isOrganization = await Organization.findOne(options.organizationId);
@@ -403,6 +651,12 @@ export class UserResolver {
 			.of(isUser)
 			.set(isOrganization);
 
+		await getConnection()
+			.createQueryBuilder()
+			.relation(User, 'joinRequest')
+			.of(isUser)
+			.set(null);
+
 		const user = await User.findOne(options.userId, {
 			relations: ['organization'],
 		});
@@ -413,7 +667,7 @@ export class UserResolver {
 	//================================================================================
 	@Mutation(() => UserResponse)
 	@UseMiddleware(isAuth)
-	async leaveOrganizationMutation(
+	async leaveOrganization(
 		@Arg('options') options: LeaveOrganizationInput
 	): Promise<UserResponse> {
 		const isUser = await User.findOne(options.userId);
@@ -438,9 +692,10 @@ export class UserResolver {
 
 		await getConnection()
 			.createQueryBuilder()
-			.relation(User, 'organization')
-			.of(isUser)
-			.set(null);
+			.update(User)
+			.set({ organizationId: undefined, role: 'developer' })
+			.where('id = :id', { id: isUser.id })
+			.execute();
 
 		const user = await User.findOne(options.userId, {
 			relations: ['organization'],

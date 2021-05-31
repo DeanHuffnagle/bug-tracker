@@ -33,7 +33,6 @@ const CreateTicket: React.FC<CreateTicketProps> = ({}) => {
 				<Box ml="auto" mr="auto">
 					<Box
 						p={8}
-						minWidth="900px"
 						maxWidth="900px"
 						borderWidth={1}
 						borderRadius={8}

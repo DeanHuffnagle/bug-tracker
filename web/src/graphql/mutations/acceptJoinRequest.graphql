@@ -1,0 +1,10 @@
+mutation AcceptJoinRequest($options: AcceptOrDeclineRequestInput!) {
+	acceptJoinRequest(options: $options) {
+		errors {
+			...errorFragment
+		}
+		user {
+			...userFragment
+		}
+	}
+}

@@ -1,5 +1,5 @@
-import { Box, Button, Flex, Heading, Link } from '@chakra-ui/react';
-import { Image } from 'react-bootstrap';
+import { Box, Flex, Heading, Link } from '@chakra-ui/react';
+import { Button, Image } from 'react-bootstrap';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
@@ -11,6 +11,7 @@ import {
 	useFindRawOrganizationProjectsQuery,
 	useMeQuery,
 	useLoginMutation,
+	useJoinRequestMutation,
 } from '../../../generated/graphql';
 import { createUrqlClient } from '../../../utils/createUrqlClient';
 import { toErrorMap } from '../../../utils/toErrorMap';
@@ -19,9 +20,11 @@ import { useGetOrganizationFromUrl } from '../../../utils/useGetOrganizationFrom
 const joinOrganization: React.FC<{}> = ({}) => {
 	const router = useRouter();
 	const [{ data: organizationData, fetching }] = useGetOrganizationFromUrl();
-	const isOrganizationId = organizationData?.findOrganization?.id;
-	const [{ data: ticketData }] = useFindRawOrganizationProjectsQuery();
 	const [{ data: meData }] = useMeQuery();
+	const [{}, joinRequest] = useJoinRequestMutation();
+	const isOrganizationId = organizationData?.findOrganization?.id;
+	const isUserId = meData?.me?.id;
+	const [{ data: ticketData }] = useFindRawOrganizationProjectsQuery();
 	const link = organizationData?.findOrganization?.link ? (
 		<a
 			target="_blank"
@@ -72,60 +75,20 @@ const joinOrganization: React.FC<{}> = ({}) => {
 						</Box>
 
 						<Box my={4} textAlign="left">
-							<Formik
-								initialValues={{ email: '', password: '' }}
-								onSubmit={async (values, { setErrors }) => {
-									const response = await login({ options: values });
-									if (response.data?.login.errors) {
-										setErrors(toErrorMap(response.data.login.errors));
-									} else if (response.data?.login.user) {
-										router.push('/');
-									}
+							<Button
+								onClick={() => {
+									joinRequest({
+										options: {
+											userId: isUserId as number,
+											organizationId: isOrganizationId as number,
+										},
+									});
+									alert('Request sent successfully!');
+									router.push('/');
 								}}
 							>
-								{({ isSubmitting }) => (
-									<Form>
-										<InputField
-											name="email"
-											placeholder="email"
-											label="Email"
-										/>
-
-										<Box mt={4}>
-											<InputField
-												name="password"
-												placeholder="password"
-												label="Password"
-												type="password"
-											/>
-										</Box>
-										<Flex mt={1}>
-											<NextLink href="/forgot-password">
-												<Link mr="auto" color={NAVY} fontWeight="semibold">
-													Forgot password?
-												</Link>
-											</NextLink>
-										</Flex>
-										<Button
-											width="full"
-											colorScheme="brand"
-											mt={5}
-											type="submit"
-											isLoading={isSubmitting}
-										>
-											sign in
-										</Button>
-										<Box textAlign="center" mt={2}>
-											{'new to Workflo? '}
-											<NextLink href="/register">
-												<Link ml="auto" color={NAVY} fontWeight="semibold">
-													Join now
-												</Link>
-											</NextLink>
-										</Box>
-									</Form>
-								)}
-							</Formik>
+								join n junk
+							</Button>
 						</Box>
 					</Box>
 				</Box>

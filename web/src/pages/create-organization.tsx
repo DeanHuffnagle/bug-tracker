@@ -5,15 +5,18 @@ import { Box, Button, Flex, Heading } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { InputField } from '../components/InputField';
 import { SelectField } from '../components/SelectField';
-import { useCreateProjectMutation } from '../generated/graphql';
+import {
+	useCreateOrganizationMutation,
+	useCreateProjectMutation,
+} from '../generated/graphql';
 import { useRouter } from 'next/router';
 import { toErrorMap } from '../utils/toErrorMap';
 
-export type CreateProjectProps = {};
+export type CreateOrganizationProps = {};
 
-const CreateProject: React.FC<CreateProjectProps> = ({}) => {
+const CreateOrganization: React.FC<CreateOrganizationProps> = ({}) => {
 	const router = useRouter();
-	const [, createProject] = useCreateProjectMutation();
+	const [, CreateOrganization] = useCreateOrganizationMutation();
 	return (
 		<>
 			<>
@@ -29,7 +32,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({}) => {
 					<Box ml="auto" mr="auto">
 						<Box
 							p={8}
-							maxWidth="900px"
+							maxWidth="500px"
 							borderWidth={1}
 							borderRadius={8}
 							bg="white"
@@ -37,51 +40,43 @@ const CreateProject: React.FC<CreateProjectProps> = ({}) => {
 						>
 							<Box backgroundColor="white" p={1} borderRadius={10}>
 								<Box textAlign="center">
-									<Heading>Create Project</Heading>
+									<Heading>Create Organization</Heading>
 								</Box>
 								<Box my={4} textAlign="left">
 									<Formik
 										initialValues={{
 											name: '',
-											description: '',
-											repositoryLink: '',
+											link: '',
 										}}
 										onSubmit={async (values, { setErrors }) => {
-											const response = await createProject({
+											const response = await CreateOrganization({
 												options: values,
 											});
-											if (response.data?.createProject.errors) {
+											if (response.data?.createOrganization.errors) {
 												setErrors(
-													toErrorMap(response.data.createProject.errors)
+													toErrorMap(response.data.createOrganization.errors)
 												);
-											} else if (response?.data?.createProject.project) {
-												alert('Project was created successfully.');
+											} else if (
+												response?.data?.createOrganization.organization
+											) {
+												alert('Organization was created successfully.');
 												router.push('/');
 											}
 										}}
 									>
 										{({ isSubmitting }) => (
 											<Form>
-												<Flex mt={4}>
+												<Box mt={4}>
 													<InputField
 														name="name"
 														placeholder="Name"
-														label="Project name"
+														label="Organization name"
 														required
 													/>
 													<InputField
-														name="repositoryLink"
+														name="link"
 														placeholder="Link"
-														label="Repository Link"
-													/>
-												</Flex>
-												<Box mt={4}>
-													<InputField
-														name="description"
-														placeholder="Enter a Brief Description Here"
-														label="Project Description"
-														textarea
-														required
+														label="Organization Link (optional)"
 													/>
 												</Box>
 
@@ -92,7 +87,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({}) => {
 													type="submit"
 													isLoading={isSubmitting}
 												>
-													Submit Project
+													Create
 												</Button>
 											</Form>
 										)}
@@ -116,4 +111,4 @@ const CreateProject: React.FC<CreateProjectProps> = ({}) => {
 	);
 };
 
-export default withUrqlClient(createUrqlClient)(CreateProject);
+export default withUrqlClient(createUrqlClient)(CreateOrganization);

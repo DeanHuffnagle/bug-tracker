@@ -1,0 +1,10 @@
+mutation JoinRequest($options: JoinRequestInput!) {
+	joinRequest(options: $options) {
+		errors {
+			...errorFragment
+		}
+		user {
+			...userFragment
+		}
+	}
+}

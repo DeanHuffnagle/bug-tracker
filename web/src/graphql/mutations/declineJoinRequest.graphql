@@ -1,0 +1,10 @@
+mutation DeclineJoinRequest($options: AcceptOrDeclineRequestInput!) {
+	declineJoinRequest(options: $options) {
+		errors {
+			...errorFragment
+		}
+		user {
+			...userFragment
+		}
+	}
+}

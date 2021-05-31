@@ -31,6 +31,8 @@ export class FindCommentsByTicketInput {
 export class CreateOrganizationInput {
 	@Field()
 	name!: string;
+	@Field(() => String, { nullable: true })
+	link?: string | null;
 }
 
 //// Change Organization Name ////
@@ -40,6 +42,14 @@ export class ChangeOrganizationNameInput {
 	name!: string;
 }
 
+//// Update Organization ////
+@InputType()
+export class UpdateOrganizationInput {
+	@Field()
+	name!: string;
+	@Field()
+	link!: string;
+}
 //================================================================================
 //Project Input Types
 //================================================================================
@@ -219,6 +229,24 @@ export class UserLoginInput {
 	password!: string;
 }
 
+//// Join Request ////
+@InputType()
+export class JoinRequestInput {
+	@Field()
+	organizationId: number;
+	@Field()
+	userId!: number;
+}
+
+//// Join Request ////
+@InputType()
+export class AcceptOrDeclineRequestInput {
+	@Field()
+	organizationId!: number;
+	@Field()
+	userId!: number;
+}
+
 //// Join Organization ////
 @InputType()
 export class JoinOrganizationInput {
@@ -263,6 +291,13 @@ export class ChangePasswordInput {
 //// Find User By Organization ////
 @InputType()
 export class FindUsersByOrganizationInput {
+	@Field(() => Int)
+	organizationId: number;
+}
+
+//// Find User By Join Request ////
+@InputType()
+export class FindUsersByJoinRequestInput {
 	@Field(() => Int)
 	organizationId: number;
 }

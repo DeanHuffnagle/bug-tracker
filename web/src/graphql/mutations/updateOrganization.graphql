@@ -1,0 +1,13 @@
+mutation UpdateOrganization(
+	$organizationId: Int!
+	$options: UpdateOrganizationInput!
+) {
+	updateOrganization(organizationId: $organizationId, options: $options) {
+		errors {
+			...errorFragment
+		}
+		organization {
+			...organizationFragment
+		}
+	}
+}

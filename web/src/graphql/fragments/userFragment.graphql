@@ -5,6 +5,7 @@ fragment userFragment on User {
 	email
 	role
 	organizationId
+	joinRequestId
 	createdAt
 	updatedAt
 }

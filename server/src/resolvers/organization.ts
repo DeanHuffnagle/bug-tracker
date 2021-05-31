@@ -16,6 +16,7 @@ import { MyContext } from '../types';
 import {
 	ChangeOrganizationNameInput,
 	CreateOrganizationInput,
+	UpdateOrganizationInput,
 } from '../utils/inputTypes';
 import { OrganizationResponse } from '../utils/objectTypes';
 
@@ -29,26 +30,53 @@ export class OrganizationResolver {
 	async createOrganization(
 		@Arg('options') options: CreateOrganizationInput,
 		@Ctx() { req }: MyContext
-	) {
+	): Promise<OrganizationResponse> {
 		const isUser = await User.findOne(req.session.UserId);
 		let organization;
+		try {
+			if (!options.link) {
+				const result = await getConnection()
+					.createQueryBuilder()
+					.insert()
+					.into(Organization)
+					.values({
+						name: options.name,
+						ownerId: isUser?.id,
+					})
+					.returning('*')
+					.execute();
+				organization = result.raw[0];
+			} else {
+				const result = await getConnection()
+					.createQueryBuilder()
+					.insert()
+					.into(Organization)
+					.values({
+						name: options.name,
+						ownerId: isUser?.id,
+						link: options.link,
+					})
+					.returning('*')
+					.execute();
+				organization = result.raw[0];
+			}
+		} catch (err) {
+			if (err.code === '23505') {
+				return {
+					errors: [
+						{
+							field: 'name',
+							message: 'organization already exists with that name.',
+						},
+					],
+				};
+			}
+		}
 
-		console.log('req.session.userID: ', req.session.UserId);
-		const result = await getConnection()
-			.createQueryBuilder()
-			.insert()
-			.into(Organization)
-			.values({
-				name: options.name,
-				ownerId: isUser?.id,
-			})
-			.returning('*')
-			.execute();
-		organization = result.raw[0];
-
-		console.log('user: ', isUser?.ownedOrganizationId);
-
-		await User.update({ id: isUser?.id }, { organizationId: organization.id });
+		await User.update(
+			{ id: isUser?.id },
+			{ organizationId: organization.id, role: 'admin' }
+		);
 
 		return { organization };
 	}
@@ -62,15 +90,17 @@ export class OrganizationResolver {
 		@Arg('id', () => Int) id: number,
 		@Ctx() { req }: MyContext
 	): Promise<Boolean> {
-		const organization = await Organization.findOne(id);
-		if (!organization) {
+		const isUser = await User.findOne(req.session.UserId);
+		const isOrganization = await Organization.findOne(id);
+		if (!isOrganization) {
 			return false;
 		}
-		if (organization.ownerId !== req.session.UserId) {
+		if (isOrganization.ownerId !== isUser?.id) {
 			return false;
 		}
 
 		await Organization.delete({ id });
+		await User.update({ id: isUser?.id }, { role: 'developer' });
 		return true;
 	}
 
@@ -121,5 +151,38 @@ export class OrganizationResolver {
 	@Query(() => [Organization], { nullable: true })
 	findOrganizations(): Promise<Organization[] | undefined> {
 		return Organization.find();
+	}
+	//================================================================================
+	//Update Organization Mutation
+	//================================================================================
+	@Mutation(() => OrganizationResponse)
+	@UseMiddleware(isAdmin)
+	async updateOrganization(
+		@Arg('options') options: UpdateOrganizationInput,
+		@Arg('organizationId', () => Int) organizationId: number
+	): Promise<OrganizationResponse> {
+		if (!options.name) {
+			return {
+				errors: [
+					{
+						field: 'organizationName',
+						message: 'cannot be blank.',
+					},
+				],
+			};
+		}
+
+		await getConnection()
+			.createQueryBuilder()
+			.update(Organization)
+			.set({
+				name: options.name,
+				link: options.link,
+			})
+			.where('id = :id', { id: organizationId })
+			.execute();
+
+		const organization = await Organization.findOne(organizationId);
+		return { organization };
 	}
 }

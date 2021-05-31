@@ -1,0 +1,10 @@
+mutation CreateOrganization($options: CreateOrganizationInput!) {
+	createOrganization(options: $options) {
+		errors {
+			...errorFragment
+		}
+		organization {
+			...organizationFragment
+		}
+	}
+}

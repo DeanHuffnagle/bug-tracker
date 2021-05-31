@@ -3,6 +3,8 @@ import React from 'react';
 import { tableFormatted } from './tableFormatted';
 import { DeleteButton } from '../components/DeleteButton';
 import { tableFormattedExternalLink } from './tableFormattedExternalLink';
+import { DeclineJoinRequestButton } from '../components/DeclineJoinRequestButton';
+import { AcceptJoinRequestButton } from '../components/AcceptJoinRequestButton';
 //================================================================================
 // Organizations Table Columns
 //================================================================================
@@ -30,7 +32,7 @@ export const ORGANIZATIONS_COLUMNS = [
 	},
 ];
 //================================================================================
-// Organizations Table Columns
+// User Table Columns
 //================================================================================
 export const USER_COLUMNS = [
 	{
@@ -52,6 +54,58 @@ export const USER_COLUMNS = [
 		Header: 'Role',
 		id: 'role',
 		accessor: 'user_role',
+	},
+];
+//================================================================================
+// Join Request Table Columns
+//================================================================================
+export const JOIN_REQUEST_COLUMNS = [
+	{
+		Header: 'Date',
+		id: 'date',
+		accessor: 'updatedAt',
+		Cell: (props) => {
+			return new Date(parseInt(props.value)).toLocaleDateString('en-US');
+		},
+	},
+	{
+		Header: 'First Name',
+		id: 'first name',
+		accessor: 'firstName',
+	},
+	{
+		Header: 'Last Name',
+		id: 'last name',
+		accessor: 'lastName',
+	},
+	{
+		Header: 'Email',
+		id: 'email',
+		accessor: 'email',
+	},
+	{
+		Header: 'Accept',
+		id: 'accept',
+		accessor: 'id',
+		Cell: (props) => {
+			return (
+				<span>
+					<AcceptJoinRequestButton userIdInput={props.value} />
+				</span>
+			);
+		},
+	},
+	{
+		Header: 'Decline',
+		id: 'decline',
+		accessor: 'id',
+		Cell: (props) => {
+			return (
+				<span>
+					<DeclineJoinRequestButton userIdInput={props.value} />
+				</span>
+			);
+		},
 	},
 ];
 //================================================================================
