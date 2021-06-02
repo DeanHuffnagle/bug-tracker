@@ -77,9 +77,7 @@ export class TicketResolver {
 				.execute();
 
 			ticket = result.raw[0];
-		} catch (err) {
-			console.error(err);
-		}
+		} catch (err) {}
 		return { ticket };
 	}
 	//================================================================================
@@ -253,7 +251,6 @@ export class TicketResolver {
 		@Arg('options') options: ChangeTicketPriorityInput,
 		@Ctx() { req }: MyContext
 	): Promise<TicketResponse> {
-		// const isTicket = await Ticket.findOne(options.ticketId);
 		const isUser = await User.findOne(req.session.UserId);
 		if (!isUser) {
 			return {
@@ -280,7 +277,6 @@ export class TicketResolver {
 		@Arg('options') options: ChangeTicketTypeInput,
 		@Ctx() { req }: MyContext
 	): Promise<TicketResponse> {
-		// const isTicket = await Ticket.findOne(options.ticketId);
 		const isUser = await User.findOne(req.session.UserId);
 		if (!isUser) {
 			return {

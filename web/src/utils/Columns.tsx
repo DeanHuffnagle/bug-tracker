@@ -54,6 +54,7 @@ export const USER_COLUMNS = [
 		Header: 'Role',
 		id: 'role',
 		accessor: 'user_role',
+		Cell: (props) => tableFormatted(props.value),
 	},
 ];
 //================================================================================

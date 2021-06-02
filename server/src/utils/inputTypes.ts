@@ -256,6 +256,13 @@ export class JoinOrganizationInput {
 	userId!: number;
 }
 
+//// Transfer Ownership ////
+@InputType()
+export class TransferOwnershipInput {
+	@Field(() => String)
+	userId!: string;
+}
+
 //// Leave Organization ////
 @InputType()
 export class LeaveOrganizationInput {
@@ -273,10 +280,12 @@ export class MakeAdminInput {
 //// Change Role ////
 @InputType()
 export class ChangeRoleInput {
-	@Field()
-	userId: number;
 	@Field(() => String)
-	userRole!: () => UserRoleType;
+	userId!: string;
+	@Field(() => String)
+	userRole!: UserRoleType;
+	@Field(() => Int)
+	organizationId!: number;
 }
 
 //// Change Password ////

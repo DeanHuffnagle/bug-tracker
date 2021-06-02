@@ -53,7 +53,6 @@ const CreateTicket: React.FC<CreateTicketProps> = ({}) => {
 										ticketType: '',
 									}}
 									onSubmit={async (values, { setErrors }) => {
-										console.log('values: ', values.projectId);
 										const response = await createTicket({
 											options: values,
 										});

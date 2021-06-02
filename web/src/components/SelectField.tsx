@@ -2,9 +2,7 @@ import {
 	FormControl,
 	FormErrorMessage,
 	FormLabel,
-	Input,
 	Select,
-	Textarea,
 } from '@chakra-ui/react';
 import { useField } from 'formik';
 import React, { InputHTMLAttributes } from 'react';
@@ -38,6 +36,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
 			>
 				{children}
 			</Select>
+			{error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
 		</FormControl>
 	);
 };

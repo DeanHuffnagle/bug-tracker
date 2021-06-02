@@ -15,19 +15,6 @@ export const GlobalFilter = ({ filter, setFilter }) => {
 					aria-describedby="inputGroup-sizing-sm"
 				/>
 			</InputGroup>
-
-			{/* <Input
-				placeholder="Search"
-				variant="flushed"
-				value={filter || ''}
-				onChange={(e) => setFilter(e.target.value)}
-			/>
-			<Input
-				placeholder="Search"
-				variant="filled"
-				value={filter || ''}
-				onChange={(e) => setFilter(e.target.value)}
-			/> */}
 		</span>
 	);
 };

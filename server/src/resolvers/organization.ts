@@ -125,7 +125,6 @@ export class OrganizationResolver {
 			};
 		}
 		const isOrganization = await Organization.findOne(isUser?.organizationId);
-		console.log('organization: ', isOrganization);
 		let organization;
 
 		await Organization.update(

@@ -49,8 +49,9 @@ export type ChangePasswordInput = {
 };
 
 export type ChangeRoleInput = {
-  userId: Scalars['Float'];
+  userId: Scalars['String'];
   userRole: Scalars['String'];
+  organizationId: Scalars['Int'];
 };
 
 export type ChangeTicketPriorityInput = {
@@ -194,6 +195,7 @@ export type Mutation = {
   changeUserRole: UserResponse;
   joinRequest: UserResponse;
   joinOrganization: UserResponse;
+  transferOwnership: UserResponse;
   leaveOrganization: UserResponse;
   deleteUser: Scalars['Boolean'];
 };
@@ -351,6 +353,11 @@ export type MutationJoinRequestArgs = {
 
 export type MutationJoinOrganizationArgs = {
   options: JoinOrganizationInput;
+};
+
+
+export type MutationTransferOwnershipArgs = {
+  options: TransferOwnershipInput;
 };
 
 
@@ -646,6 +653,10 @@ export type TicketResponse = {
   ticket?: Maybe<Ticket>;
 };
 
+export type TransferOwnershipInput = {
+  userId: Scalars['String'];
+};
+
 export type UnassignProjectInput = {
   projectId: Scalars['Int'];
   userId: Scalars['Int'];
@@ -798,7 +809,7 @@ export type TicketFragmentFragment = (
 
 export type UserFragmentFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'organizationId' | 'joinRequestId' | 'createdAt' | 'updatedAt'>
+  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'organizationId' | 'ownedOrganizationId' | 'joinRequestId' | 'createdAt' | 'updatedAt'>
 );
 
 export type AcceptJoinRequestMutationVariables = Exact<{
@@ -829,6 +840,25 @@ export type ChangePasswordMutationVariables = Exact<{
 export type ChangePasswordMutation = (
   { __typename?: 'Mutation' }
   & { changePassword: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+  ) }
+);
+
+export type ChangeUserRoleMutationVariables = Exact<{
+  options: ChangeRoleInput;
+}>;
+
+
+export type ChangeUserRoleMutation = (
+  { __typename?: 'Mutation' }
+  & { changeUserRole: (
     { __typename?: 'UserResponse' }
     & { errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
@@ -946,6 +976,16 @@ export type DeleteCommentMutation = (
   & Pick<Mutation, 'deleteComment'>
 );
 
+export type DeleteOrganizationMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteOrganizationMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteOrganization'>
+);
+
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
 }>;
@@ -970,6 +1010,29 @@ export type JoinRequestMutation = (
       & ErrorFragmentFragment
     )>>, user?: Maybe<(
       { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+  ) }
+);
+
+export type LeaveOrganizationMutationVariables = Exact<{
+  options: LeaveOrganizationInput;
+}>;
+
+
+export type LeaveOrganizationMutation = (
+  { __typename?: 'Mutation' }
+  & { leaveOrganization: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & { organization?: Maybe<(
+        { __typename?: 'Organization' }
+        & OrganizationFragmentFragment
+      )> }
       & UserFragmentFragment
     )> }
   ) }
@@ -1014,6 +1077,25 @@ export type RegisterMutationVariables = Exact<{
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
   & { register: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    )> }
+  ) }
+);
+
+export type TransferOwnershipMutationVariables = Exact<{
+  options: TransferOwnershipInput;
+}>;
+
+
+export type TransferOwnershipMutation = (
+  { __typename?: 'Mutation' }
+  & { transferOwnership: (
     { __typename?: 'UserResponse' }
     & { errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
@@ -1621,6 +1703,7 @@ export const UserFragmentFragmentDoc = gql`
   email
   role
   organizationId
+  ownedOrganizationId
   joinRequestId
   createdAt
   updatedAt
@@ -1659,6 +1742,23 @@ ${UserFragmentFragmentDoc}`;
 
 export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
+export const ChangeUserRoleDocument = gql`
+    mutation ChangeUserRole($options: ChangeRoleInput!) {
+  changeUserRole(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    user {
+      ...userFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useChangeUserRoleMutation() {
+  return Urql.useMutation<ChangeUserRoleMutation, ChangeUserRoleMutationVariables>(ChangeUserRoleDocument);
 };
 export const CreateCommentDocument = gql`
     mutation CreateComment($commentText: String!, $ticketId: Int!) {
@@ -1754,6 +1854,15 @@ export const DeleteCommentDocument = gql`
 export function useDeleteCommentMutation() {
   return Urql.useMutation<DeleteCommentMutation, DeleteCommentMutationVariables>(DeleteCommentDocument);
 };
+export const DeleteOrganizationDocument = gql`
+    mutation DeleteOrganization($id: Int!) {
+  deleteOrganization(id: $id)
+}
+    `;
+
+export function useDeleteOrganizationMutation() {
+  return Urql.useMutation<DeleteOrganizationMutation, DeleteOrganizationMutationVariables>(DeleteOrganizationDocument);
+};
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email)
@@ -1779,6 +1888,27 @@ ${UserFragmentFragmentDoc}`;
 
 export function useJoinRequestMutation() {
   return Urql.useMutation<JoinRequestMutation, JoinRequestMutationVariables>(JoinRequestDocument);
+};
+export const LeaveOrganizationDocument = gql`
+    mutation LeaveOrganization($options: LeaveOrganizationInput!) {
+  leaveOrganization(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    user {
+      ...userFragment
+      organization {
+        ...organizationFragment
+      }
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}
+${OrganizationFragmentFragmentDoc}`;
+
+export function useLeaveOrganizationMutation() {
+  return Urql.useMutation<LeaveOrganizationMutation, LeaveOrganizationMutationVariables>(LeaveOrganizationDocument);
 };
 export const LoginDocument = gql`
     mutation Login($options: UserLoginInput!) {
@@ -1826,6 +1956,23 @@ ${UserFragmentFragmentDoc}`;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const TransferOwnershipDocument = gql`
+    mutation TransferOwnership($options: TransferOwnershipInput!) {
+  transferOwnership(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    user {
+      ...userFragment
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useTransferOwnershipMutation() {
+  return Urql.useMutation<TransferOwnershipMutation, TransferOwnershipMutationVariables>(TransferOwnershipDocument);
 };
 export const UpdateOrganizationDocument = gql`
     mutation UpdateOrganization($organizationId: Int!, $options: UpdateOrganizationInput!) {

@@ -1,0 +1,13 @@
+mutation LeaveOrganization($options: LeaveOrganizationInput!) {
+	leaveOrganization(options: $options) {
+		errors {
+			...errorFragment
+		}
+		user {
+			...userFragment
+			organization {
+				...organizationFragment
+			}
+		}
+	}
+}

@@ -1,0 +1,10 @@
+mutation TransferOwnership($options: TransferOwnershipInput!) {
+	transferOwnership(options: $options) {
+		errors {
+			...errorFragment
+		}
+		user {
+			...userFragment
+		}
+	}
+}

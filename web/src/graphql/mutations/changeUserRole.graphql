@@ -1,0 +1,10 @@
+mutation ChangeUserRole($options: ChangeRoleInput!) {
+	changeUserRole(options: $options) {
+		errors {
+			...errorFragment
+		}
+		user {
+			...userFragment
+		}
+	}
+}

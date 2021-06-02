@@ -136,8 +136,6 @@ const editTicket = ({}) => {
 												toErrorMap(response?.data?.updateProject.errors)
 											);
 										} else {
-											console.log('values: ', values);
-											// router.push(`/ticket/${isTicketId}`);
 										}
 									}}
 								>

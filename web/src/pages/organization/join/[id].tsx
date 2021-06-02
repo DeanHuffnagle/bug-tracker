@@ -1,20 +1,16 @@
-import { Box, Flex, Heading, Link } from '@chakra-ui/react';
-import { Button, Image } from 'react-bootstrap';
-import { Form, Formik } from 'formik';
+import { Box, Button, Flex, Heading, Link } from '@chakra-ui/react';
+import { Image } from 'react-bootstrap';
 import { withUrqlClient } from 'next-urql';
-import NextLink from 'next/link';
+import nextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { InputField } from '../../../components/InputField';
-import { NAVY } from '../../../constants';
 import {
 	useFindRawOrganizationProjectsQuery,
-	useMeQuery,
-	useLoginMutation,
 	useJoinRequestMutation,
+	useLoginMutation,
+	useMeQuery,
 } from '../../../generated/graphql';
 import { createUrqlClient } from '../../../utils/createUrqlClient';
-import { toErrorMap } from '../../../utils/toErrorMap';
 import { useGetOrganizationFromUrl } from '../../../utils/useGetOrganizationFromUrl';
 
 const joinOrganization: React.FC<{}> = ({}) => {
@@ -59,7 +55,7 @@ const joinOrganization: React.FC<{}> = ({}) => {
 					bg="white"
 					boxShadow="lg"
 				>
-					<Box>
+					<Box mt={3} mb={10}>
 						<a href="/">
 							<Image
 								src="http://localhost:3000/workfloIcon.png"
@@ -71,25 +67,33 @@ const joinOrganization: React.FC<{}> = ({}) => {
 					</Box>
 					<Box backgroundColor="white" p={1} borderRadius={10}>
 						<Box textAlign="center">
-							<Heading>Login</Heading>
+							<Heading>Join {organizationData?.findOrganization?.name}</Heading>
+							<Box mt={5}>
+								<Link>{link}</Link>
+							</Box>
 						</Box>
 
-						<Box my={4} textAlign="left">
-							<Button
-								onClick={() => {
-									joinRequest({
-										options: {
-											userId: isUserId as number,
-											organizationId: isOrganizationId as number,
-										},
-									});
+						<Button
+							width="full"
+							colorScheme="brand"
+							mt={5}
+							onClick={async () => {
+								const response = await joinRequest({
+									options: {
+										userId: isUserId as number,
+										organizationId: isOrganizationId as number,
+									},
+								});
+								if (!response.data?.joinRequest.user) {
+									alert('something went wrong');
+								} else if (response.data?.joinRequest.user) {
 									alert('Request sent successfully!');
 									router.push('/');
-								}}
-							>
-								join n junk
-							</Button>
-						</Box>
+								}
+							}}
+						>
+							Request to join
+						</Button>
 					</Box>
 				</Box>
 			</Box>

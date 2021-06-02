@@ -28,6 +28,7 @@ import {
 	JoinRequestInput,
 	LeaveOrganizationInput,
 	MakeAdminInput,
+	TransferOwnershipInput,
 	UserLoginInput,
 	UserRegisterInput,
 } from '../utils/inputTypes';
@@ -109,10 +110,9 @@ export class UserResolver {
 				})
 				.returning('*')
 				.execute();
-			console.log('result: ', result);
+
 			user = result.raw[0];
 		} catch (err) {
-			console.log('error!: ', err);
 			if (err.code === '23505') {
 				return {
 					errors: [
@@ -139,7 +139,6 @@ export class UserResolver {
 		@Ctx() { req }: MyContext
 	) {
 		const user = await User.findOne({ where: { email: options.email } });
-		console.log('first req.session.User.id: ', req.session.UserId);
 		if (!user) {
 			return {
 				errors: [
@@ -162,7 +161,6 @@ export class UserResolver {
 			};
 		}
 		req.session.UserId = user.id;
-		console.log('second req.session.User.id: ', req.session.UserId);
 
 		return { user };
 	}
@@ -502,7 +500,6 @@ export class UserResolver {
 			req.session.destroy((err) => {
 				res.clearCookie(COOKIE_NAME);
 				if (err) {
-					console.log(err);
 					resolve(false);
 					return;
 				}
@@ -535,19 +532,56 @@ export class UserResolver {
 	//================================================================================
 	@Mutation(() => UserResponse)
 	@UseMiddleware(isAdmin)
-	async changeUserRole(@Arg('options') options: ChangeRoleInput) {
-		const unchangedUser = await User.findOne(options.userId);
-		if (!unchangedUser) {
+	async changeUserRole(
+		@Arg('options') options: ChangeRoleInput,
+		@Ctx() { req }: MyContext
+	): Promise<UserResponse> {
+		const isUserId = parseInt(options.userId);
+		const isUser = await User.findOne(options.userId);
+		const me = await User.findOne(req.session.UserId);
+		const isOrganization = await Organization.findOne(options.organizationId);
+		if (!isOrganization) {
 			return {
 				errors: [
 					{
-						field: 'user',
+						field: 'userId',
+						message: 'no organiztion found.',
+					},
+				],
+			};
+		}
+		if (isUser?.ownedOrganizationId) {
+			return {
+				errors: [
+					{
+						field: 'userId',
+						message: 'user is the owner of their organization.',
+					},
+				],
+			};
+		}
+		if (isUser?.id === me?.id) {
+			return {
+				errors: [
+					{
+						field: 'userId',
+						message: 'you can not change your own role.',
+					},
+				],
+			};
+		}
+
+		if (!isUser) {
+			return {
+				errors: [
+					{
+						field: 'userId',
 						message: 'no user found.',
 					},
 				],
 			};
 		}
-		await User.update({ id: options.userId }, { role: options.userRole });
+		await User.update({ id: isUserId }, { role: options.userRole });
 		const user = await User.findOne(options.userId);
 		return { user };
 	}
@@ -556,6 +590,7 @@ export class UserResolver {
 	//Join Request Mutation
 	//================================================================================
 	@Mutation(() => UserResponse)
+	@UseMiddleware(isAuth)
 	async joinRequest(
 		@Arg('options') options: JoinRequestInput
 	): Promise<UserResponse> {
@@ -663,6 +698,66 @@ export class UserResolver {
 		return { user };
 	}
 	//================================================================================
+	//transfer ownership mutation
+	//================================================================================
+	@Mutation(() => UserResponse)
+	@UseMiddleware(isAdmin)
+	async transferOwnership(
+		@Arg('options') options: TransferOwnershipInput,
+		@Ctx() { req }: MyContext
+	): Promise<UserResponse> {
+		const intUserId = parseInt(options.userId);
+		const isOwner = await User.findOne(req.session.UserId);
+		const isOrganization = await Organization.findOne(isOwner?.organizationId);
+		const isNewOwner = await User.findOne(intUserId);
+
+		if (!isOrganization) {
+			return {
+				errors: [
+					{
+						field: 'userId',
+						message: 'You are not in an Organization.',
+					},
+				],
+			};
+		}
+		if (!isNewOwner) {
+			return {
+				errors: [
+					{
+						field: 'userId',
+						message: 'No user found.',
+					},
+				],
+			};
+		}
+
+		if (isOwner?.ownedOrganizationId !== isOrganization.id) {
+			return {
+				errors: [
+					{
+						field: 'userId',
+						message: 'You are not the owner of this Organization.',
+					},
+				],
+			};
+		}
+
+		await getConnection()
+			.createQueryBuilder()
+			.relation(User, 'ownedOrganization')
+			.of(isNewOwner)
+			.set(isOrganization);
+
+		await User.update({ id: isNewOwner?.id }, { role: 'admin' });
+		const user = await User.findOne(isNewOwner.id, {
+			relations: ['ownedOrganization'],
+		});
+
+		return { user };
+	}
+
+	//================================================================================
 	//Leave Organization Mutation
 	//================================================================================
 	@Mutation(() => UserResponse)
@@ -671,7 +766,7 @@ export class UserResolver {
 		@Arg('options') options: LeaveOrganizationInput
 	): Promise<UserResponse> {
 		const isUser = await User.findOne(options.userId);
-		const isOrganization = await Organization.findOne();
+		const isOrganization = await Organization.findOne(isUser?.organizationId);
 		if (!isUser) {
 			return {
 				errors: [
@@ -683,11 +778,14 @@ export class UserResolver {
 			};
 		}
 		if (isUser.id === isOrganization?.ownerId) {
-			await getConnection()
-				.createQueryBuilder()
-				.relation(User, 'ownedOrganization')
-				.of(isUser)
-				.set(null);
+			return {
+				errors: [
+					{
+						field: 'userId',
+						message: 'you must transfer ownership before leaving .',
+					},
+				],
+			};
 		}
 
 		await getConnection()

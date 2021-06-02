@@ -140,7 +140,6 @@ export class CommentResolver {
 			.where('comment.ticketId = :ticketId', { ticketId: options.ticketId })
 			.getRawMany();
 
-		console.log('raw data: ', commentByTicket);
 		return commentByTicket;
 	}
 }

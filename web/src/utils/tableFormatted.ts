@@ -37,6 +37,18 @@ export const tableFormatted = (cellInput: string) => {
 		case 'other':
 			value = 'Other';
 			break;
+		case 'developer':
+			value = 'Developer';
+			break;
+		case 'submitter':
+			value = 'Submitter';
+			break;
+		case 'projectManager':
+			value = 'Project Manager';
+			break;
+		case 'admin':
+			value = 'Admin';
+			break;
 		default:
 			value = `${cellInput}`;
 			break;

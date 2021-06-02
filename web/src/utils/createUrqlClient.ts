@@ -35,6 +35,7 @@ export const createUrqlClient = (ssrExchange: any) => {
 							});
 							// console.log(cache.inspectFields('Query'));
 						},
+
 						declineJoinRequest: (result, args, cache, info) => {
 							// console.log(cache.inspectFields('Query'));
 							cache.invalidate('Query', 'findUsersByJoinRequest', {
@@ -43,6 +44,13 @@ export const createUrqlClient = (ssrExchange: any) => {
 								},
 							});
 							// console.log(cache.inspectFields('Query'));
+						},
+
+						changeUserRole: (result, args, cache, info) => {
+							console.log('change role update starting: ');
+							console.log(cache.inspectFields('Query'));
+							cache.invalidate('Query', 'findRawOrganizationUsers');
+							console.log(cache.inspectFields('Query'));
 						},
 
 						updateProject: (result, args, cache, info) => {

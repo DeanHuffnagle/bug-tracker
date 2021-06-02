@@ -133,8 +133,6 @@ const editOrganization: React.FC<{}> = ({}) => {
 												toErrorMap(response?.data?.updateOrganization.errors)
 											);
 										} else {
-											console.log('values: ', values);
-											// router.push(`/ticket/${isTicketId}`);
 										}
 									}}
 								>

@@ -35,8 +35,6 @@ export class ProjectResolver {
 		@Ctx() { req }: MyContext
 	): Promise<ProjectResponse> {
 		const isUser = await User.findOne(req.session.UserId);
-		console.log('user: ', isUser);
-		console.log('options: ', options);
 		let project;
 		if (!isUser?.organizationId) {
 			return {
@@ -101,13 +99,6 @@ export class ProjectResolver {
 			where: { organizationId: isUser?.organizationId },
 			relations: ['organization'],
 		});
-		// await getRepository(Project)
-		// 	.createQueryBuilder('project')
-		// 	.where('project.organizationId = :id', {
-		// 		id: isUser?.organizationId,
-		// 	})
-		// 	.getMany();
-
 		return projectsByOrganization;
 	}
 	//================================================================================
