@@ -63,7 +63,7 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 							id: isOrganizationId as number,
 						});
 						if (response?.data?.deleteOrganization) {
-							alert(`something went wrong.`);
+							`"${meData.me?.organization?.name}" has been permanently deleted`;
 						} else {
 							alert(
 								`"${meData.me?.organization?.name}" has been permanently deleted`
@@ -221,13 +221,19 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 				logged in as <strong>{meData?.me?.role}</strong>.
 			</div>
 		);
-		if (joinRequestData?.findUsersByJoinRequest?.length === 0) {
+		if (
+			meData.me.role === 'admin' &&
+			joinRequestData?.findUsersByJoinRequest?.length === 0
+		) {
 			notification = (
 				<Nav.Link href="/join-requests">
 					<BellIcon />
 				</Nav.Link>
 			);
-		} else {
+		} else if (
+			meData.me.role === 'admin' &&
+			joinRequestData?.findUsersByJoinRequest?.length !== 0
+		) {
 			notification = (
 				<Nav.Link href="/join-requests">
 					<BellIcon color="red" />

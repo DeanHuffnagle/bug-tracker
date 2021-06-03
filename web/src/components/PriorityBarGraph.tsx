@@ -171,8 +171,7 @@ export const PriorityBarGraph: React.FC<PriorityBarGraphProps> = ({
 	let ticketPriorityData;
 	if (admin) {
 		ticketPriorityData = adminTicketPriorityData;
-	}
-	if (manager) {
+	} else if (manager) {
 		ticketPriorityData = managerTicketPriorityData;
 	} else {
 		ticketPriorityData = devTicketPriorityData;

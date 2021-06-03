@@ -13,7 +13,7 @@ import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { Card, Col, Container, Row } from 'react-bootstrap';
+import { Card, Col, Container, ListGroup, Row } from 'react-bootstrap';
 import { InputField } from '../../../components/InputField';
 import { NavBar } from '../../../components/NavBar';
 import { SelectField } from '../../../components/SelectField';
@@ -60,73 +60,80 @@ const editTicket = ({}) => {
 					<Row>
 						<Col md={12} lg={6} className="mt-1">
 							<Card>
-								<Flex width="full">
-									<Box width="full">
-										<Heading ml={2} mt={1}>
-											{ticketData?.findTicket?.title}
-										</Heading>
-									</Box>
-									<Box mr="auto" mt={1}>
-										<NextLink href="/ticket/[id]" as={`/ticket/${isTicketId}`}>
-											<IconButton
-												as={Link}
-												aria-label="arrow back icon"
-												icon={<ArrowBackIcon />}
-												size="xs"
-												mr={1}
-											/>
-										</NextLink>
-									</Box>
-								</Flex>
-								<Text ml={2} my={2}>
-									Description: {ticketData?.findTicket?.text}
-								</Text>
-								<Text ml={2} mb={2}>
-									Assigned Developer:{' '}
-									{ticketData?.findTicket?.assignedDeveloper?.firstName}{' '}
-									{ticketData?.findTicket?.assignedDeveloper?.lastName}
-								</Text>
-								<Text ml={2} mb={4}>
-									Priority:{' '}
-									{ticketData?.findTicket?.priority === 'low' ? 'Low' : null}
-									{ticketData?.findTicket?.priority === 'medium'
-										? 'Medium'
-										: null}
-									{ticketData?.findTicket?.priority === 'high' ? 'High' : null}
-								</Text>
-								<Text ml={2} mb={4}>
-									Status:{' '}
-									{ticketData?.findTicket?.status === 'unassigned'
-										? 'Unassigned'
-										: null}
-									{ticketData?.findTicket?.status === 'inProgress'
-										? 'In Progress'
-										: null}
-									{ticketData?.findTicket?.status === 'awaitingConfirmation'
-										? 'Awaiting Confirmation'
-										: null}
-									{ticketData?.findTicket?.status === 'resolved'
-										? 'Resolved'
-										: null}
-								</Text>
-
-								<Text ml={2} mb={4}>
-									Type:{' '}
-									{ticketData?.findTicket?.type === 'bugOrError'
-										? 'Bug/Error'
-										: null}
-									{ticketData?.findTicket?.type === 'featureRequest'
-										? 'Feature Request'
-										: null}
-									{ticketData?.findTicket?.type === 'trainingRequest'
-										? 'Training Request'
-										: null}
-									{ticketData?.findTicket?.type === 'other' ? 'Other' : null}
-								</Text>
+								<Card.Header>
+									<Flex width="full">
+										<Box width="full">
+											<Heading>{ticketData?.findTicket?.title}</Heading>
+										</Box>
+										<Box mr="auto" mt={1}>
+											<NextLink
+												href="/ticket/[id]"
+												as={`/ticket/${isTicketId}`}
+											>
+												<IconButton
+													as={Link}
+													aria-label="go back"
+													icon={<ArrowBackIcon />}
+													size="xs"
+													mr={1}
+												/>
+											</NextLink>
+										</Box>
+									</Flex>
+								</Card.Header>
+								<ListGroup variant="flush">
+									<ListGroup.Item>
+										Description: {ticketData?.findTicket?.text}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Assigned Developer:{' '}
+										{ticketData?.findTicket?.assignedDeveloper?.firstName}{' '}
+										{ticketData?.findTicket?.assignedDeveloper?.lastName}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Priority:{' '}
+										{ticketData?.findTicket?.priority === 'low' ? 'Low' : null}
+										{ticketData?.findTicket?.priority === 'medium'
+											? 'Medium'
+											: null}
+										{ticketData?.findTicket?.priority === 'high'
+											? 'High'
+											: null}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Status:{' '}
+										{ticketData?.findTicket?.status === 'unassigned'
+											? 'Unassigned'
+											: null}
+										{ticketData?.findTicket?.status === 'inProgress'
+											? 'In Progress'
+											: null}
+										{ticketData?.findTicket?.status === 'awaitingConfirmation'
+											? 'Awaiting Confirmation'
+											: null}
+										{ticketData?.findTicket?.status === 'resolved'
+											? 'Resolved'
+											: null}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Type:{' '}
+										{ticketData?.findTicket?.type === 'bugOrError'
+											? 'Bug/Error'
+											: null}
+										{ticketData?.findTicket?.type === 'featureRequest'
+											? 'Feature Request'
+											: null}
+										{ticketData?.findTicket?.type === 'trainingRequest'
+											? 'Training Request'
+											: null}
+										{ticketData?.findTicket?.type === 'other' ? 'Other' : null}
+									</ListGroup.Item>
+								</ListGroup>
 							</Card>
 						</Col>
 						<Col md={12} lg={6} className="mt-1">
 							<Card className="m-auto">
+								<Heading>Edit Ticket</Heading>
 								<Formik
 									initialValues={{
 										ticketTitle: ticketData?.findTicket?.title
@@ -179,7 +186,6 @@ const editTicket = ({}) => {
 												/>
 											</Box>
 											<Flex>
-												P
 												<Box mt={1} width="full">
 													<SelectField
 														label="Assigned Developer:"
@@ -242,7 +248,7 @@ const editTicket = ({}) => {
 
 											<Button
 												width="full"
-												colorScheme="teal"
+												colorScheme="brand"
 												mt={5}
 												type="submit"
 												isLoading={isSubmitting}

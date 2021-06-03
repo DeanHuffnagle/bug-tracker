@@ -1,5 +1,8 @@
 query FindOrganization($id: Int!) {
 	findOrganization(id: $id) {
 		...organizationFragment
+		owner {
+			...userFragment
+		}
 	}
 }

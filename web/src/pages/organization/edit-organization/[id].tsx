@@ -11,7 +11,7 @@ import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import { Card, Col, Container, Row } from 'react-bootstrap';
+import { Card, Col, Container, ListGroup, Row } from 'react-bootstrap';
 import { InputField } from '../../../components/InputField';
 import { NavBar } from '../../../components/NavBar';
 import NextLink from 'next/link';
@@ -83,32 +83,45 @@ const editOrganization: React.FC<{}> = ({}) => {
 					<Row>
 						<Col className="mt-1">
 							<Card id="chart-card">
-								<Flex width="full">
-									<Box width="full">
-										<Heading>
-											{organizationData?.findOrganization?.name}
-										</Heading>
-									</Box>
-
-									<Box mr="auto" mt={1}>
-										<NextLink
-											href="/organization/[id]"
-											as={`/organization/${isOrganizationId}`}
-										>
-											<IconButton
-												as={Link}
-												aria-label="edit post"
-												icon={<ArrowBackIcon />}
-												size="xs"
-												mr={1}
-											/>
-										</NextLink>
-									</Box>
-								</Flex>
-								{link}
-								<Text>
-									Projects:{projectData?.findRawOrganizationProjects?.length}
-								</Text>
+								<Card.Header>
+									<Flex width="full">
+										<Box width="full">
+											<Heading>
+												{organizationData?.findOrganization?.name}
+											</Heading>
+										</Box>
+										<Box mr="auto" mt={1}>
+											<NextLink
+												href="/organization/[id]"
+												as={`/organization/${isOrganizationId}`}
+											>
+												<IconButton
+													as={Link}
+													aria-label="go back"
+													icon={<ArrowBackIcon />}
+													size="xs"
+													mr={1}
+												/>
+											</NextLink>
+										</Box>
+									</Flex>
+								</Card.Header>
+								<ListGroup variant="flush">
+									<ListGroup.Item> Link: {link}</ListGroup.Item>
+									<ListGroup.Item>
+										Owner: {organizationData?.findOrganization?.owner.firstName}{' '}
+										{organizationData?.findOrganization?.owner.lastName}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Members: {userData?.findRawOrganizationUsers?.length}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Projects: {projectData?.findRawOrganizationProjects?.length}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Tickets: {ticketData?.findRawOrganizationTickets?.length}
+									</ListGroup.Item>
+								</ListGroup>
 							</Card>
 						</Col>
 

@@ -220,8 +220,7 @@ export const StatusBarGraph: React.FC<StatusBarGraphProps> = ({
 	let ticketStatusData;
 	if (admin) {
 		ticketStatusData = adminTicketStatusData;
-	}
-	if (manager) {
+	} else if (manager) {
 		ticketStatusData = managerTicketStatusData;
 	} else {
 		ticketStatusData = devTicketStatusData;

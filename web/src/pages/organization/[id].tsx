@@ -2,7 +2,7 @@ import { Box, Flex, Heading, IconButton, Link, Text } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import { Card, Col, Container, Row } from 'react-bootstrap';
+import { Card, Col, Container, ListGroup, Row } from 'react-bootstrap';
 import { CustomTable } from '../../components/CustomTable';
 import { NavBar } from '../../components/NavBar';
 import NextLink from 'next/link';
@@ -19,7 +19,8 @@ import {
 } from '../../utils/Columns';
 import { createUrqlClient } from '../../utils/createUrqlClient';
 import { useGetOrganizationFromUrl } from '../../utils/useGetOrganizationFromUrl';
-import { EditIcon } from '@chakra-ui/icons';
+import { ArrowBackIcon, EditIcon } from '@chakra-ui/icons';
+import { StatusBarGraph } from '../../components/StatusBarGraph';
 
 const organization: React.FC<{}> = ({}) => {
 	const router = useRouter();
@@ -53,6 +54,25 @@ const organization: React.FC<{}> = ({}) => {
 		''
 	);
 
+	let editButton = null;
+
+	if (meData?.me?.role === 'admin') {
+		editButton = (
+			<NextLink
+				href="/organization/edit-organization/[id]"
+				as={`/organization/edit-organization/${isOrganizationId}`}
+			>
+				<IconButton
+					as={Link}
+					aria-label="edit post"
+					icon={<EditIcon />}
+					size="xs"
+					mr={1}
+				/>
+			</NextLink>
+		);
+	}
+
 	useEffect(() => {
 		if (organizationData) {
 			if (meData) {
@@ -77,37 +97,52 @@ const organization: React.FC<{}> = ({}) => {
 					<Row>
 						<Col className="mt-1">
 							<Card id="chart-card">
-								<Flex width="full">
-									<Box width="full">
-										<Heading>
-											{organizationData?.findOrganization?.name}
-										</Heading>
-									</Box>
-
-									<Box mr="auto" mt={1}>
-										<NextLink
-											href="/organization/edit-organization/[id]"
-											as={`/organization/edit-organization/${isOrganizationId}`}
-										>
-											<IconButton
-												as={Link}
-												aria-label="edit organization"
-												icon={<EditIcon />}
-												size="xs"
-												mr={1}
-											/>
-										</NextLink>
-									</Box>
-								</Flex>
-								{link}
-								<Text>
-									Projects:{projectData?.findRawOrganizationProjects?.length}
-								</Text>
+								<Card.Header>
+									<Flex width="full">
+										<Box width="full">
+											<Heading>
+												{organizationData?.findOrganization?.name}
+											</Heading>
+										</Box>
+										<Box mr="auto" mt={1}>
+											{editButton}
+										</Box>
+									</Flex>
+								</Card.Header>
+								<ListGroup variant="flush">
+									<ListGroup.Item> Link: {link}</ListGroup.Item>
+									<ListGroup.Item>
+										Owner: {organizationData?.findOrganization?.owner.firstName}{' '}
+										{organizationData?.findOrganization?.owner.lastName}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Members: {userData?.findRawOrganizationUsers?.length}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Projects: {projectData?.findRawOrganizationProjects?.length}
+									</ListGroup.Item>
+									<ListGroup.Item>
+										Tickets: {ticketData?.findRawOrganizationTickets?.length}
+									</ListGroup.Item>
+								</ListGroup>
 							</Card>
 						</Col>
 
 						<Col className="mt-1">
 							<Card id="chart-card">
+								<div className="text-center" id="dashboard-card-titles">
+									Tickets by Status
+								</div>
+								<StatusBarGraph admin={true} />
+							</Card>
+						</Col>
+					</Row>
+					<Row>
+						<Col className="mt-1">
+							<Card id="chart-card">
+								<div className="text-center" id="dashboard-card-titles">
+									Members
+								</div>
 								<CustomTable
 									columnInput={USER_COLUMNS}
 									dataInput={userTableData}
@@ -120,6 +155,9 @@ const organization: React.FC<{}> = ({}) => {
 					<Row>
 						<Col className="mt-1">
 							<Card id="chart-card">
+								<div className="text-center" id="dashboard-card-titles">
+									Projects
+								</div>
 								<CustomTable
 									columnInput={PROJECT_COLUMNS}
 									dataInput={projectTableData}
@@ -131,6 +169,9 @@ const organization: React.FC<{}> = ({}) => {
 					<Row>
 						<Col className="mt-1">
 							<Card id="chart-card">
+								<div className="text-center" id="dashboard-card-titles">
+									Tickets
+								</div>
 								<CustomTable
 									columnInput={TICKET_COLUMNS}
 									dataInput={ticketTableData}

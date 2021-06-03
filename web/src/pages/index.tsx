@@ -7,7 +7,15 @@ import { NavBar } from '../components/NavBar';
 import { PriorityBarGraph } from '../components/PriorityBarGraph';
 import { StatusBarGraph } from '../components/StatusBarGraph';
 import { TypePieChart } from '../components/TypePieChart';
-import { useFindAssignedTicketsQuery, useMeQuery } from '../generated/graphql';
+import {
+	useFindAssignedTicketsByPriorityQuery,
+	useFindAssignedTicketsByStatusQuery,
+	useFindAssignedTicketsByTypeQuery,
+	useFindAssignedTicketsQuery,
+	useFindOrganizationTicketsByStatusQuery,
+	useFindRawAssignedProjectsQuery,
+	useMeQuery,
+} from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
 //================================================================================
@@ -16,7 +24,43 @@ import { createUrqlClient } from '../utils/createUrqlClient';
 const Index: React.FC<{}> = () => {
 	const router = useRouter();
 	const [{ data: meData, fetching }] = useMeQuery();
+
+	//assigned projects
+	const [{ data: assignedProjectsData }] = useFindRawAssignedProjectsQuery();
+
+	// assigned tickets
 	const [{ data: assignedTicketsData }] = useFindAssignedTicketsQuery();
+
+	//tickets in progress
+	const [{ data: inProgressTicketsData }] = useFindAssignedTicketsByStatusQuery(
+		{
+			variables: {
+				options: {
+					status: 'inProgress',
+				},
+			},
+		}
+	);
+
+	//high priority tickets
+	const [{ data: highPriorityTicketsData }] =
+		useFindAssignedTicketsByPriorityQuery({
+			variables: {
+				options: {
+					priority: 'high',
+				},
+			},
+		});
+
+	//bugs or errors
+	const [{ data: bugsOrErrorsData }] = useFindAssignedTicketsByTypeQuery({
+		variables: {
+			options: {
+				type: 'bugOrError',
+			},
+		},
+	});
+
 	const [asked, setAsked] = useState(false);
 
 	useEffect(() => {
@@ -32,7 +76,7 @@ const Index: React.FC<{}> = () => {
 				<Heading>Loading...</Heading>
 			</>
 		);
-	} else if (meData.me && !asked) {
+	} else if (meData.me && !asked && !meData.me.joinRequestId) {
 		setAsked(true);
 		if (meData.me.organizationId === null || fetching) {
 			if (
@@ -68,44 +112,31 @@ const Index: React.FC<{}> = () => {
 										<ListGroup variant="flush">
 											<ListGroup.Item>
 												Assigned Projects:{' '}
-												{assignedTicketsData?.findAssignedTickets?.length}
+												{assignedProjectsData?.findRawAssignedProjects?.length}
 											</ListGroup.Item>
 											<ListGroup.Item>
 												Assigned Tickets:{' '}
 												{assignedTicketsData?.findAssignedTickets?.length}
 											</ListGroup.Item>
 											<ListGroup.Item>
-												Assigned Tickets:{' '}
-												{assignedTicketsData?.findAssignedTickets?.length}
+												Tickets in Progress:{' '}
+												{
+													inProgressTicketsData?.findAssignedTicketsByStatus
+														?.length
+												}
 											</ListGroup.Item>
 											<ListGroup.Item>
-												Assigned Tickets:{' '}
-												{assignedTicketsData?.findAssignedTickets?.length}
+												High Priority Tickets:{' '}
+												{
+													highPriorityTicketsData?.findAssignedTicketsByPriority
+														?.length
+												}
 											</ListGroup.Item>
 											<ListGroup.Item>
-												Assigned Tickets:{' '}
-												{assignedTicketsData?.findAssignedTickets?.length}
+												Bugs/Errors:{' '}
+												{bugsOrErrorsData?.findAssignedTicketsByType?.length}
 											</ListGroup.Item>
 										</ListGroup>
-										{/* <div className="text-center" id="dashboard-card-titles">
-											Important Information
-										</div>
-										<div id="dashboard-stats-text">
-											Assigned Projects:{' '}
-											{assignedTicketsData?.findAssignedTickets?.length}
-										</div>
-										<div id="dashboard-stats-text">
-											Assigned Tickets:{' '}
-											{assignedTicketsData?.findAssignedTickets?.length}
-										</div>
-										<div id="dashboard-stats-text">
-											Tickets in Progress:{' '}
-											{assignedTicketsData?.findAssignedTickets?.length}
-										</div>
-										<div id="dashboard-stats-text">
-											High Priority Tickets:{' '}
-											{assignedTicketsData?.findAssignedTickets?.length}
-										</div> */}
 									</Card>
 								</Col>
 
@@ -231,7 +262,7 @@ const Index: React.FC<{}> = () => {
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Priority
 										</div>
-										<PriorityBarGraph />
+										<PriorityBarGraph />q
 									</Card>
 								</Col>
 

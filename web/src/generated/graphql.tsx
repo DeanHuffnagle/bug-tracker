@@ -1282,6 +1282,10 @@ export type FindOrganizationQuery = (
   { __typename?: 'Query' }
   & { findOrganization?: Maybe<(
     { __typename?: 'Organization' }
+    & { owner: (
+      { __typename?: 'User' }
+      & UserFragmentFragment
+    ) }
     & OrganizationFragmentFragment
   )> }
 );
@@ -2121,9 +2125,13 @@ export const FindOrganizationDocument = gql`
     query FindOrganization($id: Int!) {
   findOrganization(id: $id) {
     ...organizationFragment
+    owner {
+      ...userFragment
+    }
   }
 }
-    ${OrganizationFragmentFragmentDoc}`;
+    ${OrganizationFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
 
 export function useFindOrganizationQuery(options: Omit<Urql.UseQueryArgs<FindOrganizationQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FindOrganizationQuery>({ query: FindOrganizationDocument, ...options });
