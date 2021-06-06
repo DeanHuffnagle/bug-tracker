@@ -1,4 +1,5 @@
 import { ApolloServer } from 'apollo-server-express';
+import 'dotenv-safe/config';
 import connectRedis from 'connect-redis';
 import express from 'express';
 import session from 'express-session';
@@ -18,25 +19,28 @@ import { ProjectResolver } from './resolvers/project';
 import { TicketResolver } from './resolvers/ticket';
 import { UserResolver } from './resolvers/user';
 import cors from 'cors';
+import path from 'path';
 
 const main = async () => {
-	await createConnection({
+	const conn = await createConnection({
 		type: 'postgres',
-		username: 'postgres',
-		password: 'postgres',
-		database: 'BugTracker',
+		url: process.env.DATABASE_URL,
 		entities: [User, Ticket, Project, Organization, Comment],
-		synchronize: true,
+		synchronize: !__prod__,
+		migrations: [path.join(__dirname, './migrations/*')],
 		logging: true,
 	});
+
+	// await conn.runMigrations();
 
 	const app = express();
 
 	const RedisStore = connectRedis(session);
-	const redis = new Redis();
+	const redis = new Redis(process.env.REDIS_URL);
+	app.set('trust proxy', 1);
 	app.use(
 		cors({
-			origin: 'http://localhost:3000',
+			origin: process.env.CORS_ORIGIN,
 			credentials: true,
 		})
 	);
@@ -52,9 +56,10 @@ const main = async () => {
 				httpOnly: true,
 				sameSite: 'lax',
 				secure: __prod__,
+				domain: __prod__ ? '.workflo.codes' : undefined,
 			},
 			saveUninitialized: false,
-			secret: 'Sigj24Ih00Gk0@uo&OygUyg#hfSfT4Ykmnv66$4gjO9',
+			secret: process.env.SESSION_SECRET,
 			resave: false,
 		})
 	);
@@ -83,7 +88,7 @@ const main = async () => {
 		cors: false,
 	});
 
-	app.listen(4000, () => {
+	app.listen(parseInt(process.env.PORT), () => {
 		console.log('server started on localhost:4000');
 	});
 };

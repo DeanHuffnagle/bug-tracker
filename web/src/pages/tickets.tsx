@@ -67,7 +67,7 @@ const Tickets: React.FC<{}> = () => {
 			<Container>
 				<Card>
 					<CustomTable
-						dataInput={tableData}
+						dataInput={tableData as any[]}
 						columnInput={TICKET_COLUMNS}
 						userInput={meData?.me}
 						sortByInput={'ticket number'}

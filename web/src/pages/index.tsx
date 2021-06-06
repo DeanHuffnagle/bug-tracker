@@ -1,8 +1,13 @@
 import { Heading } from '@chakra-ui/layout';
-import { withUrqlClient } from 'next-urql';
+import {
+	NextComponentType,
+	PartialNextContext,
+	withUrqlClient,
+} from 'next-urql';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { Card, Col, Container, ListGroup, Row } from 'react-bootstrap';
+import { JsxElement } from 'typescript';
 import { NavBar } from '../components/NavBar';
 import { PriorityBarGraph } from '../components/PriorityBarGraph';
 import { StatusBarGraph } from '../components/StatusBarGraph';
@@ -15,15 +20,18 @@ import {
 	useFindOrganizationTicketsByStatusQuery,
 	useFindRawAssignedProjectsQuery,
 	useMeQuery,
+	useRemoveNewUserTagMutation,
 } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
 //================================================================================
 //Index Page
 //================================================================================
-const Index: React.FC<{}> = () => {
+
+const Index = () => {
 	const router = useRouter();
 	const [{ data: meData, fetching }] = useMeQuery();
+	const [, removeNewUserTag] = useRemoveNewUserTagMutation();
 
 	//assigned projects
 	const [{ data: assignedProjectsData }] = useFindRawAssignedProjectsQuery();
@@ -78,15 +86,15 @@ const Index: React.FC<{}> = () => {
 		);
 	} else if (meData.me && !asked && !meData.me.joinRequestId) {
 		setAsked(true);
-		if (meData.me.organizationId === null || fetching) {
-			if (
-				window.confirm(
-					'you are not in an organization, would you like to create one?'
-				)
-			) {
+		if (meData.me.userExperience === 'new' || fetching) {
+			window.alert(
+				`Congratulations on creating your new account! To get started, you can create an organization to store your projects in, or search for an existing organization.`
+			);
+			if (window.confirm('would you like to create an organization now?')) {
 				router.push('/create-organization');
+				removeNewUserTag();
 			} else {
-				router.push('/organizations');
+				removeNewUserTag();
 			}
 			return (
 				<>
@@ -106,7 +114,7 @@ const Index: React.FC<{}> = () => {
 						<NavBar />
 						<Container>
 							<Row>
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<Card.Header>Important Information</Card.Header>
 										<ListGroup variant="flush">
@@ -140,7 +148,7 @@ const Index: React.FC<{}> = () => {
 									</Card>
 								</Col>
 
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Type
@@ -151,7 +159,7 @@ const Index: React.FC<{}> = () => {
 							</Row>
 
 							<Row>
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Priority
@@ -160,7 +168,7 @@ const Index: React.FC<{}> = () => {
 									</Card>
 								</Col>
 
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Status
@@ -181,19 +189,41 @@ const Index: React.FC<{}> = () => {
 						<NavBar />
 						<Container>
 							<Row>
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
-										<div className="text-center" id="dashboard-card-titles">
-											Stats and Stuff
-										</div>
-										<div id="dashboard-stats-text">
-											Assigned Tickets:{' '}
-											{assignedTicketsData?.findAssignedTickets?.length}
-										</div>
+										<Card.Header>Important Information</Card.Header>
+										<ListGroup variant="flush">
+											<ListGroup.Item>
+												Assigned Projects:{' '}
+												{assignedProjectsData?.findRawAssignedProjects?.length}
+											</ListGroup.Item>
+											<ListGroup.Item>
+												Assigned Tickets:{' '}
+												{assignedTicketsData?.findAssignedTickets?.length}
+											</ListGroup.Item>
+											<ListGroup.Item>
+												Tickets in Progress:{' '}
+												{
+													inProgressTicketsData?.findAssignedTicketsByStatus
+														?.length
+												}
+											</ListGroup.Item>
+											<ListGroup.Item>
+												High Priority Tickets:{' '}
+												{
+													highPriorityTicketsData?.findAssignedTicketsByPriority
+														?.length
+												}
+											</ListGroup.Item>
+											<ListGroup.Item>
+												Bugs/Errors:{' '}
+												{bugsOrErrorsData?.findAssignedTicketsByType?.length}
+											</ListGroup.Item>
+										</ListGroup>
 									</Card>
 								</Col>
 
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Type
@@ -204,7 +234,7 @@ const Index: React.FC<{}> = () => {
 							</Row>
 
 							<Row>
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Priority
@@ -213,7 +243,7 @@ const Index: React.FC<{}> = () => {
 									</Card>
 								</Col>
 
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Status
@@ -234,19 +264,41 @@ const Index: React.FC<{}> = () => {
 						<NavBar />
 						<Container>
 							<Row>
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
-										<div className="text-center" id="dashboard-card-titles">
-											Stats and Stuff
-										</div>
-										<div id="dashboard-stats-text">
-											Assigned Tickets:{' '}
-											{assignedTicketsData?.findAssignedTickets?.length}
-										</div>
+										<Card.Header>Important Information</Card.Header>
+										<ListGroup variant="flush">
+											<ListGroup.Item>
+												Assigned Projects:{' '}
+												{assignedProjectsData?.findRawAssignedProjects?.length}
+											</ListGroup.Item>
+											<ListGroup.Item>
+												Assigned Tickets:{' '}
+												{assignedTicketsData?.findAssignedTickets?.length}
+											</ListGroup.Item>
+											<ListGroup.Item>
+												Tickets in Progress:{' '}
+												{
+													inProgressTicketsData?.findAssignedTicketsByStatus
+														?.length
+												}
+											</ListGroup.Item>
+											<ListGroup.Item>
+												High Priority Tickets:{' '}
+												{
+													highPriorityTicketsData?.findAssignedTicketsByPriority
+														?.length
+												}
+											</ListGroup.Item>
+											<ListGroup.Item>
+												Bugs/Errors:{' '}
+												{bugsOrErrorsData?.findAssignedTicketsByType?.length}
+											</ListGroup.Item>
+										</ListGroup>
 									</Card>
 								</Col>
 
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Type
@@ -257,16 +309,16 @@ const Index: React.FC<{}> = () => {
 							</Row>
 
 							<Row>
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Priority
 										</div>
-										<PriorityBarGraph />q
+										<PriorityBarGraph />
 									</Card>
 								</Col>
 
-								<Col className="mt-1">
+								<Col className="mt-1" sm={6}>
 									<Card id="chart-card">
 										<div className="text-center" id="dashboard-card-titles">
 											Tickets by Status
@@ -280,6 +332,7 @@ const Index: React.FC<{}> = () => {
 				);
 		}
 	}
+	return <div>something went wrong.</div>;
 };
 
-export default withUrqlClient(createUrqlClient)(Index);
+export default withUrqlClient(createUrqlClient)(Index as any);

@@ -20,7 +20,7 @@ const Login: React.FC<{}> = ({}) => {
 			bg="black"
 			alignItems="center"
 			style={{
-				backgroundImage: `url("http://localhost:3000/workflo_background.png")`,
+				backgroundImage: `url("https://workflo.codes/workflo_background.png")`,
 				backgroundSize: 2450,
 			}}
 		>
@@ -36,7 +36,7 @@ const Login: React.FC<{}> = ({}) => {
 					<Box>
 						<a href="/">
 							<Image
-								src="http://localhost:3000/workfloIcon.png"
+								src="https://workflo.codes/workfloIcon.png"
 								alt="website logo"
 								width={150}
 								className=" ml-auto mr-auto"

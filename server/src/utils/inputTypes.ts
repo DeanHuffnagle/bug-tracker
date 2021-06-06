@@ -1,4 +1,5 @@
 import { InputType, Field, Int } from 'type-graphql';
+import { OrganizationPrivacyType } from '../entities/Organization';
 import {
 	TicketStatusType,
 	TicketPriorityType,
@@ -33,6 +34,8 @@ export class CreateOrganizationInput {
 	name!: string;
 	@Field(() => String, { nullable: true })
 	link?: string | null;
+	@Field(() => String)
+	privacy: OrganizationPrivacyType;
 }
 
 //// Change Organization Name ////
@@ -49,6 +52,8 @@ export class UpdateOrganizationInput {
 	name!: string;
 	@Field()
 	link!: string;
+	@Field(() => String, { nullable: true })
+	privacy?: OrganizationPrivacyType;
 }
 //================================================================================
 //Project Input Types
@@ -80,19 +85,19 @@ export class UpdateProjectInput {
 //// Assign Project ////
 @InputType()
 export class AssignProjectInput {
-	@Field(() => Int)
-	projectId!: number;
-	@Field(() => Int)
-	userId!: number;
+	@Field(() => String)
+	projectId!: string;
+	@Field(() => String)
+	userId!: string;
 }
 
 //// Unassign Project ////
 @InputType()
 export class UnassignProjectInput {
-	@Field(() => Int)
-	projectId!: number;
-	@Field(() => Int)
-	userId: number;
+	@Field(() => String)
+	projectId!: string;
+	@Field(() => String)
+	userId: string;
 }
 
 //// Unassign Project ////

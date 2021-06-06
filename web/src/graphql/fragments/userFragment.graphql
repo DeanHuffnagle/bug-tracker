@@ -4,6 +4,7 @@ fragment userFragment on User {
 	lastName
 	email
 	role
+	userExperience
 	organizationId
 	ownedOrganizationId
 	joinRequestId

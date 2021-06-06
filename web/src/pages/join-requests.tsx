@@ -19,7 +19,7 @@ const joinRequests: React.FC<{}> = () => {
 	const isOrganizationId = meData?.me?.organizationId;
 
 	const [{ data: joinRequestData }] = useFindUsersByJoinRequestQuery({
-		variables: { options: { organizationId: isOrganizationId } },
+		variables: { options: { organizationId: isOrganizationId as number } },
 	});
 
 	const tableData = joinRequestData?.findUsersByJoinRequest

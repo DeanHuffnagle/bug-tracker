@@ -37,7 +37,7 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 	const isData = dataInput ? dataInput : [{}];
 	const size = pageSizeInput ? pageSizeInput : 10;
 
-	const columns = useMemo<Column<object>[]>(() => columnInput, []);
+	const columns = useMemo<any>(() => columnInput, []);
 
 	const hiddenColumnsList = hiddenColumnsInput ? hiddenColumnsInput : [''];
 	const sortByColumn = sortByInput
@@ -77,12 +77,12 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 				pageSize: size,
 				hiddenColumns: hiddenColumnsList,
 				sortBy: sortByColumn,
-			},
+			} as any,
 		},
 		useGlobalFilter,
 		useSortBy,
 		usePagination
-	);
+	) as any;
 
 	const { globalFilter, pageIndex, pageSize } = state;
 
@@ -105,9 +105,9 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 						variant="light"
 					>
 						<thead>
-							{headerGroups.map((headerGroup) => (
+							{headerGroups.map((headerGroup: any) => (
 								<tr {...headerGroup.getHeaderGroupProps()}>
-									{headerGroup.headers.map((column) => (
+									{headerGroup.headers.map((column: any) => (
 										<th
 											{...column.getHeaderProps(column.getSortByToggleProps())}
 										>
@@ -129,11 +129,11 @@ export const CustomTable: React.FC<CustomTableProps> = ({
 							))}
 						</thead>
 						<tbody {...getTableBodyProps()}>
-							{page.map((row) => {
+							{page.map((row: any) => {
 								prepareRow(row);
 								return (
 									<tr {...row.getRowProps()}>
-										{row.cells.map((cell) => {
+										{row.cells.map((cell: any) => {
 											return (
 												<td {...cell.getCellProps()}>{cell.render('Cell')}</td>
 											);

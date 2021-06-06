@@ -41,6 +41,7 @@ export class OrganizationResolver {
 					.into(Organization)
 					.values({
 						name: options.name,
+						privacy: options.privacy,
 						ownerId: isUser?.id,
 					})
 					.returning('*')
@@ -53,6 +54,7 @@ export class OrganizationResolver {
 					.into(Organization)
 					.values({
 						name: options.name,
+						privacy: options.privacy,
 						ownerId: isUser?.id,
 						link: options.link,
 					})
@@ -170,16 +172,28 @@ export class OrganizationResolver {
 				],
 			};
 		}
-
-		await getConnection()
-			.createQueryBuilder()
-			.update(Organization)
-			.set({
-				name: options.name,
-				link: options.link,
-			})
-			.where('id = :id', { id: organizationId })
-			.execute();
+		if (options.privacy) {
+			await getConnection()
+				.createQueryBuilder()
+				.update(Organization)
+				.set({
+					name: options.name,
+					link: options.link,
+					privacy: options.privacy,
+				})
+				.where('id = :id', { id: organizationId })
+				.execute();
+		} else {
+			await getConnection()
+				.createQueryBuilder()
+				.update(Organization)
+				.set({
+					name: options.name,
+					link: options.link,
+				})
+				.where('id = :id', { id: organizationId })
+				.execute();
+		}
 
 		const organization = await Organization.findOne(organizationId);
 		return { organization };

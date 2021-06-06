@@ -22,7 +22,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
 			bg="black"
 			alignItems="center"
 			style={{
-				backgroundImage: `url("http://localhost:3000/workflo_background.png")`,
+				backgroundImage: `url("http://workflo.codes/workflo_background.png")`,
 				backgroundSize: 2450,
 			}}
 		>

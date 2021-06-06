@@ -27,6 +27,8 @@ export type UserRoleType =
 	| 'demoDeveloper'
 	| 'demoSubmitter';
 
+export type UserExperienceType = 'new' | 'old';
+
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
@@ -68,6 +70,14 @@ export class User extends BaseEntity {
 	// everyone will start as a developer by default.
 	// when an organization is created the creator will be switched to the admin role.
 	// only admins can change the role of other users in their organization.
+
+	@Field(() => String)
+	@Column({
+		type: 'enum',
+		enum: ['new', 'old'],
+		default: 'new',
+	})
+	userExperience!: UserExperienceType;
 
 	@Column()
 	password!: string;
@@ -127,6 +137,7 @@ export class User extends BaseEntity {
 	joinRequestId: number;
 
 	//// Project manager to project relationship ////
+
 	@Field(() => [Project], { nullable: true })
 	@OneToMany(() => Project, (project) => project.manager, {
 		cascade: ['insert', 'update'],

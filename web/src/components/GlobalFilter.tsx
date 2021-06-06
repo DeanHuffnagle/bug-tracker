@@ -2,7 +2,15 @@ import React from 'react';
 import { Input } from '@chakra-ui/react';
 import { FormControl, InputGroup } from 'react-bootstrap';
 
-export const GlobalFilter = ({ filter, setFilter }) => {
+type GlobalFilterProps = {
+	filter: any;
+	setFilter: any;
+};
+
+export const GlobalFilter: React.FC<GlobalFilterProps> = ({
+	filter,
+	setFilter,
+}) => {
 	return (
 		<span>
 			<InputGroup size="sm" className="mb-3">

@@ -1,0 +1,13 @@
+mutation JoinOrganization($options: JoinOrganizationInput!) {
+	joinOrganization(options: $options) {
+		errors {
+			...errorFragment
+		}
+		user {
+			...userFragment
+			organization {
+				...organizationFragment
+			}
+		}
+	}
+}

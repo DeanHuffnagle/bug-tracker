@@ -25,7 +25,7 @@ const CreateOrganization: React.FC<CreateOrganizationProps> = ({}) => {
 					alignItems="center"
 					bg="black"
 					style={{
-						backgroundImage: `url("http://localhost:3000/workflo_background.png")`,
+						backgroundImage: `url("http://workflo.codes/workflo_background.png")`,
 						backgroundSize: 2450,
 					}}
 				>

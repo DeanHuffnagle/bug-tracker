@@ -96,7 +96,7 @@ const organization: React.FC<{}> = ({}) => {
 				<Container>
 					<Row>
 						<Col className="mt-1">
-							<Card id="chart-card">
+							<Card id="chart-card" sm={6}>
 								<Card.Header>
 									<Flex width="full">
 										<Box width="full">
@@ -128,7 +128,7 @@ const organization: React.FC<{}> = ({}) => {
 							</Card>
 						</Col>
 
-						<Col className="mt-1">
+						<Col className="mt-1" sm={6}>
 							<Card id="chart-card">
 								<div className="text-center" id="dashboard-card-titles">
 									Tickets by Status

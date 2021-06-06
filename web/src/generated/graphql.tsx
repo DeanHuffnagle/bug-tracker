@@ -25,8 +25,8 @@ export type AddRepositoryLinkInput = {
 };
 
 export type AssignProjectInput = {
-  projectId: Scalars['Int'];
-  userId: Scalars['Int'];
+  projectId: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 export type AssignTicketInput = {
@@ -90,6 +90,7 @@ export type CommentResponse = {
 export type CreateOrganizationInput = {
   name: Scalars['String'];
   link?: Maybe<Scalars['String']>;
+  privacy: Scalars['String'];
 };
 
 export type CreateProjectInput = {
@@ -184,6 +185,8 @@ export type Mutation = {
   changeTicketStatus: TicketResponse;
   changeTicketPriority: TicketResponse;
   changeTicketType: TicketResponse;
+  removeNewUserTag: Scalars['Boolean'];
+  replaceNewUserTag: Scalars['Boolean'];
   register: UserResponse;
   login: UserResponse;
   forgotPassword: Scalars['Boolean'];
@@ -376,6 +379,7 @@ export type Organization = {
   name: Scalars['String'];
   ownerId?: Maybe<Scalars['Int']>;
   link?: Maybe<Scalars['String']>;
+  privacy: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   users?: Maybe<Array<User>>;
@@ -658,13 +662,14 @@ export type TransferOwnershipInput = {
 };
 
 export type UnassignProjectInput = {
-  projectId: Scalars['Int'];
-  userId: Scalars['Int'];
+  projectId: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 export type UpdateOrganizationInput = {
   name: Scalars['String'];
   link: Scalars['String'];
+  privacy?: Maybe<Scalars['String']>;
 };
 
 export type UpdateProjectInput = {
@@ -690,6 +695,7 @@ export type User = {
   lastName: Scalars['String'];
   email: Scalars['String'];
   role: Scalars['String'];
+  userExperience: Scalars['String'];
   organizationId?: Maybe<Scalars['Int']>;
   assignedTicketsId?: Maybe<Array<Scalars['Int']>>;
   createdAt: Scalars['String'];
@@ -740,7 +746,7 @@ export type ErrorFragmentFragment = (
 
 export type OrganizationFragmentFragment = (
   { __typename?: 'Organization' }
-  & Pick<Organization, 'id' | 'name' | 'ownerId' | 'link' | 'createdAt' | 'updatedAt'>
+  & Pick<Organization, 'id' | 'name' | 'ownerId' | 'link' | 'privacy' | 'createdAt' | 'updatedAt'>
 );
 
 export type ProjectFragmentFragment = (
@@ -809,7 +815,7 @@ export type TicketFragmentFragment = (
 
 export type UserFragmentFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'organizationId' | 'ownedOrganizationId' | 'joinRequestId' | 'createdAt' | 'updatedAt'>
+  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'userExperience' | 'organizationId' | 'ownedOrganizationId' | 'joinRequestId' | 'createdAt' | 'updatedAt'>
 );
 
 export type AcceptJoinRequestMutationVariables = Exact<{
@@ -827,6 +833,29 @@ export type AcceptJoinRequestMutation = (
     )>>, user?: Maybe<(
       { __typename?: 'User' }
       & UserFragmentFragment
+    )> }
+  ) }
+);
+
+export type AssignProjectMutationVariables = Exact<{
+  options: AssignProjectInput;
+}>;
+
+
+export type AssignProjectMutation = (
+  { __typename?: 'Mutation' }
+  & { assignProject: (
+    { __typename?: 'ProjectResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, project?: Maybe<(
+      { __typename?: 'Project' }
+      & { assignedDevelopers?: Maybe<Array<(
+        { __typename?: 'User' }
+        & UserFragmentFragment
+      )>> }
+      & ProjectFragmentFragment
     )> }
   ) }
 );
@@ -996,6 +1025,29 @@ export type ForgotPasswordMutation = (
   & Pick<Mutation, 'forgotPassword'>
 );
 
+export type JoinOrganizationMutationVariables = Exact<{
+  options: JoinOrganizationInput;
+}>;
+
+
+export type JoinOrganizationMutation = (
+  { __typename?: 'Mutation' }
+  & { joinOrganization: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & ErrorFragmentFragment
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & { organization?: Maybe<(
+        { __typename?: 'Organization' }
+        & OrganizationFragmentFragment
+      )> }
+      & UserFragmentFragment
+    )> }
+  ) }
+);
+
 export type JoinRequestMutationVariables = Exact<{
   options: JoinRequestInput;
 }>;
@@ -1086,6 +1138,14 @@ export type RegisterMutation = (
       & UserFragmentFragment
     )> }
   ) }
+);
+
+export type RemoveNewUserTagMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RemoveNewUserTagMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'removeNewUserTag'>
 );
 
 export type TransferOwnershipMutationVariables = Exact<{
@@ -1561,6 +1621,7 @@ export const OrganizationFragmentFragmentDoc = gql`
   name
   ownerId
   link
+  privacy
   createdAt
   updatedAt
 }
@@ -1706,6 +1767,7 @@ export const UserFragmentFragmentDoc = gql`
   lastName
   email
   role
+  userExperience
   organizationId
   ownedOrganizationId
   joinRequestId
@@ -1729,6 +1791,27 @@ ${UserFragmentFragmentDoc}`;
 
 export function useAcceptJoinRequestMutation() {
   return Urql.useMutation<AcceptJoinRequestMutation, AcceptJoinRequestMutationVariables>(AcceptJoinRequestDocument);
+};
+export const AssignProjectDocument = gql`
+    mutation AssignProject($options: AssignProjectInput!) {
+  assignProject(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    project {
+      ...projectFragment
+      assignedDevelopers {
+        ...userFragment
+      }
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${ProjectFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
+
+export function useAssignProjectMutation() {
+  return Urql.useMutation<AssignProjectMutation, AssignProjectMutationVariables>(AssignProjectDocument);
 };
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($options: ChangePasswordInput!, $token: String!) {
@@ -1876,6 +1959,27 @@ export const ForgotPasswordDocument = gql`
 export function useForgotPasswordMutation() {
   return Urql.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument);
 };
+export const JoinOrganizationDocument = gql`
+    mutation JoinOrganization($options: JoinOrganizationInput!) {
+  joinOrganization(options: $options) {
+    errors {
+      ...errorFragment
+    }
+    user {
+      ...userFragment
+      organization {
+        ...organizationFragment
+      }
+    }
+  }
+}
+    ${ErrorFragmentFragmentDoc}
+${UserFragmentFragmentDoc}
+${OrganizationFragmentFragmentDoc}`;
+
+export function useJoinOrganizationMutation() {
+  return Urql.useMutation<JoinOrganizationMutation, JoinOrganizationMutationVariables>(JoinOrganizationDocument);
+};
 export const JoinRequestDocument = gql`
     mutation JoinRequest($options: JoinRequestInput!) {
   joinRequest(options: $options) {
@@ -1960,6 +2064,15 @@ ${UserFragmentFragmentDoc}`;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const RemoveNewUserTagDocument = gql`
+    mutation RemoveNewUserTag {
+  removeNewUserTag
+}
+    `;
+
+export function useRemoveNewUserTagMutation() {
+  return Urql.useMutation<RemoveNewUserTagMutation, RemoveNewUserTagMutationVariables>(RemoveNewUserTagDocument);
 };
 export const TransferOwnershipDocument = gql`
     mutation TransferOwnership($options: TransferOwnershipInput!) {

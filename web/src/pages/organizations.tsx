@@ -35,7 +35,7 @@ const Organizations: React.FC<{}> = () => {
 			<Container>
 				<Card>
 					<CustomTable
-						dataInput={tableData}
+						dataInput={tableData as any[]}
 						columnInput={ORGANIZATIONS_COLUMNS}
 						sortByInput={'id'}
 					/>

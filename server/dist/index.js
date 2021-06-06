@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_express_1 = require("apollo-server-express");
+require("dotenv-safe/config");
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const express_1 = __importDefault(require("express"));
 const express_session_1 = __importDefault(require("express-session"));
@@ -32,21 +33,22 @@ const project_1 = require("./resolvers/project");
 const ticket_1 = require("./resolvers/ticket");
 const user_1 = require("./resolvers/user");
 const cors_1 = __importDefault(require("cors"));
+const path_1 = __importDefault(require("path"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield typeorm_1.createConnection({
+    const conn = yield typeorm_1.createConnection({
         type: 'postgres',
-        username: 'postgres',
-        password: 'postgres',
-        database: 'BugTracker',
+        url: process.env.DATABASE_URL,
         entities: [User_1.User, Ticket_1.Ticket, Project_1.Project, Organization_1.Organization, Comment_1.Comment],
-        synchronize: true,
+        synchronize: !constants_1.__prod__,
+        migrations: [path_1.default.join(__dirname, './migrations/*')],
         logging: true,
     });
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
-    const redis = new ioredis_1.default();
+    const redis = new ioredis_1.default(process.env.REDIS_URL);
+    app.set('trust proxy', 1);
     app.use(cors_1.default({
-        origin: 'http://localhost:3000',
+        origin: process.env.CORS_ORIGIN,
         credentials: true,
     }));
     app.use(express_session_1.default({
@@ -60,9 +62,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             sameSite: 'lax',
             secure: constants_1.__prod__,
+            domain: constants_1.__prod__ ? '.workflo.codes' : undefined,
         },
         saveUninitialized: false,
-        secret: 'Sigj24Ih00Gk0@uo&OygUyg#hfSfT4Ykmnv66$4gjO9',
+        secret: process.env.SESSION_SECRET,
         resave: false,
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
@@ -86,7 +89,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         app,
         cors: false,
     });
-    app.listen(4000, () => {
+    app.listen(parseInt(process.env.PORT), () => {
         console.log('server started on localhost:4000');
     });
 });

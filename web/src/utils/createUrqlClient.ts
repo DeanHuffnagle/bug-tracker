@@ -2,6 +2,7 @@ import { cacheExchange } from '@urql/exchange-graphcache';
 import { inspectFields } from '@urql/exchange-graphcache/dist/types/store/data';
 import { dedupExchange, fetchExchange } from 'urql';
 import {
+	FindUsersByJoinRequestQueryVariables,
 	LoginMutation,
 	LogoutMutation,
 	MeDocument,
@@ -12,7 +13,7 @@ import { betterUpdateQuery } from './betterUpdateQuery';
 
 export const createUrqlClient = (ssrExchange: any) => {
 	return {
-		url: 'http://localhost:4000/graphql',
+		url: process.env.NEXT_PUBLIC_API_URL as string,
 		fetchOptions: {
 			credentials: 'include' as const,
 		},
@@ -30,7 +31,8 @@ export const createUrqlClient = (ssrExchange: any) => {
 							// console.log(cache.inspectFields('Query'));
 							cache.invalidate('Query', 'findUsersByJoinRequest', {
 								options: {
-									organizationId: args.options.organizationId,
+									organizationId: (args as FindUsersByJoinRequestQueryVariables)
+										.options?.organizationId,
 								},
 							});
 							// console.log(cache.inspectFields('Query'));
@@ -40,7 +42,8 @@ export const createUrqlClient = (ssrExchange: any) => {
 							// console.log(cache.inspectFields('Query'));
 							cache.invalidate('Query', 'findUsersByJoinRequest', {
 								options: {
-									organizationId: args.options.organizationId,
+									organizationId: (args as FindUsersByJoinRequestQueryVariables)
+										.options.organizationId,
 								},
 							});
 							// console.log(cache.inspectFields('Query'));

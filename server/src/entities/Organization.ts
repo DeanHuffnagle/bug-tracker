@@ -15,6 +15,8 @@ import { Project } from './Project';
 import { Ticket } from './Ticket';
 import { User } from './User';
 
+export type OrganizationPrivacyType = 'open' | 'inviteOnly' | 'closed';
+
 @ObjectType()
 @Entity()
 export class Organization extends BaseEntity {
@@ -37,6 +39,14 @@ export class Organization extends BaseEntity {
 	@Field(() => String, { nullable: true })
 	@Column({ nullable: true })
 	link: string;
+
+	@Field(() => String)
+	@Column({
+		type: 'enum',
+		enum: ['open', 'inviteOnly', 'closed'],
+		default: 'inviteOnly',
+	})
+	privacy!: OrganizationPrivacyType;
 
 	@Field(() => String)
 	@CreateDateColumn()

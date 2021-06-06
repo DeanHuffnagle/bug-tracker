@@ -1,0 +1,13 @@
+mutation AssignProject($options: AssignProjectInput!) {
+	assignProject(options: $options) {
+		errors {
+			...errorFragment
+		}
+		project {
+			...projectFragment
+			assignedDevelopers {
+				...userFragment
+			}
+		}
+	}
+}

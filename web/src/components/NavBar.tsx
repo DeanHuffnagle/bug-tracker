@@ -1,15 +1,6 @@
 import { BellIcon } from '@chakra-ui/icons';
-import { confirmAlert } from 'react-confirm-alert';
-import { Box } from '@chakra-ui/react';
 import React from 'react';
-import {
-	Button,
-	Dropdown,
-	Image,
-	Nav,
-	Navbar,
-	NavDropdown,
-} from 'react-bootstrap';
+import { Image, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import {
 	useDeleteOrganizationMutation,
 	useFindUsersByJoinRequestQuery,
@@ -30,8 +21,8 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 	const [, deleteOrganization] = useDeleteOrganizationMutation();
 	const [, leaveOrganization] = useLeaveOrganizationMutation();
 	const [{ data: joinRequestData }] = useFindUsersByJoinRequestQuery({
-		variables: { options: { organizationId: isOrganizationId } },
-	});
+		variables: { options: { organizationId: isOrganizationId as number } },
+	}) as any;
 
 	//================================================================================
 	//Variables
@@ -51,22 +42,22 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 				let response;
 				if (
 					window.confirm(
-						`Are you sure you wish to delete "${meData.me?.organization?.name}"?`
+						`Are you sure you wish to delete "${meData?.me?.organization?.name}"?`
 					)
 				) {
 					if (
 						window.confirm(
-							`To be clear, this will permanently delete "${meData.me?.organization?.name}". Are you sure you wish to perform this action?`
+							`To be clear, this will permanently delete "${meData?.me?.organization?.name}". Are you sure you wish to perform this action?`
 						)
 					) {
 						response = await deleteOrganization({
 							id: isOrganizationId as number,
 						});
 						if (response?.data?.deleteOrganization) {
-							`"${meData.me?.organization?.name}" has been permanently deleted`;
+							`"${meData?.me?.organization?.name}" has been permanently deleted`;
 						} else {
 							alert(
-								`"${meData.me?.organization?.name}" has been permanently deleted`
+								`"${meData?.me?.organization?.name}" has been permanently deleted`
 							);
 						}
 					}
@@ -86,7 +77,7 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 				let response;
 				if (
 					window.confirm(
-						`Are you sure you wish to leave ${meData.me?.organization?.name}?`
+						`Are you sure you wish to leave ${meData?.me?.organization?.name}?`
 					)
 				)
 					response = await leaveOrganization({
@@ -95,7 +86,7 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 				if (response?.data?.leaveOrganization.errors) {
 					alert(`${response?.data.leaveOrganization.errors[0].message}`);
 				} else {
-					alert(`You successfully left ${meData.me?.organization?.name}`);
+					alert(`You successfully left ${meData?.me?.organization?.name}`);
 				}
 			}}
 		>
@@ -106,9 +97,16 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 	//assign users
 	//================================================================================
 	assignUsers = (
-		<NavDropdown.Item href={`/organization/assign-roles/${isOrganizationId}`}>
-			Assign Users
-		</NavDropdown.Item>
+		<>
+			<NavDropdown.Item href={`/organization/assign-roles/${isOrganizationId}`}>
+				Assign Roles
+			</NavDropdown.Item>
+			<NavDropdown.Item
+				href={`/organization/assign-projects/${isOrganizationId}`}
+			>
+				Assign Projects
+			</NavDropdown.Item>
+		</>
 	);
 
 	//================================================================================
@@ -211,6 +209,14 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 				</NavDropdown>
 			);
 		}
+		// if not in an orginization
+	} else {
+		dropdown_2 = (
+			<>
+				<Nav.Link href={`/create-organization`}>Create Organization</Nav.Link>
+				<Nav.Link href={`/organizations`}>Find Organizations</Nav.Link>
+			</>
+		);
 	}
 	//================================================================================
 	//notification
@@ -247,19 +253,19 @@ export const NavBar: React.FC<NavBarProps> = ({ brand, children }) => {
 			<Navbar bg="light" variant="light" expand="lg">
 				<Navbar.Brand href="/">
 					<Image
-						src="http://localhost:3000/workflo.png"
+						src="https://workflo.codes/workflo.png"
 						alt="website logo"
 						width={125}
 					/>
 				</Navbar.Brand>
-
 				{loggedInAs}
+
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ml-auto">
-						{notification}
 						{dropdown_1}
 						{dropdown_2}
+						{notification}
 					</Nav>
 				</Navbar.Collapse>
 			</Navbar>

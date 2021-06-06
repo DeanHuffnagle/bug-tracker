@@ -5,6 +5,7 @@ import { DeleteButton } from '../components/DeleteButton';
 import { tableFormattedExternalLink } from './tableFormattedExternalLink';
 import { DeclineJoinRequestButton } from '../components/DeclineJoinRequestButton';
 import { AcceptJoinRequestButton } from '../components/AcceptJoinRequestButton';
+import { AnyARecord } from 'node:dns';
 //================================================================================
 // Organizations Table Columns
 //================================================================================
@@ -13,7 +14,7 @@ export const ORGANIZATIONS_COLUMNS = [
 		Header: 'Id',
 		id: 'id',
 		accessor: 'id',
-		Cell: (e) => (
+		Cell: (e: any) => (
 			<Link href="/organization/[id]" as={`/organization/${e.value}`}>
 				<span id="clickable-text">{e.value}</span>
 			</Link>
@@ -28,7 +29,7 @@ export const ORGANIZATIONS_COLUMNS = [
 		Header: 'Link',
 		id: 'link',
 		accessor: 'link',
-		Cell: (e) => tableFormattedExternalLink(e.value),
+		Cell: (e: any) => tableFormattedExternalLink(e.value),
 	},
 ];
 //================================================================================
@@ -54,7 +55,7 @@ export const USER_COLUMNS = [
 		Header: 'Role',
 		id: 'role',
 		accessor: 'user_role',
-		Cell: (props) => tableFormatted(props.value),
+		Cell: (props: any) => tableFormatted(props.value),
 	},
 ];
 //================================================================================
@@ -65,7 +66,7 @@ export const JOIN_REQUEST_COLUMNS = [
 		Header: 'Date',
 		id: 'date',
 		accessor: 'updatedAt',
-		Cell: (props) => {
+		Cell: (props: any) => {
 			return new Date(parseInt(props.value)).toLocaleDateString('en-US');
 		},
 	},
@@ -88,7 +89,7 @@ export const JOIN_REQUEST_COLUMNS = [
 		Header: 'Accept',
 		id: 'accept',
 		accessor: 'id',
-		Cell: (props) => {
+		Cell: (props: any) => {
 			return (
 				<span>
 					<AcceptJoinRequestButton userIdInput={props.value} />
@@ -100,7 +101,7 @@ export const JOIN_REQUEST_COLUMNS = [
 		Header: 'Decline',
 		id: 'decline',
 		accessor: 'id',
-		Cell: (props) => {
+		Cell: (props: any) => {
 			return (
 				<span>
 					<DeclineJoinRequestButton userIdInput={props.value} />
@@ -117,7 +118,7 @@ export const TICKET_COLUMNS = [
 		Header: 'Ticket Number',
 		id: 'ticket number',
 		accessor: 'ticket_id',
-		Cell: (e) => (
+		Cell: (e: any) => (
 			<Link href="/ticket/[id]" as={`/ticket/${e.value}`}>
 				<span id="clickable-text">{e.value}</span>
 			</Link>
@@ -132,38 +133,38 @@ export const TICKET_COLUMNS = [
 		Header: 'Type',
 		id: 'type',
 		accessor: 'ticket_type',
-		Cell: (props) => tableFormatted(props.value),
+		Cell: (props: any) => tableFormatted(props.value),
 	},
 	{
 		Header: 'Status',
 		id: 'status',
 		accessor: 'ticket_status',
-		Cell: (props) => tableFormatted(props.value),
+		Cell: (props: any) => tableFormatted(props.value),
 	},
 	{
 		Header: 'Priority',
 		id: 'priority',
 		accessor: 'ticket_priority',
-		Cell: (props) => tableFormatted(props.value),
+		Cell: (props: any) => tableFormatted(props.value),
 	},
 	{
 		Header: 'Assigned Developer',
 		id: 'assigned developer',
-		accessor: (d) =>
+		accessor: (d: any) =>
 			`${d.assignedDeveloper_firstName} ${d.assignedDeveloper_lastName}`,
-		Cell: (props) => tableFormatted(props.value),
+		Cell: (props: any) => tableFormatted(props.value),
 	},
 	{
 		Header: 'Manager',
 		id: 'manager',
-		accessor: (d) => `${d.manager_firstName} ${d.manager_lastName}`,
-		Cell: (props) => tableFormatted(props.value),
+		accessor: (d: any) => `${d.manager_firstName} ${d.manager_lastName}`,
+		Cell: (props: any) => tableFormatted(props.value),
 	},
 	{
 		Header: 'Submitted by',
 		id: 'submitted by',
-		accessor: (d) => `${d.submitter_firstName} ${d.submitter_lastName}`,
-		Cell: (props) => tableFormatted(props.value),
+		accessor: (d: any) => `${d.submitter_firstName} ${d.submitter_lastName}`,
+		Cell: (props: any) => tableFormatted(props.value),
 	},
 ];
 //================================================================================
@@ -174,7 +175,7 @@ export const PROJECT_COLUMNS = [
 		Header: 'Project Id',
 		id: 'project id',
 		accessor: 'project_id',
-		Cell: (e) => (
+		Cell: (e: any) => (
 			<Link href="/project/[id]" as={`/project/${e.value}`}>
 				<span id="clickable-text">{e.value}</span>
 			</Link>
@@ -193,14 +194,14 @@ export const PROJECT_COLUMNS = [
 	{
 		Header: 'Project Manager',
 		id: 'project manager',
-		accessor: (d) => `${d.manager_firstName} ${d.manager_lastName}`,
-		Cell: (props) => tableFormatted(props.value),
+		accessor: (d: any) => `${d.manager_firstName} ${d.manager_lastName}`,
+		Cell: (props: any) => tableFormatted(props.value),
 	},
 	{
 		Header: 'Repository Link',
 		id: 'repository link',
 		accessor: 'project_repositoryLink',
-		Cell: (e) => tableFormattedExternalLink(e.value),
+		Cell: (e: any) => tableFormattedExternalLink(e.value),
 	},
 ];
 
@@ -216,13 +217,13 @@ export const COMMENT_COLUMNS = [
 	{
 		Header: 'User',
 		id: 'user',
-		accessor: (d) => `${d.commenter_firstName} ${d.commenter_lastName}`,
+		accessor: (d: any) => `${d.commenter_firstName} ${d.commenter_lastName}`,
 	},
 	{
 		Header: 'Date',
 		id: 'date',
 		accessor: 'comment_createdAt',
-		Cell: (props) => {
+		Cell: (props: any) => {
 			return new Date(parseInt(props.value)).toLocaleDateString('en-US');
 		},
 	},
@@ -230,7 +231,7 @@ export const COMMENT_COLUMNS = [
 		Header: 'Delete',
 		id: 'delete',
 		accessor: 'comment_id',
-		Cell: (props) => {
+		Cell: (props: any) => {
 			return (
 				<span>
 					<DeleteButton commentIdInput={props.value} />

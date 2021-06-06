@@ -81,7 +81,7 @@ const editOrganization: React.FC<{}> = ({}) => {
 				<NavBar />
 				<Container>
 					<Row>
-						<Col className="mt-1">
+						<Col className="mt-1" sm={6}>
 							<Card id="chart-card">
 								<Card.Header>
 									<Flex width="full">
@@ -125,7 +125,7 @@ const editOrganization: React.FC<{}> = ({}) => {
 							</Card>
 						</Col>
 
-						<Col className="mt-1">
+						<Col className="mt-1" sm={6}>
 							<Card id="chart-card">
 								<Formik
 									initialValues={{

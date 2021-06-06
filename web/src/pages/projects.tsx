@@ -67,7 +67,7 @@ const Projects: React.FC<{}> = () => {
 			<Container>
 				<Card>
 					<CustomTable
-						dataInput={tableData}
+						dataInput={tableData as any[]}
 						columnInput={PROJECT_COLUMNS}
 						userInput={meData?.me}
 						sortByInput={'project number'}

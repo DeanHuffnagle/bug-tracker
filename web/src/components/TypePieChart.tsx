@@ -8,7 +8,7 @@ import {
 	useMeQuery,
 } from '../generated/graphql';
 
-const renderActiveShape = (props) => {
+const renderActiveShape = (props: any) => {
 	const RADIAN = Math.PI / 180;
 	const {
 		cx,
@@ -282,7 +282,7 @@ export const TypePieChart: React.FC<PieChartProps> = ({
 	const ticketTypeColors = [GREEN, LIGHT_BLUE, ORANGE, GOLD];
 	const [active, setActive] = useState(0);
 
-	const onPieEnter = (_, index) => {
+	const onPieEnter = (_: any, index: any) => {
 		setActive(index);
 	};
 

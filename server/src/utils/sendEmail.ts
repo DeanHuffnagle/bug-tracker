@@ -10,18 +10,18 @@ export async function sendEmail(to: string, html: string) {
 
 	// create reusable transporter object using the default SMTP transport
 	let transporter = nodemailer.createTransport({
-		host: 'smtp.ethereal.email',
-		port: 587,
-		secure: false, // true for 465, false for other ports
+		service: 'hotmail',
+		// port: 587,
+		// secure: false, // true for 465, false for other ports
 		auth: {
-			user: 'uyvr4pee6svz33b5@ethereal.email', // generated ethereal user
-			pass: 'gPGsH2vTa6w51qg4Ym', // generated ethereal password
+			user: 'WorkfloPasswordRecovery@outlook.com', // generated ethereal user
+			pass: process.env.EMAIL_PASSWORD, // generated ethereal password
 		},
 	});
 
 	// send mail with defined transport object
 	let info = await transporter.sendMail({
-		from: '"Bug-Tracker" <BugTracker@BugTracker.com>', // sender address
+		from: '"Workflo" <WorkfloPasswordRecovery@outlook.com>', // sender address
 		to: to, // list of receivers
 		subject: 'Change Password', // Subject line
 		html: html, // html body

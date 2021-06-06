@@ -38,6 +38,33 @@ import { sendEmail } from '../utils/sendEmail';
 @Resolver(User)
 export class UserResolver {
 	//================================================================================
+	//Remove New User Tag
+	//================================================================================
+	@Mutation(() => Boolean)
+	async removeNewUserTag(@Ctx() { req }: MyContext): Promise<Boolean> {
+		const isUser = await User.findOne({ id: req.session.UserId });
+		if (!isUser) {
+			return false;
+		} else {
+			await User.update({ id: isUser?.id }, { userExperience: 'old' });
+			return true;
+		}
+	}
+	//================================================================================
+	//Remove New User Tag
+	//================================================================================
+	@Mutation(() => Boolean)
+	async replaceNewUserTag(@Ctx() { req }: MyContext): Promise<Boolean> {
+		const isUser = await User.findOne({ id: req.session.UserId });
+		if (!isUser) {
+			return false;
+		} else {
+			await User.update({ id: isUser?.id }, { userExperience: 'new' });
+			return true;
+		}
+	}
+
+	//================================================================================
 	//Register Mutation
 	//================================================================================
 	@Mutation(() => UserResponse)
@@ -113,6 +140,7 @@ export class UserResolver {
 
 			user = result.raw[0];
 		} catch (err) {
+			console.error(err);
 			if (err.code === '23505') {
 				return {
 					errors: [
@@ -189,7 +217,7 @@ export class UserResolver {
 
 		sendEmail(
 			email,
-			`<a href="http:localhost:3000/change-password/${token}">reset password</a>`
+			`<a href="${process.env.CORS_ORIGIN}/change-password/${token}">reset password</a>`
 		);
 		return true;
 	}

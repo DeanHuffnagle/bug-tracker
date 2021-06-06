@@ -161,8 +161,10 @@ export class ProjectResolver {
 	@Mutation(() => ProjectResponse)
 	@UseMiddleware(isProjectManager)
 	async assignProject(@Arg('options') options: AssignProjectInput) {
-		const isProject = await Project.findOne(options.projectId);
-		const isUser = await User.findOne(options.userId);
+		const isProject = await Project.findOne({
+			id: parseInt(options.projectId),
+		});
+		const isUser = await User.findOne({ id: parseInt(options.userId) });
 		if (!isUser) {
 			return {
 				errors: [
@@ -183,12 +185,27 @@ export class ProjectResolver {
 				],
 			};
 		}
-		await getConnection()
-			.createQueryBuilder()
-			.relation(Project, 'assignedDevelopers')
-			.of(isProject)
-			.add(isUser);
-		const project = await Project.findOne(options.projectId, {
+		try {
+			await getConnection()
+				.createQueryBuilder()
+				.relation(Project, 'assignedDevelopers')
+				.of(isProject)
+				.add(isUser);
+		} catch (err) {
+			console.error(err);
+			if (err.code === '23505') {
+				return {
+					errors: [
+						{
+							field: 'userId',
+							message: 'User is already assigned to this project.',
+						},
+					],
+				};
+			}
+		}
+
+		const project = await Project.findOne(isProject.id, {
 			relations: ['assignedDevelopers'],
 		});
 
@@ -202,8 +219,10 @@ export class ProjectResolver {
 	async unassignProject(
 		@Arg('options') options: UnassignProjectInput
 	): Promise<ProjectResponse> {
-		const isProject = await Project.findOne(options.projectId);
-		const isUser = await User.findOne(options.userId);
+		const isProject = await Project.findOne({
+			id: parseInt(options.projectId),
+		});
+		const isUser = await User.findOne({ id: parseInt(options.userId) });
 		if (!isUser) {
 			return {
 				errors: [
@@ -224,6 +243,7 @@ export class ProjectResolver {
 				],
 			};
 		}
+
 		await getConnection()
 			.createQueryBuilder()
 			.relation(Project, 'assignedDevelopers')
