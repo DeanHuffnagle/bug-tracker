@@ -64,6 +64,7 @@ export class User extends BaseEntity {
 			'demoDeveloper',
 			'demoSubmitter',
 		],
+		enumName: 'user_role_enum',
 		default: 'developer',
 	})
 	role!: UserRoleType;
@@ -75,9 +76,10 @@ export class User extends BaseEntity {
 	@Column({
 		type: 'enum',
 		enum: ['new', 'old'],
+		enumName: 'user_experience_enum',
 		default: 'new',
 	})
-	userExperience!: UserExperienceType;
+	experience!: UserExperienceType;
 
 	@Column()
 	password!: string;

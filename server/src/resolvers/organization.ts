@@ -34,6 +34,17 @@ export class OrganizationResolver {
 		const isUser = await User.findOne(req.session.UserId);
 		let organization;
 		try {
+			if (!options.privacy) {
+				return {
+					errors: [
+						{
+							field: 'privacy',
+							message:
+								'you must determine how your organization will handle joining.',
+						},
+					],
+				};
+			}
 			if (!options.link) {
 				const result = await getConnection()
 					.createQueryBuilder()

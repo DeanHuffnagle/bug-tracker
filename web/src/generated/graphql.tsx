@@ -695,7 +695,7 @@ export type User = {
   lastName: Scalars['String'];
   email: Scalars['String'];
   role: Scalars['String'];
-  userExperience: Scalars['String'];
+  experience: Scalars['String'];
   organizationId?: Maybe<Scalars['Int']>;
   assignedTicketsId?: Maybe<Array<Scalars['Int']>>;
   createdAt: Scalars['String'];
@@ -815,7 +815,7 @@ export type TicketFragmentFragment = (
 
 export type UserFragmentFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'userExperience' | 'organizationId' | 'ownedOrganizationId' | 'joinRequestId' | 'createdAt' | 'updatedAt'>
+  & Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'role' | 'experience' | 'organizationId' | 'ownedOrganizationId' | 'joinRequestId' | 'createdAt' | 'updatedAt'>
 );
 
 export type AcceptJoinRequestMutationVariables = Exact<{
@@ -1767,7 +1767,7 @@ export const UserFragmentFragmentDoc = gql`
   lastName
   email
   role
-  userExperience
+  experience
   organizationId
   ownedOrganizationId
   joinRequestId

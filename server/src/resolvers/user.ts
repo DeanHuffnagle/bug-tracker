@@ -46,7 +46,7 @@ export class UserResolver {
 		if (!isUser) {
 			return false;
 		} else {
-			await User.update({ id: isUser?.id }, { userExperience: 'old' });
+			await User.update({ id: isUser?.id }, { experience: 'old' });
 			return true;
 		}
 	}
@@ -59,7 +59,7 @@ export class UserResolver {
 		if (!isUser) {
 			return false;
 		} else {
-			await User.update({ id: isUser?.id }, { userExperience: 'new' });
+			await User.update({ id: isUser?.id }, { experience: 'new' });
 			return true;
 		}
 	}

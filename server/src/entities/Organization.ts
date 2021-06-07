@@ -44,9 +44,10 @@ export class Organization extends BaseEntity {
 	@Column({
 		type: 'enum',
 		enum: ['open', 'inviteOnly', 'closed'],
+		enumName: 'organization_privacy_enum',
 		default: 'inviteOnly',
 	})
-	privacy!: OrganizationPrivacyType;
+	privacy: OrganizationPrivacyType;
 
 	@Field(() => String)
 	@CreateDateColumn()

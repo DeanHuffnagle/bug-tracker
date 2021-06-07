@@ -55,8 +55,16 @@ const CreateProject: React.FC<CreateProjectProps> = ({}) => {
 													toErrorMap(response.data.createProject.errors)
 												);
 											} else if (response?.data?.createProject.project) {
+												const newProjectId =
+													response.data.createProject.project.id;
 												alert('Project was created successfully.');
-												router.push('/');
+												if (
+													window.confirm(`would you like to create a ticket?`)
+												) {
+													router.push(`/create-ticket`);
+												} else {
+													router.push(`/project/${newProjectId}`);
+												}
 											}
 										}}
 									>

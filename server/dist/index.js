@@ -39,7 +39,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         type: 'postgres',
         url: process.env.DATABASE_URL,
         entities: [User_1.User, Ticket_1.Ticket, Project_1.Project, Organization_1.Organization, Comment_1.Comment],
-        synchronize: !constants_1.__prod__,
+        synchronize: false,
         migrations: [path_1.default.join(__dirname, './migrations/*')],
         logging: true,
     });

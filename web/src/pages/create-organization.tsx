@@ -60,8 +60,18 @@ const CreateOrganization: React.FC<CreateOrganizationProps> = ({}) => {
 											} else if (
 												response?.data?.createOrganization.organization
 											) {
+												const newOrganizationId =
+													response.data.createOrganization.organization.id;
 												alert('Organization was created successfully.');
-												router.push('/');
+												if (
+													window.confirm(
+														'Now that you have an organization, you can get started on making a project. Would you like to make a project now? '
+													)
+												) {
+													router.push(`/create-project`);
+												} else {
+													router.push(`/organization/${newOrganizationId}`);
+												}
 											}
 										}}
 									>
@@ -85,8 +95,9 @@ const CreateOrganization: React.FC<CreateOrganizationProps> = ({}) => {
 														label="Joining:"
 														name="privacy"
 														placeholder="-Select-"
+														required
 													>
-														<option value="open">open</option>
+														<option value="open">Open</option>
 														<option value="inviteOnly">Invite Only</option>
 														<option value="closed">Closed</option>
 													</SelectField>

@@ -59,8 +59,9 @@ const CreateTicket: React.FC<CreateTicketProps> = ({}) => {
 										if (response.data?.createTicket.errors) {
 											setErrors(toErrorMap(response.data.createTicket.errors));
 										} else if (response?.data?.createTicket.ticket) {
+											const isTicketsProjectId = parseInt(values.projectId);
 											alert('Ticket was submitted successfully.');
-											router.push('/');
+											router.push(`/project/${isTicketsProjectId}`);
 										}
 									}}
 								>

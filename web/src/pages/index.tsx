@@ -86,7 +86,7 @@ const Index = () => {
 		);
 	} else if (meData.me && !asked && !meData.me.joinRequestId) {
 		setAsked(true);
-		if (meData.me.userExperience === 'new' || fetching) {
+		if (meData.me.experience === 'new' || fetching) {
 			window.alert(
 				`Congratulations on creating your new account! To get started, you can create an organization to store your projects in, or search for an existing organization.`
 			);
@@ -94,7 +94,16 @@ const Index = () => {
 				router.push('/create-organization');
 				removeNewUserTag();
 			} else {
-				removeNewUserTag();
+				if (
+					window.confirm(
+						`In order to get the best boost to your "workflo", it is recommended that you join an organization. would you like to find an organization to join?`
+					)
+				) {
+					removeNewUserTag();
+					router.push(`/organizations`);
+				} else {
+					removeNewUserTag();
+				}
 			}
 			return (
 				<>

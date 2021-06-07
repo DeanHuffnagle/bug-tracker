@@ -1,6 +1,6 @@
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { inspectFields } from '@urql/exchange-graphcache/dist/types/store/data';
-import { dedupExchange, fetchExchange } from 'urql';
+import { dedupExchange, fetchExchange, Query } from 'urql';
 import {
 	FindUsersByJoinRequestQueryVariables,
 	LoginMutation,
@@ -27,6 +27,12 @@ export const createUrqlClient = (ssrExchange: any) => {
 				},
 				updates: {
 					Mutation: {
+						deleteOrganization: (result, args, cache, info) => {
+							cache.invalidate('Query', 'me');
+						},
+						createOrganization: (result, args, cache, info) => {
+							cache.invalidate('Query', 'me');
+						},
 						acceptJoinRequest: (result, args, cache, info) => {
 							// console.log(cache.inspectFields('Query'));
 							cache.invalidate('Query', 'findUsersByJoinRequest', {

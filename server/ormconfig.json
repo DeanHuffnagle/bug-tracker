@@ -4,7 +4,7 @@
 	"port": 5432,
 	"username": "postgres",
 	"password": "postgres",
-	"database": "Workflo",
+	"database": "BugTracker2",
 	"entities": ["dist/entities/*.js"],
 	"migrations": ["dist/migrations/*.js"]
 }

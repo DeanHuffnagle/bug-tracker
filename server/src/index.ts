@@ -26,7 +26,7 @@ const main = async () => {
 		type: 'postgres',
 		url: process.env.DATABASE_URL,
 		entities: [User, Ticket, Project, Organization, Comment],
-		synchronize: !__prod__,
+		synchronize: false,
 		migrations: [path.join(__dirname, './migrations/*')],
 		logging: true,
 	});

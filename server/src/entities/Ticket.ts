@@ -51,6 +51,7 @@ export class Ticket extends BaseEntity {
 	@Column({
 		type: 'enum',
 		enum: ['low', 'medium', 'high'],
+		enumName: 'ticket_priority_enum',
 		default: 'high',
 	})
 	priority!: TicketPriorityType;
@@ -59,6 +60,7 @@ export class Ticket extends BaseEntity {
 	@Column({
 		type: 'enum',
 		enum: ['unassigned', 'inProgress', 'awaitingConfirmation', 'resolved'],
+		enumName: 'ticket_status_enum',
 		default: 'unassigned',
 	})
 	status!: TicketStatusType;
@@ -67,6 +69,7 @@ export class Ticket extends BaseEntity {
 	@Column({
 		type: 'enum',
 		enum: ['bugOrError', 'featureRequest', 'other', 'trainingRequest'],
+		enumName: 'ticket_type_enum',
 		default: 'other',
 	})
 	type!: TicketTypeType;
