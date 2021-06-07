@@ -47,6 +47,7 @@ const CreateOrganization: React.FC<CreateOrganizationProps> = ({}) => {
 										initialValues={{
 											name: '',
 											link: '',
+											privacy: '',
 										}}
 										onSubmit={async (values, { setErrors }) => {
 											const response = await CreateOrganization({
@@ -78,6 +79,17 @@ const CreateOrganization: React.FC<CreateOrganizationProps> = ({}) => {
 														placeholder="Link"
 														label="Organization Link (optional)"
 													/>
+												</Box>
+												<Box mt={1} width="full">
+													<SelectField
+														label="Joining:"
+														name="privacy"
+														placeholder="-Select-"
+													>
+														<option value="open">open</option>
+														<option value="inviteOnly">Invite Only</option>
+														<option value="closed">Closed</option>
+													</SelectField>
 												</Box>
 
 												<Button

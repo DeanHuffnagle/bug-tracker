@@ -72,8 +72,11 @@ export class UserResolver {
 		@Arg('options') options: UserRegisterInput,
 		@Ctx() { req }: MyContext
 	) {
+		const isEmail = options.email.toLowerCase();
 		const hashedPassword = await argon2.hash(options.password);
+
 		let user;
+
 		if (!options.firstName) {
 			return {
 				errors: [
@@ -132,7 +135,7 @@ export class UserResolver {
 				.values({
 					firstName: options.firstName,
 					lastName: options.lastName,
-					email: options.email,
+					email: isEmail,
 					password: hashedPassword,
 				})
 				.returning('*')
@@ -166,7 +169,11 @@ export class UserResolver {
 		@Arg('options') options: UserLoginInput,
 		@Ctx() { req }: MyContext
 	) {
-		const user = await User.findOne({ where: { email: options.email } });
+		const isEmail = options.email.toLocaleLowerCase();
+		const user = await getRepository(User)
+			.createQueryBuilder('user')
+			.where('LOWER(user.email) = LOWER(:email)', { email: isEmail })
+			.getOne();
 		if (!user) {
 			return {
 				errors: [
@@ -858,4 +865,7 @@ export class UserResolver {
 			.getRawMany();
 		return organizationUsers;
 	}
+	//================================================================================
+	//Delete Comment Mutation
+	//================================================================================
 }

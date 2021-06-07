@@ -31,7 +31,7 @@ const main = async () => {
 		logging: true,
 	});
 
-	// await conn.runMigrations();
+	await conn.runMigrations();
 
 	const app = express();
 

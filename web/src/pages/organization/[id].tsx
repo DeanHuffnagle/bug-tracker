@@ -95,8 +95,8 @@ const organization: React.FC<{}> = ({}) => {
 				<NavBar />
 				<Container>
 					<Row>
-						<Col className="mt-1">
-							<Card id="chart-card" sm={6}>
+						<Col className="mt-1" sm={6}>
+							<Card id="chart-card">
 								<Card.Header>
 									<Flex width="full">
 										<Box width="full">
